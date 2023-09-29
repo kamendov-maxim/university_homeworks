@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+void printArray(int array[], int size);
+
 int main()
 {
     srand(time(0));
@@ -27,7 +29,16 @@ int main()
 
     for (int i = 0; i < size; ++i)
     {
-        array[i] = rand();
+        array[i] = rand() % 100;
     }
 
+    printArray(array, size);
+
+    free(array);
+}
+
+void printArray(int array[], int size) {
+    for (int i = 0; i < size; i++) {
+        printf("%d ", array[i]);
+    }
 }
