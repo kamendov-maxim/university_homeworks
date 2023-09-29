@@ -4,6 +4,8 @@
 #include <stdbool.h>
 
 void printArray(int array[], int size);
+void swap(int *firstValue, int *secondValue);
+void part(int array[], int leftElement, int rightElement);
 
 int main()
 {
@@ -32,13 +34,43 @@ int main()
         array[i] = rand() % 100;
     }
 
+    printf("\nBefore:\n");
+    printArray(array, size);
+    part(array, 0, size - 2);
+    printf("\nAfter:\n");
     printArray(array, size);
 
     free(array);
 }
 
-void printArray(int array[], int size) {
-    for (int i = 0; i < size; i++) {
+void printArray(int array[], int size)
+{
+    for (int i = 0; i < size; i++)
+    {
         printf("%d ", array[i]);
     }
+    printf("\n");
+}
+
+void swap(int *firstValue, int *secondValue)
+{
+    int buffer = *firstValue;
+    *firstValue = *secondValue;
+    *secondValue = buffer;
+}
+
+void part(int array[], int leftElement, int rightElement)
+{
+    int currentSeparator = array[leftElement];
+    int i = rightElement;
+
+    for (int j = rightElement; j > leftElement; --j)
+    {
+        if (array[j] >= currentSeparator)
+        {
+            swap(&array[i], &array[j]);
+            --i;
+        }
+    }
+    swap(&array[i], &array[leftElement]);
 }
