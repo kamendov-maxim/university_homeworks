@@ -108,21 +108,21 @@ int binarySearch(int array[], int x, int leftEdge, int rightEdge)
 
 bool testBinarySearchFunction(void)
 {
-    int testArray[10] = {};
+    int testArray[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     int test = ;
     if (binarySearch(testArray, test, 0, 9) != )
     {
         return false;
     }
 
-    int testArray[10] = {};
+    int testArray[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     int test = ;
     if (binarySearch(testArray, test, 0, 9) != )
     {
         return false;
     }
 
-    int testArray[10] = {};
+    int testArray[10] = {9, 8, 4, 6, 2, 4, 2, 8, 5, 4};
     int test = ;
     if (binarySearch(testArray, test, 0, 9) != )
     {
