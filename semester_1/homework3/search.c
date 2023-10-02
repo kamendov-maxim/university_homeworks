@@ -5,6 +5,8 @@
 
 void generateRandomArray(int array[], int size);
 void printArray(int array[], int size);
+int binarySearch(int array[], int x, int leftEdge, int rightEdge);
+bool testBinarySearchFunction(void);
 
 int main()
 {
@@ -43,17 +45,21 @@ int main()
 
     generateRandomArray(k_array, k);
 
-    
-
     printArray(array, size);
     printArray(k_array, k);
 
-
     for (int i = 0; i < k; ++i)
     {
-        
+        int number = k_array[i];
+        if (binarySearch(array, number, 0, size - 1) != -1)
+        {
+            printf("%d is in array\n", k_array[i]);
+        }
+        else
+        {
+            printf("%d is not in array\n", k_array[i]);
+        }
     }
-
 
     return 0;
 }
@@ -75,7 +81,7 @@ void printArray(int array[], int size)
     printf("\n");
 }
 
-int binarySearch(int array[], int x, int leftEdge, int rightEdge, int *answer)
+int binarySearch(int array[], int x, int leftEdge, int rightEdge)
 {
     while (leftEdge <= rightEdge)
     {
@@ -83,8 +89,7 @@ int binarySearch(int array[], int x, int leftEdge, int rightEdge, int *answer)
 
         if (array[middleElement] == x)
         {
-            *answer = middleElement;
-            return 0;
+            return middleElement;
         }
 
         if (array[middleElement] < x)
@@ -99,4 +104,44 @@ int binarySearch(int array[], int x, int leftEdge, int rightEdge, int *answer)
     }
 
     return -1;
+}
+
+bool testBinarySearchFunction(void)
+{
+    int testArray[10] = {};
+    int test = ;
+    if (binarySearch(testArray, test, 0, 9) != )
+    {
+        return false;
+    }
+
+    int testArray[10] = {};
+    int test = ;
+    if (binarySearch(testArray, test, 0, 9) != )
+    {
+        return false;
+    }
+
+    int testArray[10] = {};
+    int test = ;
+    if (binarySearch(testArray, test, 0, 9) != )
+    {
+        return false;
+    }
+
+    int testArray[10] = {};
+    int test = ;
+    if (binarySearch(testArray, test, 0, 9) != )
+    {
+        return false;
+    }
+
+    int testArray[10] = {};
+    int test = ;
+    if (binarySearch(testArray, test, 0, 9) != )
+    {
+        return false;
+    }
+
+    return true;
 }
