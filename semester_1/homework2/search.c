@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+#include <stdbool.h>
 
 void generateRandomArray(int array[], int size);
 void printArray(int array[], int size);
@@ -40,8 +43,18 @@ int main()
 
     generateRandomArray(k_array, k);
 
+    
+
     printArray(array, size);
     printArray(k_array, k);
+
+
+    for (int i = 0; i < k; ++i)
+    {
+        
+    }
+
+
     return 0;
 }
 
@@ -55,10 +68,35 @@ void generateRandomArray(int array[], int size)
 
 void printArray(int array[], int size)
 {
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < size; ++i)
     {
         printf("%d ", array[i]);
     }
     printf("\n");
 }
 
+int binarySearch(int array[], int x, int leftEdge, int rightEdge, int *answer)
+{
+    while (leftEdge <= rightEdge)
+    {
+        int middleElement = leftEdge + (rightEdge - leftEdge) / 2;
+
+        if (array[middleElement] == x)
+        {
+            *answer = middleElement;
+            return 0;
+        }
+
+        if (array[middleElement] < x)
+        {
+            leftEdge = middleElement + 1;
+        }
+
+        else
+        {
+            rightEdge = middleElement - 1;
+        }
+    }
+
+    return -1;
+}
