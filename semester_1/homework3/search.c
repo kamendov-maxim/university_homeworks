@@ -3,10 +3,18 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-void generateRandomArray(int array[], int size);
+int partition(int array[], int leftElement, int rightElement);
+void swap(int *firstValue, int *secondValue);
 void printArray(int array[], int size);
+void generateRandomArray(int array[], int size);
+void insertionSort(int array[], int leftElement, int rightElement);
 int binarySearch(int array[], int x, int leftEdge, int rightEdge);
-bool testBinarySearchFunction(void);
+void smartQuickSort(int array[], int leftElement, int rightElement);
+
+bool test(void);
+bool testSmartQuickSearch(void);
+bool testPartitionFunction(void);
+bool testSwapFunction(void);
 
 int main()
 {
@@ -35,6 +43,7 @@ int main()
     printf("\nEnter the quantity of numbers for tests: ");
     int k = 0;
     scanf("%d", &k);
+    printf("\n");
 
     int *k_array = malloc(k * sizeof(int));
     if (k_array == NULL)
@@ -45,8 +54,13 @@ int main()
 
     generateRandomArray(k_array, k);
 
+    printf("Your array: ");
     printArray(array, size);
+    printf("Your numbers to search in array: ");
     printArray(k_array, k);
+    printf("\n");
+
+    smartQuickSort(array, 0, size - 1);
 
     for (int i = 0; i < k; ++i)
     {
@@ -60,8 +74,60 @@ int main()
             printf("%d is not in array\n", k_array[i]);
         }
     }
+    printf("\n");
 
     return 0;
+}
+
+void printArray(int array[], int size)
+{
+    for (int i = 0; i < size; ++i)
+    {
+        printf("%d ", array[i]);
+    }
+    printf("\n");
+}
+
+void swap(int *firstValue, int *secondValue)
+{
+    int buffer = *firstValue;
+    *firstValue = *secondValue;
+    *secondValue = buffer;
+}
+
+int partition(int array[], int leftElement, int rightElement)
+{
+    rightElement -= 1;
+    int currentSeparator = array[leftElement];
+    int i = rightElement;
+
+    for (int j = rightElement; j > leftElement; --j)
+    {
+        if (array[j] >= currentSeparator)
+        {
+            swap(&array[i], &array[j]);
+            --i;
+        }
+    }
+
+    swap(&array[i], &array[leftElement]);
+
+    return i;
+}
+
+void smartQuickSort(int array[], int leftElement, int rightElement)
+{
+    if (rightElement - leftElement + 1 < 10)
+    {
+        insertionSort(array, leftElement, rightElement + 1);
+        return;
+    }
+    if (leftElement < rightElement)
+    {
+        int pivotIndex = partition(array, 0, rightElement);
+        smartQuickSort(array, leftElement, pivotIndex - 1);
+        smartQuickSort(array, pivotIndex + 1, rightElement);
+    }
 }
 
 void generateRandomArray(int array[], int size)
@@ -72,13 +138,19 @@ void generateRandomArray(int array[], int size)
     }
 }
 
-void printArray(int array[], int size)
+void insertionSort(int array[], int leftElement, int rightElement)
 {
-    for (int i = 0; i < size; ++i)
+    for (int i = leftElement; i < rightElement; i++)
     {
-        printf("%d ", array[i]);
+        int currentElement = array[i];
+        int j = i - 1;
+        while (j >= leftElement && array[j] >= currentElement)
+        {
+            array[j + 1] = array[j];
+            j--;
+        }
+        array[j + 1] = currentElement;
     }
-    printf("\n");
 }
 
 int binarySearch(int array[], int x, int leftEdge, int rightEdge)
@@ -106,42 +178,10 @@ int binarySearch(int array[], int x, int leftEdge, int rightEdge)
     return -1;
 }
 
-bool testBinarySearchFunction(void)
+bool test(void)
 {
-    int testArray[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    int test = ;
-    if (binarySearch(testArray, test, 0, 9) != )
-    {
-        return false;
-    }
-
-    int testArray[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    int test = ;
-    if (binarySearch(testArray, test, 0, 9) != )
-    {
-        return false;
-    }
-
-    int testArray[10] = {9, 8, 4, 6, 2, 4, 2, 8, 5, 4};
-    int test = ;
-    if (binarySearch(testArray, test, 0, 9) != )
-    {
-        return false;
-    }
-
-    int testArray[10] = {};
-    int test = ;
-    if (binarySearch(testArray, test, 0, 9) != )
-    {
-        return false;
-    }
-
-    int testArray[10] = {};
-    int test = ;
-    if (binarySearch(testArray, test, 0, 9) != )
-    {
-        return false;
-    }
-
-    return true;
+    
 }
+
+
+
