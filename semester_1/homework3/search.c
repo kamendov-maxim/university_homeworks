@@ -7,17 +7,29 @@ int partition(int array[], int leftElement, int rightElement);
 void swap(int *firstValue, int *secondValue);
 void printArray(int array[], int size);
 void generateRandomArray(int array[], int size);
-void insertionSort(int array[], int leftElement, int rightElement);
-int binarySearch(int array[], int x, int leftEdge, int rightEdge);
+void insertSort(int array[], int leftElement, int rightElement);
+int binarySearch(int array[], int elementWeAreLookingFor, int leftEdge, int rightEdge);
 void smartQuickSort(int array[], int leftElement, int rightElement);
 
 bool test(void);
-bool testSmartQuickSearch(void);
+bool testSmartQuickSort(void);
 bool testPartitionFunction(void);
 bool testSwapFunction(void);
+bool testStarterForBinarySearch(int testArray[], int elementWeAreLookingFor, int answer, int size);
+bool testStarterForPartitionFunction(int testArray[], int answerArray[], int sizeOfTestArray);
+bool testBinarySearch(void);
+bool testInsertSort(void);
+
+
 
 int main()
 {
+    if (!test())
+    {
+        printf("\nSorry but the program does not work correctly\n");
+        return 1;
+    }
+
     srand(time(0));
 
     printf("\nEnter the size of your array: ");
@@ -119,7 +131,7 @@ void smartQuickSort(int array[], int leftElement, int rightElement)
 {
     if (rightElement - leftElement + 1 < 10)
     {
-        insertionSort(array, leftElement, rightElement + 1);
+        insertSort(array, leftElement, rightElement + 1);
         return;
     }
     if (leftElement < rightElement)
@@ -138,7 +150,7 @@ void generateRandomArray(int array[], int size)
     }
 }
 
-void insertionSort(int array[], int leftElement, int rightElement)
+void insertSort(int array[], int leftElement, int rightElement)
 {
     for (int i = leftElement; i < rightElement; i++)
     {
@@ -153,18 +165,18 @@ void insertionSort(int array[], int leftElement, int rightElement)
     }
 }
 
-int binarySearch(int array[], int x, int leftEdge, int rightEdge)
+int binarySearch(int array[], int elementWeAreLookingFor, int leftEdge, int rightEdge)
 {
     while (leftEdge <= rightEdge)
     {
         int middleElement = leftEdge + (rightEdge - leftEdge) / 2;
 
-        if (array[middleElement] == x)
+        if (array[middleElement] == elementWeAreLookingFor)
         {
             return middleElement;
         }
 
-        if (array[middleElement] < x)
+        if (array[middleElement] < elementWeAreLookingFor)
         {
             leftEdge = middleElement + 1;
         }
@@ -180,8 +192,101 @@ int binarySearch(int array[], int x, int leftEdge, int rightEdge)
 
 bool test(void)
 {
-    
+    if (!testSwapFunction()
+    || !testBinarySearch()
+    || !testPartitionFunction())
+    {
+        return false;
+    }
+
+    return true;
 }
 
+bool testSwapFunction(void)
+{
+    int firstValue = 0;
+    int secondValue = 1;
+    swap(&firstValue, &secondValue);
+    if (firstValue != 1 || secondValue != 0)
+    {
+        return false;
+    }
+    return true;
+}
 
+bool testStarterForPartitionFunction(int testArray[], int answerArray[], int sizeOfTestArray)
+{
+    partition(testArray, 0, sizeOfTestArray - 1);
+    for (int i = 0; i < 9; ++i)
+    {
+        if (testArray[i] != answerArray[i])
+        {
+            return false;
+        }
+    }
+    return true;
+}
 
+bool testsForPartitionFunction(void)
+{
+    int testArray1[9] = {61, 99, 60, 80, 27, 57, 35, 81, 80};
+    int answerArray1[9] = {27, 57, 60, 35, 61, 99, 80, 81, 80};
+
+    int testArray2[6] = {43, 36, 55, 60, 94, 24};
+    int answerArray2[6] = {24, 36, 43, 55, 60, 94};
+
+    int testArray3[5] = {87, 91, 53, 37, 42};
+    int answerArray3[5] = {37, 42, 53, 87, 91};
+
+    int testArray4[1] = {5};
+    int answerArray4[1] = {5};
+
+    if (!testStarterForPartitionFunction(testArray1, answerArray1, 10) 
+    || !testStarterForPartitionFunction(testArray2, answerArray2, 10) 
+    || !testStarterForPartitionFunction(testArray3, answerArray3, 10) 
+    || !testStarterForPartitionFunction(testArray4, answerArray4, 10))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool testStarterForBinarySearch(int testArray[], int elementWeAreLookingFor, int answer, int size)
+{
+    if (binarySearch(testArray, elementWeAreLookingFor, 0, size -1) != answer)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool testBinarySearch(void)
+{
+    int testArray1[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    int testElementWeAreLookingFor1 = 3;
+    int answer1 = 4;
+
+    int testArray2[6] = {5, 4, 7, 2, 0, 10};
+    int testElementWeAreLookingFor2 = 0;
+    int answer2 = 5;
+
+    int testArray3[4] = {6, 42, 5, 8};
+    int testElementWeAreLookingFor3 = 10;
+    int answer3 = -1;
+
+    if (!testStarterForBinarySearch(testArray1, testElementWeAreLookingFor1, answer1, 10)
+    || !testStarterForBinarySearch(testArray2, testElementWeAreLookingFor2, answer2, 6)
+    || !testStarterForBinarySearch(testArray3, testElementWeAreLookingFor2, answer3, 4))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool testSmartQuickSort(void)
+{
+    
+}
