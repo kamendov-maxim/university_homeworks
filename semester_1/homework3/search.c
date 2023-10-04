@@ -78,6 +78,12 @@ int main()
         return 1;
     }
 
+    if (errorCode == 2)
+    {
+        printf("\nsmartQuickSort: Incorrect input\n");
+        return 1;
+    }
+
     for (int i = 0; i < k; ++i)
     {
         int number = k_array[i];
@@ -135,12 +141,16 @@ int smartQuickSort(int array[], int leftElement, int rightElement)
 {
     if (rightElement < leftElement)
     {
-        return 1;
+        return 2;
     }
 
     if (rightElement - leftElement + 1 < 10)
     {
-        insertSort(array, leftElement, rightElement + 1);
+        int errorCode = insertSort(array, leftElement, rightElement + 1);
+        if (errorCode != 0)
+        {
+            return 1;
+        }
         return 0;
     }
     if (leftElement < rightElement)
@@ -255,7 +265,10 @@ bool testsForPartitionFunction(void)
     int testArray4[1] = {5};
     int answerArray4[1] = {5};
 
-    if (!testStarterForPartitionFunction(testArray1, answerArray1, 10) || !testStarterForPartitionFunction(testArray2, answerArray2, 10) || !testStarterForPartitionFunction(testArray3, answerArray3, 10) || !testStarterForPartitionFunction(testArray4, answerArray4, 10))
+    if (!testStarterForPartitionFunction(testArray1, answerArray1, 10) 
+    || !testStarterForPartitionFunction(testArray2, answerArray2, 10) 
+    || !testStarterForPartitionFunction(testArray3, answerArray3, 10) 
+    || !testStarterForPartitionFunction(testArray4, answerArray4, 10))
     {
         return false;
     }
@@ -365,7 +378,7 @@ bool testSortings(void)
     {
         return false;
     }
-    
+
     return true;
 }
 
