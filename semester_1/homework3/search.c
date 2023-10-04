@@ -12,14 +12,14 @@ int binarySearch(int array[], int elementWeAreLookingFor, int leftEdge, int righ
 int smartQuickSort(int array[], int leftElement, int rightElement);
 
 bool test(void);
-bool testSmartQuickSort(void);
-bool testPartitionFunction(void);
 bool testSwapFunction(void);
 bool testStarterForBinarySearch(int testArray[], int elementWeAreLookingFor, int answer, int size);
 bool testStarterForPartitionFunction(int testArray[], int answerArray[], int sizeOfTestArray);
 bool testBinarySearch(void);
 bool testSortings(void);
 bool checkIfArrayIsSorted(int array[], int size);
+bool testPartitionFunction(void);
+bool testStarterForSmartQuickSort(int testArray[], int size, int ec);
 
 int main()
 {
@@ -251,7 +251,7 @@ bool testStarterForPartitionFunction(int testArray[], int answerArray[], int siz
     return true;
 }
 
-bool testsForPartitionFunction(void)
+bool testPartitionFunction(void)
 {
     int testArray1[9] = {61, 99, 60, 80, 27, 57, 35, 81, 80};
     int answerArray1[9] = {27, 57, 60, 35, 61, 99, 80, 81, 80};
