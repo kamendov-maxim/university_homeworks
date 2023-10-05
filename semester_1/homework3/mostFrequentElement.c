@@ -52,6 +52,13 @@ int main()
         array[i] = currentNumber;
     }
 
+    int errorCode = smartQuickSort(array, 0, size - 1);
+    if (errorCode != 0)
+    {
+        printf("\nSorry but something went wrong\n");
+        return 1;
+    }
+
     printf("\nThe most frequent element in the array is %d\n", mostFrequentElement(array, size));
 
     return 0;
