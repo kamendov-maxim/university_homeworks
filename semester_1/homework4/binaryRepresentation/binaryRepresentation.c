@@ -84,7 +84,8 @@ int main(int argc, char const *argv[])
     printBinary(additionAnswer);
     int ans = binaryToDecimal(additionAnswer);
 
-    printf("%d", ans);
+    printf("Сумма в десятичном представлении:\n");
+    printf("%d\n", ans);
 
     return 0;
 }
