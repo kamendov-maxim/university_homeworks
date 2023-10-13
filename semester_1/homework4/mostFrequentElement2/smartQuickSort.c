@@ -2,51 +2,11 @@
 
 #include <stdbool.h>
 
-
-int smartQuickSort(int array[], int leftElement, int rightElement)
+void swap(int *firstValue, int *secondValue)
 {
-    if (rightElement < leftElement)
-    {
-        return 2;
-    }
-
-    if (rightElement - leftElement + 1 < 10)
-    {
-        int errorCode = insertSort(array, leftElement, rightElement + 1);
-        if (errorCode != 0)
-        {
-            return 1;
-        }
-        return 0;
-    }
-    if (leftElement < rightElement)
-    {
-        int currentSeparator = partition(array, 0, rightElement);
-        smartQuickSort(array, leftElement, currentSeparator - 1);
-        smartQuickSort(array, currentSeparator + 1, rightElement);
-    }
-    return 0;
-}
-
-int insertSort(int array[], int leftElement, int rightElement)
-{
-    if (rightElement < leftElement)
-    {
-        return 1;
-    }
-
-    for (int i = leftElement; i < rightElement; ++i)
-    {
-        int currentElement = array[i];
-        int j = i - 1;
-        while (j >= leftElement && array[j] >= currentElement)
-        {
-            array[j + 1] = array[j];
-            --j;
-        }
-        array[j + 1] = currentElement;
-    }
-    return 0;
+    int buffer = *firstValue;
+    *firstValue = *secondValue;
+    *secondValue = buffer;
 }
 
 int partition(int array[], int leftElement, int rightElement)
@@ -69,23 +29,25 @@ int partition(int array[], int leftElement, int rightElement)
     return i;
 }
 
-void swap(int *firstValue, int *secondValue)
+int insertSort(int array[], int leftElement, int rightElement)
 {
-    int buffer = *firstValue;
-    *firstValue = *secondValue;
-    *secondValue = buffer;
-}
-
-
-
-bool testSmartQuickSort(void)
-{
-    if (!(testSwapFunction() * testPartitionFunction() * testSmartQuickSortFunction()))
+    if (rightElement < leftElement)
     {
-        return false;
+        return 1;
     }
 
-    return true;
+    for (int i = leftElement; i < rightElement; ++i)
+    {
+        int currentElement = array[i];
+        int j = i - 1;
+        while (j >= leftElement && array[j] >= currentElement)
+        {
+            array[j + 1] = array[j];
+            --j;
+        }
+        array[j + 1] = currentElement;
+    }
+    return 0;
 }
 
 bool testSwapFunction(void)
@@ -175,4 +137,39 @@ bool testSmartQuickSortFunction(void)
     }
 
     return true;
+}
+
+bool testSmartQuickSort(void)
+{
+    if (!(testSwapFunction() * testPartitionFunction() * testSmartQuickSortFunction()))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+int smartQuickSort(int array[], int leftElement, int rightElement)
+{
+    if (rightElement < leftElement)
+    {
+        return 2;
+    }
+
+    if (rightElement - leftElement + 1 < 10)
+    {
+        int errorCode = insertSort(array, leftElement, rightElement + 1);
+        if (errorCode != 0)
+        {
+            return 1;
+        }
+        return 0;
+    }
+    if (leftElement < rightElement)
+    {
+        int currentSeparator = partition(array, 0, rightElement);
+        smartQuickSort(array, leftElement, currentSeparator - 1);
+        smartQuickSort(array, currentSeparator + 1, rightElement);
+    }
+    return 0;
 }
