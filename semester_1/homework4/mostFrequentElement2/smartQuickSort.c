@@ -1,5 +1,5 @@
 #include "smartQuickSort.h"
-
+#include <stdlib.h>
 #include <stdbool.h>
 
 void swap(int *firstValue, int *secondValue)
@@ -50,19 +50,15 @@ int insertSort(int array[], int leftElement, int rightElement)
     return 0;
 }
 
-bool testSwapFunction(void)
+static bool testSwapFunction(void)
 {
     int firstValue = 0;
     int secondValue = 1;
     swap(&firstValue, &secondValue);
-    if (firstValue != 1 || secondValue != 0)
-    {
-        return false;
-    }
-    return true;
+    return !(firstValue != 1 || secondValue != 0);
 }
 
-bool testStarterForArrays(int testArray[], int answerArray[], int size)
+static bool compareArrays(int testArray[], int answerArray[], int size)
 {
     for (int i = 0; i < size; ++i)
     {
@@ -78,92 +74,63 @@ bool testPartitionFunction(void)
 {
     int testArray1[9] = {61, 99, 60, 80, 27, 57, 35, 81, 80};
     int answerArray1[9] = {27, 57, 60, 35, 61, 99, 80, 81, 80};
+    const size_t size1 = 9;
 
     int testArray2[6] = {43, 36, 55, 60, 94, 24};
     int answerArray2[6] = {24, 36, 43, 55, 60, 94};
+    const size_t size2 = 6;
 
     int testArray3[5] = {87, 91, 53, 37, 42};
     int answerArray3[5] = {37, 42, 53, 87, 91};
+    const size_t size3 = 5;
 
     int testArray4[1] = {5};
     int answerArray4[1] = {5};
+    const size_t size4 = 1;
 
-    partition(testArray1, 0, 9);
-    partition(testArray2, 0, 6);
-    partition(testArray3, 0, 5);
-    partition(testArray4, 0, 1);
+    partition(testArray1, 0, size1);
+    partition(testArray2, 0, size2);
+    partition(testArray3, 0, size3);
+    partition(testArray4, 0, size4);
 
-    if (!(testStarterForArrays(testArray1, answerArray1, 9) * testStarterForArrays(testArray2, answerArray2, 6) * testStarterForArrays(testArray3, answerArray3, 5) * testStarterForArrays(testArray4, answerArray4, 1)))
-    {
-        return false;
-    }
-
-    return true;
+    return compareArrays(testArray1, answerArray1, size1) && compareArrays(testArray2, answerArray2, size2) && compareArrays(testArray3, answerArray3, size3) && compareArrays(testArray4, answerArray4, size4);
 }
 
-bool testSmartQuickSortFunction(void)
+static bool testSmartQuickSortFunction(void)
 {
 
     int testArray1[5] = {5, 4, 3, 2, 1};
     int answerArray1[5] = {1, 2, 3, 4, 5};
+    const size_t size1 = 5;
 
     int testArray2[5] = {1, 2, 3, 4, 5};
     int answerArray2[5] = {1, 2, 3, 4, 5};
+    const size_t size2 = 5;
 
     int testArray3[1] = {1};
     int answerArray3[1] = {1};
+    const size_t size3 = 1;
 
-    int errorCode = smartQuickSort(testArray1, 0, 5 - 1);
-    if (errorCode != 0)
-    {
-        return false;
-    }
+    smartQuickSort(testArray1, 0, size1 - 1);
 
-    errorCode = smartQuickSort(testArray2, 0, 5 - 1);
-    if (errorCode != 0)
-    {
-        return false;
-    }
+    smartQuickSort(testArray2, 0, size2 - 1);
 
-    errorCode = smartQuickSort(testArray3, 0, 1 - 1);
-    if (errorCode != 0)
-    {
-        return false;
-    }
+    smartQuickSort(testArray3, 0, size3 - 1);
 
-    if (!(testStarterForArrays(testArray1, answerArray1, 5) * testStarterForArrays(testArray2, answerArray2, 5) * testStarterForArrays(testArray3, answerArray3, 1)))
-    {
-        return false;
-    }
-
-    return true;
+    return compareArrays(testArray1, answerArray1, 5) && compareArrays(testArray2, answerArray2, 5) && compareArrays(testArray3, answerArray3, 1);
 }
 
 bool testSmartQuickSort(void)
 {
-    if (!(testSwapFunction() * testPartitionFunction() * testSmartQuickSortFunction()))
-    {
-        return false;
-    }
-
-    return true;
+    return testSwapFunction() && testPartitionFunction() && testSmartQuickSortFunction();
 }
 
-int smartQuickSort(int array[], int leftElement, int rightElement)
+void smartQuickSort(int array[], int leftElement, int rightElement)
 {
-    if (rightElement < leftElement)
-    {
-        return 2;
-    }
 
     if (rightElement - leftElement + 1 < 10)
     {
         int errorCode = insertSort(array, leftElement, rightElement + 1);
-        if (errorCode != 0)
-        {
-            return 1;
-        }
-        return 0;
     }
     if (leftElement < rightElement)
     {
@@ -171,5 +138,4 @@ int smartQuickSort(int array[], int leftElement, int rightElement)
         smartQuickSort(array, leftElement, currentSeparator - 1);
         smartQuickSort(array, currentSeparator + 1, rightElement);
     }
-    return 0;
 }

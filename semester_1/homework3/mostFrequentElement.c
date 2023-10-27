@@ -13,7 +13,7 @@ bool testSmartQuickSort(void);
 bool testPartitionFunction(void);
 bool testSwapFunction(void);
 bool testStarterForPartitionFunction(int testArray[], int answerArray[], int size);
-bool testStarterForMostFrequentELement(int testArray[], int size, int answer);
+bool testCaseForMostFrequentELement(int testArray[], int size, int answer);
 bool testMostFrequentElementFunction(void);
 
 int main()
@@ -264,7 +264,7 @@ bool testMostFrequentElementFunction(void)
     int testArray3[1] = {0};
     int answer3 = 0;
 
-    if (!(testStarterForMostFrequentELement(testArray1, 10, answer1) * testStarterForMostFrequentELement(testArray2, 4, answer2) * testStarterForMostFrequentELement(testArray3, 1, answer3)))
+    if (!(testCaseForMostFrequentELement(testArray1, 10, answer1) * testCaseForMostFrequentELement(testArray2, 4, answer2) * testCaseForMostFrequentELement(testArray3, 1, answer3)))
     {
         return false;
     }
@@ -272,7 +272,7 @@ bool testMostFrequentElementFunction(void)
     return true;
 }
 
-bool testStarterForMostFrequentELement(int testArray[], int size, int answer)
+bool testCaseForMostFrequentELement(int testArray[], int size, int answer)
 {
     if (mostFrequentElement(testArray, size) != answer)
     {
