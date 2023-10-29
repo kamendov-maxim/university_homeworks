@@ -5,7 +5,7 @@
 
 #include "../stack/stack.h"
 
-#define MAX 100
+
 #define PROGRAMFINISHEDCORRECTLY 0;
 #define PROGRAMFINISHEDWITHERROR 1;
 #define PROGRAMFAILEDTESTS 2;

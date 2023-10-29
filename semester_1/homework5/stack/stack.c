@@ -11,7 +11,7 @@ typedef struct Stack
 
 StackErrorCode push(Stack **const stack, const char element)
 {
-    Stack *temp = calloc(1, sizeof(Stack));
+    Stack *temp = (Stack *)calloc(1, sizeof(Stack));
     if (temp == NULL)
     {
         return outOfMemory;
