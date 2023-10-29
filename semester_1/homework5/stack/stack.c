@@ -9,21 +9,9 @@ typedef struct Stack
     struct Stack *previous;
 } Stack;
 
-Stack *createStack(StackErrorCode *errorCode)
+StackErrorCode push(Stack **const stack, const char element)
 {
-    Stack *stack = calloc(1, sizeof(Stack));
-    if (stack == NULL)
-    {
-        *errorCode = outOfMemory;
-        return stack;
-    }
-    *errorCode = ok;
-    return stack;
-}
-
-StackErrorCode push(Stack **stack, char element)
-{
-    Stack *temp = calloc(1, sizeof(Stack));
+    Stack *temp = (Stack *)calloc(1, sizeof(Stack));
     if (temp == NULL)
     {
         return outOfMemory;
@@ -34,25 +22,20 @@ StackErrorCode push(Stack **stack, char element)
     return ok;
 }
 
-char pop(Stack **stack, StackErrorCode *errorCode)
+StackErrorCode pop(Stack ** const stack)
 {
-    if (*stack == NULL)
+    if (isEmpty(*stack))
     {
-        *errorCode = stackIsEmpty;
-        return '\0';
+        return stackIsEmpty;
     }
 
-    *errorCode = ok;
-    char value = (*stack)->element;
-
-    Stack *temp;
-    temp = (*stack)->previous;
+    Stack *temp = ((*stack)->previous);
     free(*stack);
     (*stack) = temp;
-    return value;
+    return ok;
 }
 
-char top(Stack *stack, StackErrorCode *errorCode)
+char top(Stack *stack, StackErrorCode * const errorCode)
 {
     if (isEmpty(stack))
     {
@@ -63,51 +46,25 @@ char top(Stack *stack, StackErrorCode *errorCode)
     return stack->element;
 }
 
-bool isEmpty(Stack *stack)
+bool isEmpty(const Stack * const stack)
 {
     return stack == NULL;
 }
 
-void deleteStack(Stack *stack)
+StackErrorCode printStack(const Stack * stack)
 {
-    if (stack == NULL)
+    for (;stack != NULL; stack = stack->previous)
     {
-        return;
-    }
-    Stack *current = stack;
-    Stack *next = NULL;
-    while (current->previous != NULL)
-    {
-        next = current->previous;
-        free(current);
-        current = next;
-    }
-    free(next);
-}
-
-
-StackErrorCode printStack(Stack *stack)
-{
-    Stack *temp = stack;
-    while (temp->previous != NULL)
-    {
-        char currentElement = temp->element;
-        printf("%c ", currentElement);
-        temp = temp->previous;
+        printf("%c ", stack->element);
     }
     printf("\n");
     return ok;
 }
 
-void clearStack(Stack **stack)
+void deleteStack(Stack **stack)
 {
     while (!isEmpty(*stack))
     {
-        StackErrorCode errorCode = ok;
-        pop(stack, &errorCode);
-        if (errorCode == stackIsEmpty)
-        {
-            break;
-        }
+        pop(stack);
     }
 }
