@@ -57,7 +57,7 @@ int main(void)
     return PROGRAM_FINISHED_CORRECTLY;
 }
 
-char *get_string(size_t * const len)
+static char *get_string(size_t * const len)
 {
     *len = 0;
     size_t capacity = 1;
