@@ -1,59 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-#include <locale.h>
 
 #include "../stack/stack.h"
+#include "calculator.h"
 
-#define MAX 1000
-
-typedef enum ErrorCode
-{
-    OK,
-    problemWithStack,
-    incorrectInput,
-    emptyLine
-} ErrorCode;
-
-bool operation(char operand, Stack **stack);
-int calculator(const char expression[], ErrorCode *errorCode);
 bool test();
 
-int main()
-{
-    setlocale(LC_ALL, "Rus");
-    if (!test())
-    {
-        printf("Простите, но похоже, что программа сейчас не работает корректно\n");
-        return 1;
-    }
-
-    printf("Введите арифметическое выражение в постфиксной форме: ");
-
-    char expression[MAX] = {'\0'};
-    fgets(expression, sizeof(expression), stdin);
-
-    while (strlen(expression) < 2)
-    {
-        printf("\nВы не ввели выражение\nПопробуйте ещё раз\n\n");
-
-        printf("Введите арифметическое выражение в постфиксной форме: ");
-
-        fgets(expression, sizeof(expression), stdin);
-    }
-
-    ErrorCode errorCode = OK;
-    int result = calculator(expression, &errorCode);
-    if (errorCode != OK)
-    {
-        printf("Похоже, что-то пошло не так\n", errorCode);
-        return 1;
-    }
-    printf("Ответ: %d", result);
-
-    return 0;
-}
 
 int calculator(const char expression[], ErrorCode *errorCode)
 {
@@ -82,7 +32,8 @@ int calculator(const char expression[], ErrorCode *errorCode)
             break;
         }
         case '/':
-        {
+        {   
+            int firstElement = top()
             int secondElement = pop(&stack, &stackErrorCode);
             if (stackErrorCode != ok)
             {
