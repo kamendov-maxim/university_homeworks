@@ -52,7 +52,7 @@ bool isBalanced(const char *const line, ErrorCode *const errorCode)
 
             pop(&stack);
 
-            bool check = (oppositeBracket(topElement) == currentBracket);
+            const bool check = (oppositeBracket(topElement) == currentBracket);
 
             if (!check)
             {

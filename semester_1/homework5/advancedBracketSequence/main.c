@@ -9,8 +9,9 @@
 #define PROGRAM_FINISHED_CORRECTLY 0;
 #define PROGRAM_FINISHED_WITH_ERROR 1;
 #define PROGRAM_FAILED_TESTS 2;
+#define MEMORY_ERROR 3;
 
-char *get_string(size_t * const len);
+static char *get_string(size_t * const len);
 
 int main(void)
 {
@@ -30,12 +31,13 @@ int main(void)
     if (line == NULL)
     {
         printf("Ошибка доступа к памяти\n");
+        return MEMORY_ERROR;
     }
 
 
     ErrorCode errorCode = OK;
 
-    bool check = isBalanced(line, &errorCode);
+    const bool check = isBalanced(line, &errorCode);
 
     if (errorCode != OK)
     {
@@ -71,6 +73,7 @@ char *get_string(size_t * const len)
             s = (char *)realloc(s, capacity * sizeof(char));
             if (s == NULL)
             {
+                *len = 0;
                 return NULL;
             }
         }
