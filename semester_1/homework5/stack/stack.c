@@ -9,19 +9,7 @@ typedef struct Stack
     struct Stack *previous;
 } Stack;
 
-Stack *createStack(StackErrorCode *errorCode)
-{
-    Stack *stack = calloc(1, sizeof(Stack));
-    if (stack == NULL)
-    {
-        *errorCode = outOfMemory;
-        return stack;
-    }
-    *errorCode = ok;
-    return stack;
-}
-
-StackErrorCode push(Stack **stack, char element)
+StackErrorCode push(Stack **const stack, const char element)
 {
     Stack *temp = calloc(1, sizeof(Stack));
     if (temp == NULL)
@@ -34,22 +22,18 @@ StackErrorCode push(Stack **stack, char element)
     return ok;
 }
 
-char pop(Stack **stack, StackErrorCode *errorCode)
+StackErrorCode pop(Stack **stack)
 {
     if (*stack == NULL)
     {
-        *errorCode = stackIsEmpty;
-        return '\0';
+        return stackIsEmpty;
     }
-
-    *errorCode = ok;
-    char value = (*stack)->element;
 
     Stack *temp;
     temp = (*stack)->previous;
     free(*stack);
     (*stack) = temp;
-    return value;
+    return ok;
 }
 
 char top(Stack *stack, StackErrorCode *errorCode)
@@ -65,49 +49,23 @@ char top(Stack *stack, StackErrorCode *errorCode)
 
 bool isEmpty(Stack *stack)
 {
-    return stack->element == NULL;
+    return stack == NULL;
 }
-
-void deleteStack(Stack *stack)
-{
-    if (stack == NULL)
-    {
-        return;
-    }
-    Stack *current = stack;
-    Stack *next = NULL;
-    while (current->previous != NULL)
-    {
-        next = current->previous;
-        free(current);
-        current = next;
-    }
-    free(next);
-}
-
 
 StackErrorCode printStack(Stack *stack)
 {
-    Stack *temp = stack;
-    while (temp->previous != NULL)
+    for (const Stack *elem = stack; elem != NULL; elem = elem->previous)
     {
-        char currentElement = temp->element;
-        printf("%c ", currentElement);
-        temp = temp->previous;
+        printf("%c ", elem->element);
     }
     printf("\n");
     return ok;
 }
 
-void clearStack(Stack **stack)
+void deleteStack(Stack **stack)
 {
     while (!isEmpty(*stack))
     {
-        StackErrorCode errorCode = ok;
-        pop(stack, &errorCode);
-        if (errorCode == stackIsEmpty)
-        {
-            break;
-        }
+        pop(stack);
     }
 }
