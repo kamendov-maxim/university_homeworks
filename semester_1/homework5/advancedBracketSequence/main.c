@@ -27,6 +27,11 @@ int main(void)
     size_t len = 0;
     char *line = get_string(&len);
 
+    if (line == NULL)
+    {
+        printf("Ошибка доступа к памяти\n");
+    }
+
 
     ErrorCode errorCode = OK;
 
@@ -64,6 +69,10 @@ char *get_string(size_t * const len)
         {
             capacity *= 2;
             s = (char *)realloc(s, capacity * sizeof(char));
+            if (s == NULL)
+            {
+                return NULL;
+            }
         }
     }
 
