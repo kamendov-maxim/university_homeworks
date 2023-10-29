@@ -6,28 +6,27 @@
 #include "advancedBracketSequence.h"
 #include "test/test.h"
 
-#define PROGRAMFINISHEDCORRECTLY 0;
-#define PROGRAMFINISHEDWITHERROR 1;
-#define PROGRAMFAILEDTESTS 2;
+#define PROGRAM_FINISHED_CORRECTLY 0;
+#define PROGRAM_FINISHED_WITH_ERROR 1;
+#define PROGRAM_FAILED_TESTS 2;
 
-char *get_string(int *len);
+char *get_string(size_t * const len);
 
 int main(void)
 {
     if (!test())
     {
         printf("Простите, но похоже, что программа сейчас не работает корректно\n");
-        return PROGRAMFAILEDTESTS;
+        return PROGRAM_FAILED_TESTS;
     }
 
     setlocale(LC_ALL, "Rus");
 
     printf("Введите вашу скобочную последовательность:\n");
 
-    int len = 0;
+    size_t len = 0;
     char *line = get_string(&len);
 
-    printf("Ваша скобочная последовательность: %s\n", line);
 
     ErrorCode errorCode = OK;
 
@@ -36,30 +35,28 @@ int main(void)
     if (errorCode != OK)
     {
         printf("Похоже, что-то пошло не так\n");
-        return PROGRAMFINISHEDWITHERROR;
+        return PROGRAM_FINISHED_WITH_ERROR;
     }
 
     if (check)
     {
-        printf("Ваша скобочная последовательность сбалансирована\n");
+        printf("Ваша скобочная последовательность сбалансирована\n\n");
     }
     else
     {
         printf("Ваша скобочная последовательность несбалансирована\n\n");
     }
 
-    return PROGRAMFINISHEDCORRECTLY;
+    return PROGRAM_FINISHED_CORRECTLY;
 }
 
-char *get_string(int *len)
+char *get_string(size_t * const len)
 {
     *len = 0;
-    int capacity = 1;
+    size_t capacity = 1;
     char *s = (char *)malloc(sizeof(char));
 
-    char c = getchar();
-
-    while (c != '\n')
+    for (char c = getchar(); c != '\n'; c = getchar())
     {
         s[(*len)++] = c;
 
@@ -68,8 +65,6 @@ char *get_string(int *len)
             capacity *= 2;
             s = (char *)realloc(s, capacity * sizeof(char));
         }
-
-        c = getchar();
     }
 
     s[*len] = '\0';

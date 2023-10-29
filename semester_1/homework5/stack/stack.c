@@ -22,21 +22,20 @@ StackErrorCode push(Stack **const stack, const char element)
     return ok;
 }
 
-StackErrorCode pop(Stack **stack)
+StackErrorCode pop(Stack ** const stack)
 {
-    if (*stack == NULL)
+    if (isEmpty(*stack))
     {
         return stackIsEmpty;
     }
 
-    Stack *temp;
-    temp = (*stack)->previous;
+    Stack *temp = ((*stack)->previous);
     free(*stack);
     (*stack) = temp;
     return ok;
 }
 
-char top(Stack *stack, StackErrorCode *errorCode)
+char top(Stack *stack, StackErrorCode * const errorCode)
 {
     if (isEmpty(stack))
     {
@@ -47,16 +46,16 @@ char top(Stack *stack, StackErrorCode *errorCode)
     return stack->element;
 }
 
-bool isEmpty(Stack *stack)
+bool isEmpty(const Stack * const stack)
 {
     return stack == NULL;
 }
 
-StackErrorCode printStack(Stack *stack)
+StackErrorCode printStack(const Stack * stack)
 {
-    for (const Stack *elem = stack; elem != NULL; elem = elem->previous)
+    for (;stack != NULL; stack = stack->previous)
     {
-        printf("%c ", elem->element);
+        printf("%c ", stack->element);
     }
     printf("\n");
     return ok;

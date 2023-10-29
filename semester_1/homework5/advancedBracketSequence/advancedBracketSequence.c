@@ -4,9 +4,6 @@
 #include "../stack/stack.h"
 #include "advancedBracketSequence.h"
 
-bool test(void);
-bool testCheck(const int *const tests, const int *const answers);
-
 char oppositeBracket(char bracket)
 {
     switch (bracket)
@@ -25,13 +22,12 @@ char oppositeBracket(char bracket)
 
 bool isBalanced(const char *const line, ErrorCode *const errorCode)
 {
-    int i = 0;
-    char currentBracket = line[i];
     StackErrorCode stackErrorCode = ok;
     Stack *stack = NULL;
 
-    while (currentBracket != '\n' && currentBracket != '\0')
+    for (size_t i = 0; line[i] != '\n' && line[i] != '\0'; ++i)
     {
+        char currentBracket = line[i];
 
         if (currentBracket == '(' || currentBracket == '{' || currentBracket == '[')
         {
@@ -43,10 +39,9 @@ bool isBalanced(const char *const line, ErrorCode *const errorCode)
                 return false;
             }
         }
-
-        if (currentBracket == ')' || currentBracket == '}' || currentBracket == ']')
+        else if (currentBracket == ')' || currentBracket == '}' || currentBracket == ']')
         {
-            bool check = oppositeBracket(top(stack, &stackErrorCode)) == currentBracket;
+            char topElement = top(stack, &stackErrorCode);
 
             if (stackErrorCode != ok)
             {
@@ -55,13 +50,9 @@ bool isBalanced(const char *const line, ErrorCode *const errorCode)
                 return false;
             }
 
-            stackErrorCode = pop(&stack);
-            if (stackErrorCode != ok)
-            {
-                *errorCode = PROBLEMWITHSTACK;
-                deleteStack(&stack);
-                return false;
-            }
+            pop(&stack);
+
+            bool check = (oppositeBracket(topElement) == currentBracket);
 
             if (!check)
             {
@@ -70,9 +61,8 @@ bool isBalanced(const char *const line, ErrorCode *const errorCode)
                 return false;
             }
         }
-        ++i;
-        currentBracket = line[i];
     }
+
     if (!isEmpty(stack))
     {
         printStack(stack);

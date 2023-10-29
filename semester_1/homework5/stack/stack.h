@@ -14,7 +14,7 @@ typedef enum StackErrorCode
 
 StackErrorCode push(Stack **const stack, const char element);
 StackErrorCode pop(Stack **stack);
-char top(Stack *stack, StackErrorCode *errorCode);
-bool isEmpty(Stack *stack);
+char top(Stack *stack, StackErrorCode * const errorCode);
+bool isEmpty(const Stack * const stack);
 void deleteStack(Stack **stack);
-StackErrorCode printStack(Stack *stack);
+StackErrorCode printStack(const Stack * stack);
