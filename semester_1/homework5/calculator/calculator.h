@@ -1,11 +1,9 @@
-
-
 typedef enum ErrorCode
 {
     OK,
-    problemWithStack,
-    incorrectInput,
-    emptyLine
+    PROBLEMWITHSTACK,
+    INCORRECTINPUT,
+    EMPTYLINE
 } ErrorCode;
 
 int calculator(const char expression[], ErrorCode *errorCode);

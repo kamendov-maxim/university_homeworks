@@ -35,7 +35,7 @@ StackErrorCode pop(Stack ** const stack)
     return ok;
 }
 
-char top(Stack *stack, StackErrorCode * const errorCode)
+char top(const Stack * const stack, StackErrorCode * const errorCode)
 {
     if (isEmpty(stack))
     {
