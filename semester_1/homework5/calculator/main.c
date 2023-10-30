@@ -4,25 +4,21 @@
 
 #include "../get_string/get_string.h"
 #include "calculator.h"
+#include "test/test.h"
 
 #define PROGRAM_FINISHED_CORRECTLY 0
 #define PROGRAM_FAILED_TESTS 1
 #define PROGRAM_FINISHED_WITH_ERROR 2
 #define MEMORY_ACCESS_ERROR 3
 
-bool test(void)
-{
-    return true;
-}
-
 int main()
 {
     setlocale(LC_ALL, "Rus");
-    // if (!test())
-    // {
-    //     printf("Простите, но похоже, что программа сейчас не работает корректно\n");
-    //     return PROGRAM_FAILED_TESTS;
-    // }
+    if (!test())
+    {
+        // printf("Простите, но похоже, что программа сейчас не работает корректно\n");
+        // return PROGRAM_FAILED_TESTS;
+    }
 
     printf("Введите арифметическое выражение в постфиксной форме: ");
 

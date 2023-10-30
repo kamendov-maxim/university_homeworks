@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <stdio.h>
+
 #include "../stack/stack.h"
 #include "calculator.h"
 
@@ -20,6 +22,8 @@ static ErrorCode getElems(Stack *stack, int *firstElement, int *secondElement)
         return PROBLEMWITHSTACK;
     }
     pop(&stack);
+
+    printf("%d %d\n", *firstElement, *secondElement);
     return OK;
 }
 
@@ -113,9 +117,8 @@ int calculator(const char expression[], ErrorCode *errorCode)
         *errorCode = PROBLEMWITHSTACK;
         return -1;
     }
-
     pop(&stack);
-    deleteStack(&stack);
     *errorCode = OK;
+    deleteStack(&stack);
     return result;
 }

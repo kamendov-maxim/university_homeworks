@@ -30,7 +30,7 @@ StackErrorCode pop(Stack ** const stack)
     }
 
     Stack *temp = ((*stack)->previous);
-    free(*stack);
+    *stack = NULL;
     (*stack) = temp;
     return ok;
 }
