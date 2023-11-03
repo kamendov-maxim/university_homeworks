@@ -24,14 +24,18 @@ StackErrorCode push(Stack **const stack, const char element)
 
 StackErrorCode pop(Stack ** const stack)
 {
-    if (isEmpty(*stack))
+    if (isEmpty(*stack) || stack == NULL)
     {
         return stackIsEmpty;
     }
 
-    Stack *temp = ((*stack)->previous);
-    *stack = NULL;
-    (*stack) = temp;
+    Stack *temp = *stack;
+    *stack = (*stack)->previous;
+    free(temp);
+    // Stack *temp = ((*stack)->previous);
+    // // *stack = NULL;
+    // free(stack);
+    // (*stack) = temp;
     return ok;
 }
 
@@ -53,9 +57,15 @@ bool isEmpty(const Stack * const stack)
 
 StackErrorCode printStack(const Stack * stack)
 {
+        printf("eee");
+    if (isEmpty(stack))
+    {
+        printf("Stack is empty\n");
+        return stackIsEmpty;
+    }
     for (;stack != NULL; stack = stack->previous)
     {
-        printf("%c ", stack->element);
+        printf("%d ", stack->element);
     }
     printf("\n");
     return ok;

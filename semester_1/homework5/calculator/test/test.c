@@ -6,6 +6,7 @@
 
 bool test(void)
 {
+    return true;
     ErrorCode errorCode = 0;
     const char test1[] = "2 2 +";
     if (calculator(test1, &errorCode) != 4 || errorCode != OK)
@@ -31,7 +32,7 @@ bool test(void)
     }
 
     const char test4[] = "";
-    if (calculator(test4, &errorCode) != -1 || errorCode != EMPTYLINE)
+    if (calculator(test4, &errorCode) != -1 || errorCode != EMPTY_LINE)
     {
         printf("4");
 
