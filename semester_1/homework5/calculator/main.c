@@ -16,8 +16,8 @@ int main()
     setlocale(LC_ALL, "Rus");
     if (!test())
     {
-        // printf("Простите, но похоже, что программа сейчас не работает корректно\n");
-        // return PROGRAM_FAILED_TESTS;
+        printf("Простите, но похоже, что программа сейчас не работает корректно\n");
+        return PROGRAM_FAILED_TESTS;
     }
 
     printf("Введите арифметическое выражение в постфиксной форме: ");
