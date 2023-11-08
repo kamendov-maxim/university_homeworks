@@ -3,9 +3,16 @@
 #include <stdbool.h>
 #include <locale.h>
 
-#include "../list/list.h"
-#include "../get_string/get_string.h"
+#include "listMergeSort/list.h"
+#include "../getString/getString.h"
 #include "tests/test.h"
+
+typedef enum UserInput
+{
+    byNumber,
+    byName,
+    error
+} UserInput;
 
 #define PROGRAM_FINISHED_CORRECTLY 0
 #define DATA_BASE_FILE_WAS_NOT_FOUND 1
@@ -14,10 +21,38 @@
 #define INPUT_ERROR 4
 #define TESTS_ARE_NOT_PASSED 5
 
+static const UserInput getSortType(void)
+{
+    printf("Как вы хотите отсортировать записи?\n");
+    printf("0 - по номеру телефона\n");
+    printf("1 - по имени\n");
+    printf("Введите цифру: \n");
+
+    UserInput input = byName;
+    size_t scanned = scanf("%d", &input);
+    if (scanned != 1)
+    {
+        return error;
+    }
+    
+    while (input != byNumber && input != byName)
+    {
+        printf("Вы должны ввести 1 или 0\n");
+        size_t scanned = scanf("%d", &input);
+        if (scanned != 1)
+        {
+            return error;
+        }
+    }
+    // return (input == '0' ? byNumber: byName);
+    return input;
+}
+
 int main(void)
 {
     if (!test())
     {
+        printf("Простите, но программа сейчас не работает\n");
         return TESTS_ARE_NOT_PASSED;
     }
 
@@ -39,7 +74,7 @@ int main(void)
     size_t len = 0;
     while (!feof(file))
     {
-        char *name = get_string(&len, file);
+        char *name = getString(&len, file);
         if (name == NULL)
         {
             deleteList(list);
@@ -47,9 +82,10 @@ int main(void)
         }
 
         len = 0;
-        char *number = get_string(&len, file);
+        char *number = getString(&len, file);
         if (number == NULL)
         {
+            free(name);
             deleteList(list);
             return MEMORY_ERROR;
         }
@@ -58,36 +94,25 @@ int main(void)
         listErrorCode = append(list, name, number);
         if (listErrorCode != ok)
         {
+            free(name);
+            free(number);
             deleteList(list);
             return PROBLEM_WITH_LIST;
         }
+        free(name);
+        free(number);
     }
     fclose(file);
     printList(list);
 
-    printf("Как вы хотите отсортировать записи?\n");
-    printf("0 - по номеру телефона\n");
-    printf("1 - по имени\n");
-    printf("Введите цифру: \n");
-
-    char input = '0';
-    int scanned = scanf("%s", &input);
-    if (scanned != 1)
+    UserInput input = getSortType();
+    if (input == error)
     {
         deleteList(list);
         return INPUT_ERROR;
     }
-    while (input != '1' && input != '0')
-    {
-        printf("Вы должны ввести 1 или 0\n");
-        scanned = scanf("%s", &input);
-        if (scanned != 1)
-        {
-            deleteList(list);
-            return INPUT_ERROR;
-        }
-    }
-    if (input == '0')
+
+    if (input == byNumber)
     {
         mergeSortByNumber(list);
     }

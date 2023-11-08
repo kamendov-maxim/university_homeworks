@@ -1,168 +1,64 @@
 #include <stdbool.h>
 
 #include "test.h"
-#include "../../list/list.h"
+#include "../listMergeSort/list.h"
 
-static bool test1(void)
+
+// bool test(void)
+// {
+//     return true;
+// }
+
+static bool testCase(char  * const names[], char  * const numbers[], size_t sizeOfArray)
 {
-    ListErrorCode listErrorCode = ok;
-    List *testList1 = createList(&listErrorCode);
-    if (listErrorCode != ok)
+    ListErrorCode testListErrorCode = ok;
+    List *testList = createList(&testListErrorCode);
+    if (testListErrorCode != ok)
     {
         return false;
     }
 
-    listErrorCode = append(testList1, "bbb", "3");
-    if (listErrorCode != ok)
+    for (int i = 0; i < sizeOfArray; ++i)
     {
+        testListErrorCode = append(testList, names[i], numbers[i]);
+        if (testListErrorCode != ok)
+        {
+            return false;
+        }
+    }
+
+    mergeSortByNumber(testList);
+    if (!isSortedByNumber(testList))
+    {
+        deleteList(testList);
         return false;
     }
 
-    listErrorCode = append(testList1, "aaa", "2");
-    if (listErrorCode != ok)
+    mergeSortByName(testList);
+    if (!isSortedByName(testList))
     {
+        deleteList(testList);
         return false;
     }
 
-    listErrorCode = append(testList1, "ccc", "5");
-    if (listErrorCode != ok)
-    {
-        return false;
-    }
-
-    listErrorCode = append(testList1, "eee", "4");
-    if (listErrorCode != ok)
-    {
-        return false;
-    }
-
-    listErrorCode = append(testList1, "ddd", "1");
-    if (listErrorCode != ok)
-    {
-        return false;
-    }
-
-    mergeSortByNumber(testList1);
-    if (!isSortedByNumber(testList1))
-    {
-        deleteList(testList1);
-        return false;
-    }
-    mergeSortByName(testList1);
-    if (!isSortedByName(testList1))
-    {
-        deleteList(testList1);
-        return false;
-    }
-    deleteList(testList1);
-
-    return true;
-}
-
-static bool test2(void)
-{
-    ListErrorCode listErrorCode = ok;
-    List *testList2 = createList(&listErrorCode);
-    if (listErrorCode != ok)
-    {
-        return false;
-    }
-
-    listErrorCode = append(testList2, "eee", "5");
-    if (listErrorCode != ok)
-    {
-        return false;
-    }
-    listErrorCode = append(testList2, "ddd", "4");
-    if (listErrorCode != ok)
-    {
-        return false;
-    }
-    listErrorCode = append(testList2, "ccc", "3");
-    if (listErrorCode != ok)
-    {
-        return false;
-    }
-    listErrorCode = append(testList2, "bbb", "2");
-    if (listErrorCode != ok)
-    {
-        return false;
-    }
-    listErrorCode = append(testList2, "aaa", "1");
-    if (listErrorCode != ok)
-    {
-        return false;
-    }
-    mergeSortByNumber(testList2);
-    if (!isSortedByNumber(testList2))
-    {
-        deleteList(testList2);
-        return false;
-    }
-    mergeSortByName(testList2);
-    if (!isSortedByName(testList2))
-    {
-        deleteList(testList2);
-        return false;
-    }
-    deleteList(testList2);
-
-    return true;
-}
-
-static bool test3(void)
-{
-    ListErrorCode listErrorCode = ok;
-    List *testList3 = createList(&listErrorCode);
-    if (listErrorCode != ok)
-    {
-        return false;
-    }
-
-    listErrorCode = append(testList3, "aaa", "1");
-    if (listErrorCode != ok)
-    {
-        return false;
-    }
-    listErrorCode = append(testList3, "aaa", "1");
-    if (listErrorCode != ok)
-    {
-        return false;
-    }
-    listErrorCode = append(testList3, "aaa", "1");
-    if (listErrorCode != ok)
-    {
-        return false;
-    }
-    listErrorCode = append(testList3, "aaa", "1");
-    if (listErrorCode != ok)
-    {
-        return false;
-    }
-    listErrorCode = append(testList3, "aaa", "1");
-    if (listErrorCode != ok)
-    {
-        deleteList(testList3);
-        return false;
-    }
-    mergeSortByNumber(testList3);
-    if (!isSortedByNumber(testList3))
-    {
-        deleteList(testList3);
-        return false;
-    }
-    mergeSortByName(testList3);
-    if (!isSortedByName(testList3))
-    {
-        printf("Failed on sorting by a name (all elements are the same)\n");
-        return false;
-    }
-    deleteList(testList3);
+    deleteList(testList);
 
     return true;
 }
 
 bool test(void)
 {
-    return test1() && test2() && test3();
+    char  * const testNames1[5] = {"bbb", "aaa", "ccc", "eee", "ddd"};
+    char  * const testNumbers1[5] = {"3", "2", "5", "4", "1"};
+    bool testCase1 = testCase(testNames1, testNumbers1, 5);
+
+    char  * const testNames2[5] = {"eee", "ddd", "ccc", "bbb", "aaa"};
+    char  * const testNumbers2[5] = {"5", "4", "3", "2", "1"};
+    bool testCase2 = testCase(testNames2, testNumbers2, 5);
+
+    char  * const testNames3[5] = {"aaa", "aaa", "aaa", "aaa", "aaa"};
+    char  * const testNumbers3[5] = {"1", "1", "1", "1", "1"};
+    bool testCase3 = testCase(testNames3, testNumbers3, 5);
+
+    return testCase1 && testCase2 && testCase3;
 }

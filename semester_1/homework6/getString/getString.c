@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "get_string.h"
+#include "getString.h"
 
-char *get_string(size_t * const len, FILE * filename)
+char *getString(size_t * const len, FILE * filename)
 {
     *len = 0;
     size_t capacity = 1;
@@ -13,9 +13,8 @@ char *get_string(size_t * const len, FILE * filename)
         return NULL;
     }
 
-    for (char c = fgetc(filename); c != '\n' && c != EOF; c = fgetc(filename))
+    for (char c = fgetc(filename); c != '\n' && c != EOF && c != '-' && c != '\0'; c = fgetc(filename))
     {
-        // printf("%c\n", c);
         s[(*len)++] = c;
 
         if (*len >= capacity)

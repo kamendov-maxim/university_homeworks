@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 
-#include "../../list/list.h"
+#include "../listMergeSort/list.h"
+
 
 bool test(void);
