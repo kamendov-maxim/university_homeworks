@@ -90,7 +90,6 @@ void deleteList(List *const list)
     {
         Node *currentNode = list->head;
         list->head = currentNode->next;
-        // free(currentNode->value);
         free(currentNode);
     }
 }
@@ -100,10 +99,6 @@ bool isSorted(List const *const list)
     Node *temp = list->head;
     for (; temp->next != NULL; temp = temp->next)
     {
-        // if (strcmp(temp->value, temp->next->value) > 0)
-        // {
-        //     return false;
-        // }
         if (temp->next != NULL)
         {
             if (temp->value > temp->next->value)

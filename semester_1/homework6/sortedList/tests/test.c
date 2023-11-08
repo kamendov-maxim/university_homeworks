@@ -3,7 +3,7 @@
 #include "test.h"
 #include "../list/list.h"
 
-static bool testCase(const int * testArray, const size_t size)
+static bool testCase(const int *testArray, const size_t size)
 {
     ListErrorCode listErrorCode = ok;
     List *list = createList(&listErrorCode);
@@ -29,7 +29,7 @@ bool test(void)
 
     const int testArray3[6] = {1, 2, 3, 4, 5, 6};
     bool testCase3 = testCase(testArray3, 6);
-     
+
     const int testArray4[5] = {1, 1, 1, 1, 1};
     bool testCase4 = testCase(testArray4, 5);
 

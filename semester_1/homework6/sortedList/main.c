@@ -71,16 +71,13 @@ int main()
     while (input != exitCommand)
     {
         UserInput input = getCommand();
-        
+
         switch (input)
         {
         case appendCommand:
         {
             size_t len = 0;
             printf("Ведите значение, которое вы хотите добавить\n");
-            // char *value = getString(&len);
-            // printf("%d\n", len);
-            // printf("dasaf");
             int value = 0;
             if (scanf("%d", &value) != 1)
             {

@@ -8,7 +8,7 @@ char *getString(size_t *const len)
     *len = 0;
     size_t capacity = 1;
     char *s = (char *)malloc(sizeof(char));
-    
+
     if (s == NULL)
     {
         return NULL;
