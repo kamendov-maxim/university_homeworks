@@ -3,7 +3,7 @@
 
 #include "getString.h"
 
-char *getString(size_t * const len, FILE * filename)
+char *getString(size_t * const len, FILE * filename, char const endOfLine)
 {
     *len = 0;
     size_t capacity = 1;
@@ -13,7 +13,7 @@ char *getString(size_t * const len, FILE * filename)
         return NULL;
     }
 
-    for (char c = fgetc(filename); c != '\n' && c != EOF && c != '-' && c != '\0'; c = fgetc(filename))
+    for (char c = fgetc(filename); c != endOfLine && c != '-' && c != EOF; c = fgetc(filename))
     {
         s[(*len)++] = c;
 

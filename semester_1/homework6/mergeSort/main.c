@@ -6,6 +6,7 @@
 #include "listMergeSort/list.h"
 #include "../getString/getString.h"
 #include "tests/test.h"
+#include "fileReading/fileReading.h"
 
 typedef enum UserInput
 {
@@ -21,6 +22,8 @@ typedef enum UserInput
 #define INPUT_ERROR 4
 #define TESTS_ARE_NOT_PASSED 5
 
+#define FILENAME "mergeSort/db.txt"
+
 static const UserInput getSortType(void)
 {
     printf("Как вы хотите отсортировать записи?\n");
@@ -34,7 +37,7 @@ static const UserInput getSortType(void)
     {
         return error;
     }
-    
+
     while (input != byNumber && input != byName)
     {
         printf("Вы должны ввести 1 или 0\n");
@@ -44,7 +47,6 @@ static const UserInput getSortType(void)
             return error;
         }
     }
-    // return (input == '0' ? byNumber: byName);
     return input;
 }
 
@@ -55,54 +57,21 @@ int main(void)
         printf("Простите, но программа сейчас не работает\n");
         return TESTS_ARE_NOT_PASSED;
     }
-
     setlocale(LC_ALL, "Rus");
 
-    FILE *file = fopen("mergeSort/db.txt", "r");
-    if (file == NULL)
+    List *list = createList();
+    if (list == NULL)
     {
-        return DATA_BASE_FILE_WAS_NOT_FOUND;
+        return MEMORY_ERROR;
     }
-
     ListErrorCode listErrorCode = ok;
-    List *list = createList(&listErrorCode);
-    if (listErrorCode != ok)
+    int errorCode = fileReading(list, FILENAME, false);
+    if (errorCode != 0)
     {
-        return PROBLEM_WITH_LIST;
+        printf("Возникла ошибка при чтении из базы данных\n");
+        return errorCode;
     }
 
-    size_t len = 0;
-    while (!feof(file))
-    {
-        char *name = getString(&len, file);
-        if (name == NULL)
-        {
-            deleteList(list);
-            return MEMORY_ERROR;
-        }
-
-        len = 0;
-        char *number = getString(&len, file);
-        if (number == NULL)
-        {
-            free(name);
-            deleteList(list);
-            return MEMORY_ERROR;
-        }
-        len = 0;
-
-        listErrorCode = append(list, name, number);
-        if (listErrorCode != ok)
-        {
-            free(name);
-            free(number);
-            deleteList(list);
-            return PROBLEM_WITH_LIST;
-        }
-        free(name);
-        free(number);
-    }
-    fclose(file);
     printList(list);
 
     UserInput input = getSortType();

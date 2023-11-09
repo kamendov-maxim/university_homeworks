@@ -26,45 +26,59 @@ void printList(List const *const list)
     printf("\n");
     for (Node *currentNode = list->head; currentNode != NULL; currentNode = currentNode->next)
     {
-        printf("%s - %s\n", currentNode->name, currentNode->number);
+        printf("%s-%s\n", currentNode->name, currentNode->number);
     }
     printf("\n");
 }
 
-List *createList(ListErrorCode *const listErrorCode)
+List *createList(void)
 {
     List *newList = (List *)calloc(1, sizeof(List));
     if (newList == NULL)
     {
-        *listErrorCode = memoryError;
         return NULL;
     }
 
-    *listErrorCode = ok;
     return newList;
 }
 
-ListErrorCode append(List *const list, char *const name, char *const number)
+ListErrorCode append(List *const list, char *const name, char *const number, bool const copyRequired)
 {
-    const size_t nameLen = strlen(name);
-    char *nameCopy = (char *)malloc(nameLen * sizeof(char));
-    if (nameCopy == NULL)
+    char *nameCopy;
+    char *numberCopy;
+    if (copyRequired)
     {
-        return memoryError;
-    }
-    strcpy(nameCopy, name);
+        const size_t nameLen = strlen(name);
+        nameCopy = (char *)malloc(nameLen * sizeof(char));
+        if (nameCopy == NULL)
+        {
+            return memoryError;
+        }
+        strcpy(nameCopy, name);
 
-    const size_t numberLen = strlen(number);
-    char *numberCopy = (char *)malloc(numberLen * sizeof(char));
-    if (numberCopy == NULL)
-    {
-        return memoryError;
+        const size_t numberLen = strlen(number);
+        numberCopy = (char *)malloc(numberLen * sizeof(char));
+        if (numberCopy == NULL)
+        {
+            free(nameCopy);
+            return memoryError;
+        }
+        strcpy(numberCopy, number);
     }
-    strcpy(numberCopy, number);
+    else
+    {
+        nameCopy = name;
+        numberCopy = number;
+    }
 
     Node *newNode = (Node *)calloc(1, sizeof(Node));
     if (newNode == NULL)
     {
+        if (copyRequired)
+        {
+            free(nameCopy);
+            free(numberCopy);
+        }
         return memoryError;
     }
 
@@ -78,8 +92,7 @@ ListErrorCode append(List *const list, char *const name, char *const number)
     }
 
     Node *currentNode = list->head;
-    for (; currentNode->next != NULL; currentNode = currentNode->next)
-        ;
+    for (; currentNode->next != NULL; currentNode = currentNode->next);
 
     currentNode->next = newNode;
     return ok;
@@ -102,7 +115,7 @@ static char *getNodeField(Node const *const node, bool byName)
     return (byName ? node->name : node->number);
 }
 
-bool isSorted(List const *const list, bool byName)
+static bool isSorted(List const *const list, bool byName)
 {
     Node *temp = list->head;
     for (; temp->next != NULL; temp = temp->next)
@@ -129,22 +142,18 @@ static void splitHalf(Node *const head, Node **const first, Node **const second)
 {
     size_t length = 0;
 
-    for (Node *count = head; count->next != NULL; count = count->next, ++length)
-        ;
+    for (Node *count = head; count->next != NULL; count = count->next, ++length);
 
     Node *temp = head;
-    for (size_t i = 0; i < length / 2; temp = temp->next, ++i)
-        ;
+    for (size_t i = 0; i < length / 2; temp = temp->next, ++i);
 
     *first = head;
     *second = temp->next;
     temp->next = NULL;
 }
 
-static Node * mergeSortJoin(Node *first, Node *second, bool byName)
-{ 
-    bool firstIteration = true;
-
+static Node *mergeSortJoin(Node *first, Node *second, bool byName)
+{
     Node *temp = (Node *)calloc(1, sizeof(Node));
     Node *ptr = temp;
     for (; first != NULL && second != NULL; temp = temp->next)
@@ -170,7 +179,7 @@ static Node * mergeSortJoin(Node *first, Node *second, bool byName)
     return ptr;
 }
 
-static void mergeSortRecursion(Node **head, bool byName, List* const list)
+static void mergeSortRecursion(Node **head, bool byName)
 {
     if ((*head) == NULL || (*head)->next == NULL)
     {
@@ -181,18 +190,18 @@ static void mergeSortRecursion(Node **head, bool byName, List* const list)
     Node *second = NULL;
     splitHalf(*head, &first, &second);
 
-    mergeSortRecursion(&first, byName, list);
-    mergeSortRecursion(&second, byName, list);
+    mergeSortRecursion(&first, byName);
+    mergeSortRecursion(&second, byName);
 
     *head = mergeSortJoin(first, second, byName);
 }
 
 void mergeSortByName(List *const list)
 {
-    mergeSortRecursion(&(list->head), true, list);
+    mergeSortRecursion(&(list->head), true);
 }
 
 void mergeSortByNumber(List *const list)
 {
-    mergeSortRecursion(&(list->head), false, list);
+    mergeSortRecursion(&(list->head), false);
 }

@@ -13,9 +13,9 @@ typedef enum ListErrorCode
 
 typedef struct List List;
 
-List *createList(ListErrorCode * const listErrorCode);
+List *createList(void);
 void printList(List const * const list);
-ListErrorCode append(List * const list, char * const number, char * const name);
+ListErrorCode append(List *const list, char *const name, char *const number, bool const copyRequired);
 void deleteList(List * const list);
 void mergeSortByNumber(List * const list);
 void mergeSortByName(List * const list);
