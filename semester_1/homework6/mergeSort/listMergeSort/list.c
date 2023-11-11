@@ -19,10 +19,6 @@ typedef struct List
 
 void printList(List const *const list)
 {
-    if (list->head == NULL)
-    {
-        return;
-    }
     printf("\n");
     for (Node *currentNode = list->head; currentNode != NULL; currentNode = currentNode->next)
     {
@@ -34,53 +30,48 @@ void printList(List const *const list)
 List *createList(void)
 {
     List *newList = (List *)calloc(1, sizeof(List));
-    if (newList == NULL)
-    {
-        return NULL;
-    }
 
     return newList;
 }
 
-ListErrorCode append(List *const list, char *const name, char *const number, bool const copyRequired)
+static char *copyString(char * const string, bool const copyRequired)
 {
-    char *nameCopy;
-    char *numberCopy;
     if (copyRequired)
     {
-        const size_t nameLen = strlen(name);
-        nameCopy = (char *)malloc(nameLen * sizeof(char));
-        if (nameCopy == NULL)
-        {
-            return memoryError;
-        }
-        strcpy(nameCopy, name);
-
-        const size_t numberLen = strlen(number);
-        numberCopy = (char *)malloc(numberLen * sizeof(char));
-        if (numberCopy == NULL)
-        {
-            free(nameCopy);
-            return memoryError;
-        }
-        strcpy(numberCopy, number);
+        return string;
     }
-    else
+    const size_t len = strlen(string);
+    char *copy = (char *)malloc(len * sizeof(char));
+    if (copy != NULL)
     {
-        nameCopy = name;
-        numberCopy = number;
+        strcpy(copy, string);
     }
+    return copy;
+}
 
+ListErrorCode append(List *const list, char *const name, char *const number, bool const copyRequired)
+{
     Node *newNode = (Node *)calloc(1, sizeof(Node));
     if (newNode == NULL)
     {
         if (copyRequired)
         {
-            free(nameCopy);
-            free(numberCopy);
+            deleteList(list);
         }
         return memoryError;
     }
+
+    char *nameCopy = copyString(name, copyRequired);
+    if (nameCopy == NULL)
+    {
+        return memoryError;
+    }
+    char *numberCopy = copyString(number, copyRequired);
+    if (numberCopy == NULL)
+    {
+        return memoryError;
+    }
+
 
     newNode->name = nameCopy;
     newNode->number = numberCopy;
@@ -155,6 +146,11 @@ static void splitHalf(Node *const head, Node **const first, Node **const second)
 static Node *mergeSortJoin(Node *first, Node *second, bool byName)
 {
     Node *temp = (Node *)calloc(1, sizeof(Node));
+    if (temp == NULL)
+    {
+        return NULL;
+    }
+
     Node *ptr = temp;
     for (; first != NULL && second != NULL; temp = temp->next)
     {
@@ -179,8 +175,13 @@ static Node *mergeSortJoin(Node *first, Node *second, bool byName)
     return ptr;
 }
 
-static void mergeSortRecursion(Node **head, bool byName)
+static void mergeSortRecursion(Node **head, bool byName, ListErrorCode *listErrorCode)
 {
+    if (*listErrorCode != ok)
+    {
+        return;
+    }
+
     if ((*head) == NULL || (*head)->next == NULL)
     {
         return;
@@ -190,18 +191,22 @@ static void mergeSortRecursion(Node **head, bool byName)
     Node *second = NULL;
     splitHalf(*head, &first, &second);
 
-    mergeSortRecursion(&first, byName);
-    mergeSortRecursion(&second, byName);
+    mergeSortRecursion(&first, byName, listErrorCode);
+    mergeSortRecursion(&second, byName, listErrorCode);
 
     *head = mergeSortJoin(first, second, byName);
+    if (head == NULL)
+    {
+        *listErrorCode = memoryError;
+    }
 }
 
-void mergeSortByName(List *const list)
+void mergeSortByName(List *const list, ListErrorCode *listErrorCode)
 {
-    mergeSortRecursion(&(list->head), true);
+    mergeSortRecursion(&(list->head), true, listErrorCode);
 }
 
-void mergeSortByNumber(List *const list)
+void mergeSortByNumber(List *const list, ListErrorCode *listErrorCode)
 {
-    mergeSortRecursion(&(list->head), false);
+    mergeSortRecursion(&(list->head), false, listErrorCode);
 }

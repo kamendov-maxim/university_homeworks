@@ -13,7 +13,7 @@ char *getString(size_t * const len, FILE * filename, char const endOfLine)
         return NULL;
     }
 
-    for (char c = fgetc(filename); c != endOfLine && c != '-' && c != EOF; c = fgetc(filename))
+    for (char c = fgetc(filename); c != endOfLine && /* c != '-' && */ c != EOF; c = fgetc(filename))
     {
         s[(*len)++] = c;
 

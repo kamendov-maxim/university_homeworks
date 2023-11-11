@@ -65,10 +65,11 @@ int main(void)
         return MEMORY_ERROR;
     }
     ListErrorCode listErrorCode = ok;
-    int errorCode = fileReading(list, FILENAME, false);
+    int errorCode = fileReading(list, FILENAME);
     if (errorCode != 0)
     {
         printf("Возникла ошибка при чтении из базы данных\n");
+        deleteList(list);
         return errorCode;
     }
 
@@ -83,13 +84,18 @@ int main(void)
 
     if (input == byNumber)
     {
-        mergeSortByNumber(list);
+        mergeSortByNumber(list, &listErrorCode);
     }
     else
     {
-        mergeSortByName(list);
+        mergeSortByName(list, &listErrorCode);
     }
-
+    if (listErrorCode != ok)
+    {
+        deleteList(list);
+        printf("Ошибка во время выполнения программы\n");
+        return MEMORY_ERROR;
+    }
     printList(list);
     deleteList(list);
     return PROGRAM_FINISHED_CORRECTLY;

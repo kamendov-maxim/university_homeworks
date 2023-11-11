@@ -21,15 +21,15 @@ static bool testCase(char  * const names[], char  * const numbers[], size_t size
         }
     }
 
-    mergeSortByNumber(testList);
-    if (!isSortedByNumber(testList))
+    mergeSortByNumber(testList, &testListErrorCode);
+    if (!isSortedByNumber(testList) || testListErrorCode != ok)
     {
         deleteList(testList);
         return false;
     }
 
-    mergeSortByName(testList);
-    if (!isSortedByName(testList))
+    mergeSortByName(testList, &testListErrorCode);
+    if (!isSortedByName(testList)  || testListErrorCode != ok)
     {
         deleteList(testList);
         return false;
