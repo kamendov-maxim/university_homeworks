@@ -3,32 +3,17 @@
 #include "test.h"
 #include "../list/list.h"
 
-bool test(void)
+static bool testCase(const size_t n, const size_t m, const size_t answer)
 {
     ListErrorCode listErrorCode = ok;
+    return (count(n, m, &listErrorCode) == answer && listErrorCode == ok);
+}
 
-    int testN1 = 10;
-    int testM1 = 3;
-    int answer1 = 4;
-    bool testCase1 = (count(testN1, testM1, &listErrorCode) == answer1);
-    if (listErrorCode != ok)
-    {
-        return false;
-    }
-
-    int testN2 = 6;
-    int testM2 = 2;
-    int answer2 = 5;
-    bool testCase2 = (count(testN2, testM2, &listErrorCode) == answer2);
-
-    int testN3 = 6;
-    int testM3 = 5;
-    int answer3 = 1;
-    bool testCase3 = (count(testN3, testM3, &listErrorCode) == answer3);
-    if (listErrorCode != ok)
-    {
-        return false;
-    }
+bool test(void)
+{
+    bool testCase1 = testCase(10, 3, 4);
+    bool testCase2 = testCase(6, 2, 5);
+    bool testCase3 = testCase(6, 5, 1);
 
     return testCase1 && testCase2 && testCase3;
 }

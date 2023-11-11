@@ -13,6 +13,4 @@ typedef enum ListErrorCode
 
 typedef struct List List;
 
-List *createList(void);
-void deleteList(List *const list);
-int count(const int n, const int m, ListErrorCode * const listErrorCode);
+size_t count(const size_t n, const size_t m, ListErrorCode *const listErrorCode);

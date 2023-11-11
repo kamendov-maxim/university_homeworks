@@ -16,28 +16,28 @@ typedef struct List
     Node *head;
 } List;
 
-List *createList(void)
+static List *createList(void)
 {
     List *newList = (List *)calloc(1, sizeof(List));
-    if (newList == NULL)
-    {
-        return NULL;
-    }
-
     return newList;
 }
 
-void deleteList(List *const list)
+static void deleteList(List *const list)
 {
-    while (list->head != NULL)
+    while (list->head->next != list->head && list->head != NULL)
     {
         Node *currentNode = list->head;
         list->head = currentNode->next;
+        // if (list->head != currentNode->next)
+        // {
+        // }
         free(currentNode);
     }
+    // free(list->head);
+    // free(list);
 }
 
-static List *appendWarriors(const int n)
+static List *appendWarriors(const size_t n)
 {
     Node *head = NULL;
     List *warriors = createList();
@@ -49,6 +49,10 @@ static List *appendWarriors(const int n)
     for (int i = n; i > 0; --i)
     {
         Node *warrior = malloc(sizeof(Node));
+        if (warrior == NULL)
+        {
+            return NULL;
+        }
 
         warrior->value = i;
         warrior->next = head;
@@ -63,27 +67,24 @@ static List *appendWarriors(const int n)
     return warriors;
 }
 
-static int killing(List *warriors, const int m)
+static size_t killing(List *warriors, const size_t m)
 {
     Node *warrior = warriors->head;
-    int t = m - 1;
-    while (warrior->next->value != warrior->value)
+    size_t t = m - 1;
+    while (warrior->next != warrior)
     {
-        for (int count = 1; count != t; warrior = warrior->next, ++count);
+        for (size_t count = 1; count != t; warrior = warrior->next, ++count);
 
-        if (warrior->next != NULL && warrior->next->next != NULL)
-        {
-            Node *temp = warrior->next;
-            warrior->next = warrior->next->next;
-            free(temp);
-        }
+        Node *temp = warrior->next;
+        warrior->next = warrior->next->next;
+        free(temp);
         t = m;
     }
 
     return (warrior->value);
 }
 
-int count(const int n, const int m, ListErrorCode *const listErrorCode)
+size_t count(const size_t n, const size_t m, ListErrorCode *const listErrorCode)
 {
     List *warriors = appendWarriors(n);
     if (warriors == NULL)
@@ -92,5 +93,6 @@ int count(const int n, const int m, ListErrorCode *const listErrorCode)
         return -1;
     }
 
+    // deleteList(warriors);
     return killing(warriors, m);
 }
