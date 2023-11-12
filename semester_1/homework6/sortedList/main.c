@@ -4,7 +4,6 @@
 
 #include "list/list.h"
 #include "tests/test.h"
-#include "getString/getString.h"
 
 #define PROGRAM_FINISHED_CORRECTLY 0
 #define MEMORY_ERROR 2
@@ -12,36 +11,48 @@
 #define INPUT_ERROR 4
 #define TESTS_ARE_NOT_PASSED 5
 
+#define SOMETHING_WENT_WRONG_MESSAGE "Похоже, что то пошло не так\n"
+
 typedef enum UserInput
 {
     exitCommand,
     appendCommand,
     popCommand,
-    printCommand,
-    error
+    printCommand
 } UserInput;
+
+const size_t commandsCount = 4;
+
+
+static void scanfCheck(int scanned)
+{
+    if (scanned != 1)
+    {
+        printf("%s", SOMETHING_WENT_WRONG_MESSAGE);
+        exit(INPUT_ERROR);
+    }
+}
+
+static UserInput userInput(void)
+{
+    UserInput input = exitCommand;
+    scanfCheck(scanf("%d", &input));
+
+    while (input >= commandsCount)
+    {
+        printf("Проверьте правильность ввода\n");
+        scanfCheck(scanf("%d", &input));
+    }
+
+    return input;
+}
 
 static const UserInput getCommand(void)
 {
     printf("\nДоступные команды:\n0 – выйти\n1 – добавить значение в сортированный список\n2 – удалить значение из списка\n3 – распечатать список\n");
     printf("\nВведите номер, соответствующий команде, которую вы хотите выполнить\n");
 
-    UserInput input = exitCommand;
-    size_t scanned = scanf("%d", &input);
-    if (scanned != 1)
-    {
-        return error;
-    }
-
-    while (input != exitCommand && input != appendCommand && input != popCommand && input != printCommand)
-    {
-        printf("Проверьте правильность ввода\n");
-        size_t scanned = scanf("%d", &input);
-        if (scanned != 1)
-        {
-            return error;
-        }
-    }
+    UserInput input = userInput();
 
     return input;
 }
@@ -58,15 +69,15 @@ int main()
 
     setlocale(LC_ALL, "Rus");
 
-    ListErrorCode listErrorCode = ok;
-    List *list = createList(&listErrorCode);
-    if (listErrorCode != ok)
+    List *list = createList();
+    if (list == NULL)
     {
-        printf("Похоже, что то пошло не так\n");
+        printf("Недостаточно памяти\n");
 
-        return PROBLEM_WITH_LIST;
+        return MEMORY_ERROR;
     }
 
+    ListErrorCode listErrorCode = ok;
     UserInput input = printCommand;
     while (input != exitCommand)
     {
@@ -79,16 +90,12 @@ int main()
             size_t len = 0;
             printf("Ведите значение, которое вы хотите добавить\n");
             int value = 0;
-            if (scanf("%d", &value) != 1)
-            {
-                printf("Похоже, что то пошло не так\n");
-                return INPUT_ERROR;
-            }
+            scanfCheck(scanf("%d", &value));
 
             listErrorCode = append(list, value);
             if (listErrorCode != ok)
             {
-                printf("Похоже, что то пошло не так\n");
+                printf("%s", SOMETHING_WENT_WRONG_MESSAGE);
                 return PROBLEM_WITH_LIST;
             }
             break;
@@ -100,14 +107,10 @@ int main()
 
         case popCommand:
         {
-            printf("Введите индекс элемента, который вы хотите удалить:\n");
-            size_t index = 0;
-            if (scanf("%zu", &index) != 1)
-            {
-                printf("Похоже, что то пошло не так\n");
-                return INPUT_ERROR;
-            }
-            listErrorCode = popByIndex(list, index);
+            printf("Введите значение, которое вы хотите удалить:\n");
+            int value = 0;
+            scanfCheck(scanf("%d", &value));
+            listErrorCode = pop(list, value);
             if (listErrorCode != ok)
             {
                 printf("Проверьте правильность ввода\n");
@@ -116,17 +119,12 @@ int main()
             break;
         }
 
-        case error:
-            break;
-
         case exitCommand:
             deleteList(list);
             return PROGRAM_FINISHED_CORRECTLY;
             break;
         }
     }
-
-    deleteList(list);
 
     return PROGRAM_FINISHED_CORRECTLY;
 }

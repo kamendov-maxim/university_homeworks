@@ -14,9 +14,10 @@ typedef enum ListErrorCode
 
 typedef struct List List;
 
-List *createList(ListErrorCode *const listErrorCode);
+List *createList(void);
 void printList(List const *const list);
 ListErrorCode append(List *const list, int const value);
 void deleteList(List *const list);
-bool isSorted(List const *const list);
-ListErrorCode popByIndex(List *const list, size_t const index);
+ListErrorCode pop(List *const list, int const value);
+bool compareListWithArray(List const *const list, int const *const array, const size_t arraySize);
+

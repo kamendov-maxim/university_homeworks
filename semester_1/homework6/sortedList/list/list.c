@@ -18,10 +18,6 @@ typedef struct List
 
 void printList(List const *const list)
 {
-    if (list->head == NULL)
-    {
-        return;
-    }
     printf("\n[");
     for (Node *currentNode = list->head; currentNode != NULL; currentNode = currentNode->next)
     {
@@ -34,17 +30,9 @@ void printList(List const *const list)
     printf("]\n");
 }
 
-List *createList(ListErrorCode *const listErrorCode)
+List *createList(void)
 {
-    List *newList = (List *)calloc(1, sizeof(List));
-    if (newList == NULL)
-    {
-        *listErrorCode = memoryError;
-        return NULL;
-    }
-
-    *listErrorCode = ok;
-    return newList;
+    return (List *)calloc(1, sizeof(List));
 }
 
 ListErrorCode append(List *const list, int const value)
@@ -72,7 +60,7 @@ ListErrorCode append(List *const list, int const value)
     Node *currentNode = list->head;
     for (; currentNode->next != NULL; currentNode = currentNode->next)
     {
-        if (currentNode->next != NULL && value < currentNode->next->value)
+        if (value < currentNode->next->value)
         {
             newNode->next = currentNode->next;
             currentNode->next = newNode;
@@ -94,31 +82,14 @@ void deleteList(List *const list)
     }
 }
 
-bool isSorted(List const *const list)
+ListErrorCode pop(List *const list, int const value)
 {
     Node *temp = list->head;
-    for (; temp->next != NULL; temp = temp->next)
-    {
-        if (temp->next != NULL)
-        {
-            if (temp->value > temp->next->value)
-            {
-                printf("\n%d %d %d\n", temp->value, temp->next->value, temp->value > temp->next->value);
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
-ListErrorCode popByIndex(List *const list, size_t const index)
-{
-    Node *temp = list->head;
-    Node *previous = NULL;
     size_t i = 0;
     for (Node *currentNode = temp; currentNode != NULL; currentNode = currentNode->next)
     {
-        if (i == index)
+
+        if (currentNode->value == value)
         {
             if (i == 0)
             {
@@ -126,21 +97,39 @@ ListErrorCode popByIndex(List *const list, size_t const index)
             }
             else
             {
-                temp->next = currentNode->next;
+                if (currentNode->next == NULL)
+                {
+                    temp->next = NULL;
+                }
+                else
+                {
+                    temp->next = currentNode->next;
+                }
             }
             free(currentNode);
             return ok;
         }
         ++i;
-        previous = temp;
         temp = currentNode;
     }
 
-    if (index == -1)
-    {
-        free(temp);
-        previous->next = NULL;
-        return ok;
-    }
     return indexError;
+}
+
+bool compareListWithArray(List const *const list, int const *const array, const size_t arraySize)
+{
+    size_t currentIndex = 0;
+    for (Node *currentNode = list->head; currentNode != NULL; currentNode = currentNode->next)
+    {
+        if (currentIndex == arraySize)
+        {
+            return false;
+        }
+        if (currentNode->value != array[currentIndex])
+        {
+            return false;
+        }
+        ++currentIndex;
+    }
+    return true;
 }
