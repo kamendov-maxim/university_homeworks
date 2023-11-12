@@ -4,7 +4,7 @@
 #include <locale.h>
 
 #include "listMergeSort/list.h"
-#include "../getString/getString.h"
+#include "../String/String.h"
 #include "tests/test.h"
 #include "fileReading/fileReading.h"
 

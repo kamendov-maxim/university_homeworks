@@ -4,6 +4,8 @@
 #include <stdbool.h>
 
 #include "list.h"
+#include "../../String/String.h"
+
 
 typedef struct Node
 {
@@ -34,21 +36,6 @@ List *createList(void)
     return newList;
 }
 
-static char *copyString(char * const string, bool const copyRequired)
-{
-    if (copyRequired)
-    {
-        return string;
-    }
-    const size_t len = strlen(string);
-    char *copy = (char *)malloc(len * sizeof(char));
-    if (copy != NULL)
-    {
-        strcpy(copy, string);
-    }
-    return copy;
-}
-
 ListErrorCode append(List *const list, char *const name, char *const number, bool const copyRequired)
 {
     Node *newNode = (Node *)calloc(1, sizeof(Node));
@@ -69,6 +56,7 @@ ListErrorCode append(List *const list, char *const name, char *const number, boo
     char *numberCopy = copyString(number, copyRequired);
     if (numberCopy == NULL)
     {
+        free(nameCopy);
         return memoryError;
     }
 
