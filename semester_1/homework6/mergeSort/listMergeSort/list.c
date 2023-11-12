@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 #include "list.h"
-#include "../../String/String.h"
+#include "../String/String.h"
 
 
 typedef struct Node

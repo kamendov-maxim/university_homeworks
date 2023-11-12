@@ -1,6 +1,6 @@
 #include "fileReading.h"
 #include "../listMergeSort/list.h"
-#include "../../String/String.h"
+#include "../String/String.h"
 
 #define OK 0
 #define DATA_BASE_FILE_WAS_NOT_FOUND 1

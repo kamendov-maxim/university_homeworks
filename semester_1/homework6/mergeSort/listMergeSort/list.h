@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stdbool.h>
 
+#include "../String/String.h"
+
 typedef enum ListErrorCode 
 {
     ok,
