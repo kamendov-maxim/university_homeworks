@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h>
 
 #include "binarySearchTree.h"
@@ -17,7 +16,7 @@ typedef struct Node
 typedef struct Dictionary
 {
     Node *root;
-} Tree;
+} Dictionary;
 
 Dictionary *createDictionary(void)
 {
@@ -57,11 +56,6 @@ DictionaryErrorCode append(Dictionary *dictionary, int const key, char *const va
         Node *newNode = (Node *)calloc(1, sizeof(Node));
         if (newNode == NULL)
         {
-            if (copyRequired)
-            {
-                deleteDictionary(dictionary);
-            }
-
             return memoryError;
         }
         newNode->key = key;
@@ -71,14 +65,20 @@ DictionaryErrorCode append(Dictionary *dictionary, int const key, char *const va
     return ok;
 }
 
-static Node *getMinNode(Node *root)
+static void deleteNode(Node * const nodeToDelete)
+{
+    free(nodeToDelete->value);
+    free(nodeToDelete);
+}
+
+static Node *getMinNode(Node * const root)
 {
     Node *currentNode = root;
     for (; currentNode->leftChild != NULL; currentNode = currentNode->leftChild);
     return currentNode;
 }
 
-void deleteElement(Dictionary *dictionary, int const key)
+void deleteElement(Dictionary * const dictionary, int const key)
 {
     Node **nodeToDelete = searchNode(&(dictionary->root), key);
     if (*nodeToDelete == NULL)
@@ -89,9 +89,7 @@ void deleteElement(Dictionary *dictionary, int const key)
     Node *left = (*nodeToDelete)->leftChild;
     Node *right = (*nodeToDelete)->rightChild;
     
-    free((*nodeToDelete)->value);
-    free(*nodeToDelete);
-    *nodeToDelete = NULL;
+    deleteNode(*nodeToDelete);
 
     if (left != NULL)
     {
@@ -101,11 +99,10 @@ void deleteElement(Dictionary *dictionary, int const key)
             return;
         }
         *nodeToDelete = left;
-        return;
     }
-    if (right != NULL)
+    else if (right != NULL)
     {
-        *nodeToDelete = left;
+        *nodeToDelete = right;
     }
 }
 
@@ -115,10 +112,12 @@ static void deleteRecursion(Node *root)
     {
         return;
     }
+    printf("check %d\n", root == NULL);
     deleteRecursion(root->leftChild);
     deleteRecursion(root->rightChild);
-    free(root->value);
-    free(root);
+    // free(root->value);
+    // free(root);
+    deleteNode(root);
 }
 
 void deleteDictionary(Dictionary *dictionary)
