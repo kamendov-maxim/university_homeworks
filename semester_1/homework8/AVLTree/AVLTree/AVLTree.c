@@ -55,24 +55,24 @@ void updateHeight(Node *root)
     root->height = (leftHeight > rightHeight ? leftHeight : rightHeight) + 1;
 }
 
-static Node *leftBigRotate(Node **root)
+static void leftBigRotate(Node **root)
 {
     Node *a = (*root)->rightChild;
     Node *b = a->leftChild;
     (*root)->rightChild = b;
-    a->leftChild = root;
-    updateHeight(root);
+    a->leftChild = *root;
+    updateHeight(*root);
     updateHeight(a);
     *root = a;
 }
 
-static Node *rightBigRotate(Node **root)
+static void rightBigRotate(Node **root)
 {
     Node *a = (*root)->leftChild;
     Node *b = a->rightChild;
     (*root)->leftChild = b;
-    a->rightChild = root;
-    updateHeight(root);
+    a->rightChild = *root;
+    updateHeight(*root);
     updateHeight(a);
     *root = a;
 }
@@ -93,13 +93,13 @@ static void rightRotate(Node **root)
     Node *a = (*root)->rightChild;
     Node *temp = a->leftChild;
     (*root)->rightChild = temp;
-    a->leftChild = root;
+    a->leftChild = *root;
     updateHeight(*root);
     updateHeight(a);
     *root = a;
 }
 
-static void balance(Node const **const root)
+static void balance(Node  **const root)
 {
     if (nodeBalance(*root) == 2)
     {
@@ -125,10 +125,14 @@ static void balance(Node const **const root)
 
 DictionaryErrorCode append(Dictionary *dictionary, int const key, char *const value, bool const copyRequired)
 {
-    char *valueCopy = copyString(value, copyRequired);
-    if (valueCopy == NULL)
+    char *valueCopy = value;
+    if (copyRequired)
     {
-        return memoryError;
+        valueCopy = copyString(value);
+        if (valueCopy == NULL)
+        {
+            return memoryError;
+        }
     }
 
     Node **nodeToWriteTo = searchNode(&(dictionary->root), key);

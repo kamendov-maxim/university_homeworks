@@ -35,12 +35,8 @@ char *getString(size_t * const len, FILE * filename, char const endOfLine)
     return s;
 }
 
-char *copyString(char * const string, bool const copyRequired)
+char *copyString(char * const string)
 {
-    if (!copyRequired)
-    {
-        return string;
-    }
     const size_t len = strlen(string);
     char *copy = (char *)malloc(len * sizeof(char));
     if (copy != NULL)
