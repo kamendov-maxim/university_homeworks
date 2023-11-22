@@ -43,12 +43,13 @@ int main(void)
         }
     }
 
-    printf("\nДо");
+    printf("\nФункция для удаления элементов с нечетными индексами\n");
+    printf("\nИсходный список");
     printList(list);
 
     deleteOddElements(list);
 
-    printf("\nПослe");
+    printf("\nРезультат работы функции");
     printList(list);
     printf("\n");
 
