@@ -43,13 +43,14 @@ int main(void)
         }
     }
 
-    printf("До\n");
+    printf("\nДо");
     printList(list);
 
     deleteOddElements(list);
 
-    printf("После\n");
+    printf("\nПослe");
     printList(list);
+    printf("\n");
 
     deleteList(list);
     return 0;
@@ -110,5 +111,5 @@ const bool test(void)
     int answerArray2[5] = {5, 8, 6, 1, 11};
     bool testCase2 = testCase(testArray2, 10, answerArray2, 5);
 
-    return testCase2 && testCase2;
+    return testCase1 && testCase2;
 }
