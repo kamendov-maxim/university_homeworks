@@ -99,6 +99,10 @@ void deleteElement(Dictionary *const dictionary, int const key)
         if (right != NULL)
         {
             *nodeToDelete = getMinNode(right);
+            if (*nodeToDelete != right)
+            {
+                (*nodeToDelete)->rightChild = right;
+            }
             return;
         }
         *nodeToDelete = left;
@@ -122,7 +126,7 @@ static void deleteRecursion(Node *root)
     // free(root);
     printf("%d", root == NULL);
     // printf("%d %s", root->key, root->value);
-    // deleteNode(root);
+    deleteNode(root);
 }
 
 void deleteDictionary(Dictionary *dictionary)
