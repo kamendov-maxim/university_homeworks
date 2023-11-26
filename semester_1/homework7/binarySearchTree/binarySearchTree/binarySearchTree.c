@@ -65,20 +65,23 @@ DictionaryErrorCode append(Dictionary *dictionary, int const key, char *const va
     return ok;
 }
 
-static void deleteNode(Node * const nodeToDelete)
+static void deleteNode(Node *const nodeToDelete)
 {
-    free(nodeToDelete->value);
-    free(nodeToDelete);
+    if (nodeToDelete != NULL)
+    {
+        free(nodeToDelete->value);
+        free(nodeToDelete);
+    }
 }
 
-static Node *getMinNode(Node * const root)
+static Node *getMinNode(Node *const root)
 {
     Node *currentNode = root;
     for (; currentNode->leftChild != NULL; currentNode = currentNode->leftChild);
     return currentNode;
 }
 
-void deleteElement(Dictionary * const dictionary, int const key)
+void deleteElement(Dictionary *const dictionary, int const key)
 {
     Node **nodeToDelete = searchNode(&(dictionary->root), key);
     if (*nodeToDelete == NULL)
@@ -88,7 +91,7 @@ void deleteElement(Dictionary * const dictionary, int const key)
 
     Node *left = (*nodeToDelete)->leftChild;
     Node *right = (*nodeToDelete)->rightChild;
-    
+
     deleteNode(*nodeToDelete);
 
     if (left != NULL)
@@ -117,7 +120,9 @@ static void deleteRecursion(Node *root)
     deleteRecursion(root->rightChild);
     // free(root->value);
     // free(root);
-    deleteNode(root);
+    printf("%d", root == NULL);
+    // printf("%d %s", root->key, root->value);
+    // deleteNode(root);
 }
 
 void deleteDictionary(Dictionary *dictionary)

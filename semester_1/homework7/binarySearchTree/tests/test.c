@@ -25,7 +25,7 @@ static bool testCase(size_t testLen, UserInput const *const testCommands, int co
     DictionaryErrorCode dictionaryErrorCode = ok;
     for (size_t currentTest = 0; currentTest < testLen; ++currentTest)
     {
-        printf("iteration\n");
+        // printf("iteration\n");
         switch (testCommands[currentTest])
         {
         case appendCommand:
@@ -33,11 +33,11 @@ static bool testCase(size_t testLen, UserInput const *const testCommands, int co
             // return true;
             // break;
 
-            printf("opopioo\n");
+            // printf("opopioo\n");
             dictionaryErrorCode = append(dictionary, keys[currentKey], values[currentValue], true);
             if (dictionaryErrorCode != ok)
             {
-                printf("ASD");
+                // printf("ASD");
                 deleteDictionary(dictionary);
                 return false;
             }
@@ -90,7 +90,7 @@ static bool testCase(size_t testLen, UserInput const *const testCommands, int co
             break;
         }
     }
-    // deleteDictionary(dictionary);
+    deleteDictionary(dictionary);
     return true;
 }
 
@@ -101,7 +101,7 @@ const bool test(void)
     char *testValues1[2] = {"five", "six"};
     char const *charAnswers1[1] = {"five"};
     bool const boolAnswers1[] = {false};
-    // bool testCase1 = testCase(5, testCommands1, testKeys1, testValues1, charAnswers1, boolAnswers1);
+    bool testCase1 = testCase(5, testCommands1, testKeys1, testValues1, charAnswers1, boolAnswers1);
 
     UserInput testCommands2[5] = {checkKeyCommand, appendCommand, checkKeyCommand, deleteElementCommand, checkKeyCommand};
     int const testKeys2[5] = {1, 1, 1, 1, 1};
@@ -115,8 +115,7 @@ const bool test(void)
     char *testValues3[3] = {"one", "two", "one"};
     char const *charAnswers3[3] = {"one", "two", "one"};
     bool const boolAnswers3[0] = {};
-    // bool testCase3 = testCase(4, testCommands3, testKeys3, testValues3, charAnswers3, boolAnswers3);
+    bool testCase3 = testCase(4, testCommands3, testKeys3, testValues3, charAnswers3, boolAnswers3);
 
-    return true;
-    // return testCase1 && testCase2 && testCase3;
+    return testCase1 && testCase2 && testCase3;
 }
