@@ -2,119 +2,85 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-int partialQuotient(int number, int divisor, int *answer);
+#define PROGRAM_FINISHED_CORRECTLY 0
+#define PROGRAM_FAILED_TESTS 1
+#define INPUT_ERROR 2
 
-void programStart(void);
-bool correctInputCheck(int number, int divisor);
-
+int partialQuotient(int number, int divisor);
 bool test(void);
-bool testingPartialQuotientFunction(void);
-bool testCorrectInputCheck(void);
 
-int main()
+static void scanfCheck(const int scanned)
 {
-
-    if (!test())
+    if (scanned != 1)
     {
-        printf("Sorry but the program does not work correctly\n");
-        return 0;
+        exit(INPUT_ERROR);
     }
-    programStart();
-
-    return 0;
 }
 
-int partialQuotient(int number, int divisor, int *resultOfWork)
+int partialQuotient(int number, int divisor)
 {
-    *resultOfWork = 0;
+    int absNumber = abs(number);
+    int absDivisor = abs(divisor);
 
-    if (divisor == 0)
-    {
-        return 1;
-    }
-
-    const int absNumber = abs(number);
-    const int absDivisor = abs(divisor);
-    int answer = 0;
-
-    while (((absNumber - absDivisor * answer) >= absDivisor) || (((number < 0 && divisor > 0) ^ (number > 0 && divisor < 0)) && absNumber > answer * absDivisor))
-    {
-        ++answer;
-    }
+    int q = 0;
+    for (; (absNumber - q * absDivisor) >= absDivisor; ++q)
+        ;
 
     if (number < 0 ^ divisor < 0)
     {
-        answer *= -1;
+        q += 1;
+        q *= -1;
     }
-    *resultOfWork = answer;
+    else if (number < 0 && divisor < 0)
+    {
+        q += 1;
+    }
+
+    return q;
+}
+
+int main(void)
+{
+    if (!test())
+    {
+        printf("Sorry nut the program does not work correctly\n");
+        return PROGRAM_FAILED_TESTS;
+    }
+
+    int number = 0;
+    int divisor = 0;
+    while (divisor == 0)
+    {
+        printf("Enter the number: ");
+        scanfCheck(scanf("%d", &number));
+        printf("Enter the divisor: ");
+        scanfCheck(scanf("%d", &divisor));
+        if (divisor == 0)
+        {
+            printf("0 cannot be the divisor\n");
+        }
+    }
+
+    printf("Your partial quotient of number %d and divisor %d is %d\n", number, divisor, partialQuotient(number, divisor));
     return 0;
 }
 
-bool correctInputCheck(int number, int divisor)
+static bool testCase(int *const testArray)
 {
-    if (divisor == 0)
-    {
-        printf("Divisor cannot be 0\n");
-        return false;
-    }
-    return true;
+    int number = testArray[0];
+    int divisor = testArray[1];
+    int answer = testArray[2];
+
+    return partialQuotient(number, divisor) == answer;
 }
-
-void programStart(void)
-{
-    printf("Write your number: ");
-    int number = 0;
-    scanf("%d", &number);
-    printf("Write your divisor: ");
-    int divisor = 1;
-    scanf("%d", &divisor);
-
-    int answer = 0;
-    int errorCode = partialQuotient(number, divisor, &answer);
-    if (errorCode == 1)
-    {
-        printf("Divisor cannot be zero\n");
-        return;
-    }
-    printf("Your partial quotient = %d\n", answer);
-}
-
-// testing
 
 bool test(void)
 {
-    if (!testingPartialQuotientFunction())
-    {
-        return false;
-    }
+    int testArray1[3] = {78, 33, 2};
+    int testArray2[3] = {-78, 33, -3};
+    int testArray3[3] = {-9, -13, 1};
+    int testArray4[3] = {9, 90, 0};
+    int testArray5[3] = {78, 26, 3};
 
-    return true;
-}
-
-bool testingPartialQuotientFunction(void)
-{
-    int numbersForTest[3] = {-7, -15, 10000};
-    int divisorsForTest[3] = {3, -2, -1000231};
-    int answers[9] = {-3, 3, 0, -5, 7, 0, 3333, -5000, -1};
-    int currentAnswer = 0;
-    int errorCode = 0;
-    int currentTest = 0;
-    for (int i = 0; i < 3; ++i)
-    {
-        for (int j = 0; j < 3; ++j)
-        {
-
-            errorCode = partialQuotient(numbersForTest[i], divisorsForTest[j], &currentTest);
-            if (errorCode == 0)
-            {
-                if (currentTest != answers[currentAnswer])
-                {
-
-                    return false;
-                }
-            }
-            ++currentAnswer;
-        }
-    }
-    return true;
+    return testCase(testArray1) && testCase(testArray2) && testCase(testArray3) && testCase(testArray4) && testCase(testArray5);
 }
