@@ -102,6 +102,7 @@ void deleteElement(Dictionary *const dictionary, int const key)
             if (*nodeToDelete != right)
             {
                 (*nodeToDelete)->rightChild = right;
+                (*nodeToDelete)->leftChild = left;
             }
             return;
         }
