@@ -1,59 +1,95 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <time.h>
+
+#define PROGRAM_FINISHED_CORRECTLY 0
+#define PROGRAM_FAILED_TESTS 1
+#define INPUT_ERROR 2
+#define RECURSIVE_FIBONACCI_ERROR 3
+#define ITERATIVE_FIBONACCI_ERROR 4
+#define TIME_COMPARE_ERROR 5
+#define SOMETHING_WENT_WRONG_MESSAGE "\nSorry but something went wrong\n"
 
 int iterativeFibonacci(int number, long long int *answer);
 int recursiveFibonacci(int number, long long int *answer);
-long long int recursiveFibonacciBody(int number);
-bool correctInputCheckForRecursiveFunction(int number);
-bool testIterativeFunction(void);
-bool testRecursiveFunction(void);
+double compareTimeOfWork(int (*fibonacci1)(int, long long int *), int (*fibonacci2)(int, long long int *), const int input, int *const errorCode);
 bool test(void);
 
-int main()
+int main(void)
 {
-
     if (!test())
     {
         printf("\nSorry but the program does not work correctly\n");
         return 1;
     }
 
-    printf("\nEnter the number of fbonacci number you want to see: ");
+    printf("\nEnter the number of fibonacci number you want to see: ");
     int number = 0;
-    int scanfNumberOfElements = scanf("%d", &number);
+    int scanned = scanf("%d", &number);
 
-    if (scanfNumberOfElements != 1)
+    if (scanned != 1)
     {
-        printf("\nSorry but something went wrong\n");
-        return 1;
+        printf("%s", SOMETHING_WENT_WRONG_MESSAGE);
+        return INPUT_ERROR;
     }
 
     long long int iterativeAnswer = 0;
     int errorCode1 = iterativeFibonacci(number, &iterativeAnswer);
     if (errorCode1 != 0)
     {
-        printf("\nSorry but something went wrong\n");
-        return 1;
+        printf("%s", SOMETHING_WENT_WRONG_MESSAGE);
+        return ITERATIVE_FIBONACCI_ERROR;
     }
 
     long long int recursiveAnswer = 0;
     int errorCode2 = recursiveFibonacci(number, &recursiveAnswer);
     if (errorCode2 != 0)
     {
-        printf("\nSorry but something went wrong\n");
-        return 1;
-    }
-
-    if (iterativeAnswer != recursiveAnswer)
-    {
-        printf("\nSorry but something went wrong\n");
+        printf("%s", SOMETHING_WENT_WRONG_MESSAGE);
         return 1;
     }
 
     printf("\nResult of work of iterative function: %lld", iterativeAnswer);
     printf("\nResult of work of recursive function: %lld\n", recursiveAnswer);
 
-    return 0;
+    int errorCode = 0;
+
+    double timeCompare = 0.0;
+    for (int number = 1; timeCompare == 0.0; ++number)
+    {
+        timeCompare = compareTimeOfWork(iterativeFibonacci, recursiveFibonacci, number, &errorCode);
+        if (errorCode != 0)
+        {
+            printf("%s", SOMETHING_WENT_WRONG_MESSAGE);
+            return TIME_COMPARE_ERROR;
+        }
+        if (timeCompare < 0.0)
+        {
+            printf("Iterative function is significantly faster than recursive beginning with fibonacci number #%d\n", number);
+        }
+        
+    }
+
+    return PROGRAM_FINISHED_CORRECTLY;
+}
+
+double compareTimeOfWork(int (*fibonacci1)(int, long long int *), int (*fibonacci2)(int, long long int *), const int input, int *const errorCode)
+{
+    long long answer1 = 0;
+    time_t startTime1 = time(NULL);
+    const int errorCode1 = fibonacci1(input, &answer1);
+    time_t finishTime1 = time(NULL);
+    double time1 = difftime(finishTime1, startTime1);
+
+    long long answer2 = 0;
+    time_t startTime2 = time(NULL);
+    const int errorCode2 = fibonacci1(input, &answer2);
+    time_t finishTime2 = time(NULL);
+    double time2 = difftime(finishTime2, startTime2);
+
+    *errorCode = ((errorCode1 != 0 || errorCode2 != 0 || answer1 != answer2) ? 1 : 0);
+
+    return time1 - time2;
 }
 
 int iterativeFibonacci(int number, long long int *answer)
@@ -83,19 +119,7 @@ int iterativeFibonacci(int number, long long int *answer)
     return 0;
 }
 
-int recursiveFibonacci(int number, long long int *answer)
-{
-    if (!correctInputCheckForRecursiveFunction(number))
-    {
-        return 1;
-    }
-
-    *answer = recursiveFibonacciBody(number);
-
-    return 0;
-}
-
-long long int recursiveFibonacciBody(int number)
+static long long int recursiveFibonacciBody(int number)
 {
     if (number == 0)
     {
@@ -108,58 +132,36 @@ long long int recursiveFibonacciBody(int number)
     return recursiveFibonacciBody(number - 1) + recursiveFibonacciBody(number - 2);
 }
 
-bool correctInputCheckForRecursiveFunction(int number)
+int recursiveFibonacci(int number, long long int *answer)
 {
     if (number < 1)
     {
-        return false;
+        return 1;
     }
-    return true;
+
+    *answer = recursiveFibonacciBody(number);
+
+    return 0;
 }
 
-bool testIterativeFunction(void)
+static const bool testFibonacciFunction(int (*fibonacci)(int, long long int *))
 {
     long long int test1 = 0;
-    int errorCode1 = iterativeFibonacci(-5, &test1);
+    int errorCode1 = fibonacci(-5, &test1);
     if (errorCode1 != 1)
     {
         return false;
     }
 
     long long int test2 = 0;
-    int errorCode2 = iterativeFibonacci(3, &test2);
+    int errorCode2 = fibonacci(3, &test2);
     if (test2 != 2 || errorCode2 != 0)
     {
         return false;
     }
 
     long long int test3 = 0;
-    int errorCode3 = iterativeFibonacci(21, &test3);
-    if (test3 != 10946 || errorCode3 != 0)
-    {
-        return false;
-    }
-    return true;
-}
-
-bool testRecursiveFunction(void)
-{
-    long long int test1 = 0;
-    int errorCode1 = recursiveFibonacci(-5, &test1);
-    if (errorCode1 != 1)
-    {
-        return false;
-    }
-
-    long long int test2 = 0;
-    int errorCode2 = recursiveFibonacci(3, &test2);
-    if (test2 != 2 || errorCode2 != 0)
-    {
-        return false;
-    }
-
-    long long int test3 = 0;
-    int errorCode3 = recursiveFibonacci(21, &test3);
+    int errorCode3 = fibonacci(21, &test3);
     if (test3 != 10946 || errorCode3 != 0)
     {
         return false;
@@ -169,15 +171,5 @@ bool testRecursiveFunction(void)
 
 bool test(void)
 {
-    if (!testIterativeFunction())
-    {
-        return false;
-    }
-
-    if (!testRecursiveFunction())
-    {
-        return false;
-    }
-
-    return true;
+    return testFibonacciFunction(iterativeFibonacci) && testFibonacciFunction(iterativeFibonacci);
 }
