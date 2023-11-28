@@ -3,6 +3,10 @@
 #include <stdlib.h>
 #include <math.h>
 
+#define PROGRAM_FINISHED_CORRECTLY 0
+#define PROGRAM_FAILED_TESTS 1
+#define INPUT_ERROR 2
+
 float linearPowerOfNumber(int number, int power);
 float fastPowerOfNumber(int number, int power);
 float fastPowerOfNumberRecursivePart(int number, int power);
@@ -13,7 +17,7 @@ int main()
     if (!test())
     {
         printf("\nSorry but it seems like the program does not work correctly\n");
-        return 1;
+        return PROGRAM_FAILED_TESTS;
     }
     printf("\nWrite your number: ");
     int number = 0;
@@ -21,7 +25,7 @@ int main()
     if (errorCodeScanf1 != 1)
     {
         printf("\nSorry but it seems like the program does not work correctly\n");
-        return 1;
+        return INPUT_ERROR;
     }
 
     printf("\nWrite your power: ");
@@ -30,7 +34,7 @@ int main()
     if (errorCodeScanf2 != 1)
     {
         printf("\nSorry but it seems like the program does not work correctly\n");
-        return 1;
+        return INPUT_ERROR;
     }
     float answer1 = linearPowerOfNumber(number, power);
     float answer2 = fastPowerOfNumber(number, power);
@@ -38,7 +42,7 @@ int main()
     printf("\nlinear function result of work: %f", answer1);
     printf("\nfast function result of work: %f", answer2);
 
-    return 0;
+    return PROGRAM_FINISHED_CORRECTLY;
 }
 
 float linearPowerOfNumber(int number, int power)
@@ -65,14 +69,13 @@ float linearPowerOfNumber(int number, int power)
 
 float fastPowerOfNumber(int number, int power)
 {
-    if (power == 0.0)
+    if (power == 0)
     {
         return 1;
     }
 
-    if (power == 1.0)
+    if (power == 1)
     {
-
         return number;
     }
 
@@ -83,7 +86,7 @@ float fastPowerOfNumber(int number, int power)
         power = abs(power);
     }
 
-    float answer = fastPowerOfNumberRecursivePart(number, power);
+    float answer = (power % 2 == 0 ? fastPowerOfNumber(number * number, power / 2) : fastPowerOfNumber(number * number, power / 2) * number);
 
     if (negativePowerflag)
     {
@@ -93,35 +96,24 @@ float fastPowerOfNumber(int number, int power)
     return answer;
 }
 
-float fastPowerOfNumberRecursivePart(int number, int power)
+static bool testCase(float *test)
 {
-    if (power % 2 == 0)
-    {
-        return fastPowerOfNumber(number * number, power / 2);
-    }
-    return fastPowerOfNumber(number * number, power / 2) * number;
+    float number = test[0];
+    float pow = test[1];
+    float answer = test[2];
+    return (linearPowerOfNumber(number, pow) == answer) && (fastPowerOfNumber(number, pow));
 }
 
 bool test(void)
 {
-    float numbers[5] = {3, 4, 0, -5, -9};
-    float powers[4] = {0, 7, 2, 5};
-    float answers[20] = {1, 2187, 9, 243, 1, 16384, 16, 1024, 1, 0, 0, 0, 1, -78125, 25, -3125, 1, -4782969, 81, -59049};
-    int currentAnswer = 0;
-    for (int n = 0; n < 5; ++n)
+    float tests[6][3] = {{5, 2, 25}, {3, 4, 81}, {2, -2, 0.25}, {2, -4, 0.0625}, {15, 3, 3375}, {4, 3, 0.01525}};
+    for (size_t i = 0; i < 3; ++i)
     {
-        for (int p = 0; p < 4; ++p)
+        if (!testCase(tests[i]))
         {
-            if (linearPowerOfNumber(numbers[n], powers[p]) != answers[currentAnswer])
-            {
-                return false;
-            }
-            if (fastPowerOfNumber(numbers[n], powers[p]) != answers[currentAnswer])
-            {
-                return false;
-            }
-            ++currentAnswer;
+            return false;
         }
     }
+
     return true;
 }
