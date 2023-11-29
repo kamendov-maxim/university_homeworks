@@ -2,7 +2,16 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-int bubbleSort(int array[], int size);
+#define PROGRAM_FINISHED_CORRECTLY 0
+#define PROGRAM_FAILED_TESTS 1
+#define MEMORY_ERROR 2
+#define COUNTING_SORT_ARRAY_ERROR 3
+#define BUBBLE_SORT_ARRAY_ERROR 4
+#define INPUT_ERROR 5
+
+#define SOMETHING_WENT_WRONG_MESSAGE "\nSorry but something went wrong\n"
+
+void bubbleSort(int *const array, const size_t size);
 int countingSort(int array[], int size);
 bool test(void);
 bool checkIfArrayIsSorted(int array[], int size);
@@ -15,31 +24,36 @@ int main()
     if (!test())
     {
         printf("\nSorry but the program does not work correctly\n");
-        return 1;
+        return PROGRAM_FAILED_TESTS;
     }
 
-    int size = 0;
-    printf("Enter the size of the array: ");
-    scanf("%d", &size);
-
-    while (size <= 0)
+    size_t size = 0;
+    while (size == 0)
     {
-        printf("\nSize of your array should be at least 1\n");
         printf("Enter the size of your array: ");
-        scanf("%d", &size);
+        scanf("%zd", &size);
+        if (scanf("%zd", &size) != 1)
+        {
+            return INPUT_ERROR;
+        }
+        if (size == 0)
+        {
+            printf("\nSize of your array should be at least 1\n");
+        }
     }
 
-    int *countingSortArray = malloc(size * sizeof(int));
+    int *countingSortArray = (int *)malloc(size * sizeof(int));
     if (countingSortArray == NULL)
     {
-        printf("\nSorry but something went wrong\n");
-        return 1;
+        printf("%s", SOMETHING_WENT_WRONG_MESSAGE);
+        return MEMORY_ERROR;
     }
 
-    int *bubbleSortArray = malloc(size * sizeof(int));
+    int *bubbleSortArray = (int *)malloc(size * sizeof(int));
     if (bubbleSortArray == NULL)
     {
-        printf("\nSorry but something went wrong\n");
+        printf("%s", SOMETHING_WENT_WRONG_MESSAGE);
+        free(countingSortArray);
         return 1;
     }
 
@@ -56,17 +70,13 @@ int main()
 
     if (errorCode == 1)
     {
-        printf("\nSorry but something went wrong\n");
-        return 1;
+        printf("%s", SOMETHING_WENT_WRONG_MESSAGE);
+        free(bubbleSortArray);
+        free(countingSortArray);
+        return COUNTING_SORT_ARRAY_ERROR;
     }
 
-    errorCode = bubbleSort(bubbleSortArray, size);
-
-    if (errorCode == 1)
-    {
-        printf("\nSorry but something went wrong\n");
-        return 1;
-    }
+    bubbleSort(bubbleSortArray, size);
 
     printf("\nResult of work of counting sort: \n");
     printArray(countingSortArray, size);
@@ -76,19 +86,17 @@ int main()
 
     printf("\n");
 
-    return 0;
+    free(bubbleSortArray);
+    free(countingSortArray);
+
+    return PROGRAM_FINISHED_CORRECTLY;
 }
 
-int bubbleSort(int array[], int size)
+void bubbleSort(int *const array, const size_t size)
 {
-    if (size < 0)
-    {
-        return 2;
-    }
-
     if (size == 0)
     {
-        return 0;
+        return;
     }
 
     int buffer;
@@ -113,13 +121,11 @@ int bubbleSort(int array[], int size)
         ++i;
 
     } while (alreadySwapped);
-
-    return 0;
 }
 
 void printArray(int array[], int size)
 {
-    for (int i = 0; i < size; i++)
+    for (int i = 0; i < size; ++i)
     {
         printf("%d ", array[i]);
     }
@@ -223,36 +229,29 @@ bool test()
 bool testBubbleSort(void)
 {
     int testArray1[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    int errorCode1 = bubbleSort(testArray1, 10);
-    if (errorCode1 != 0 || !checkIfArrayIsSorted(testArray1, 10))
+    bubbleSort(testArray1, 10);
+    if (!checkIfArrayIsSorted(testArray1, 10))
     {
         return false;
     }
 
     int testArray2[10] = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
-    int errorCode2 = bubbleSort(testArray2, 10);
-    if (errorCode2 != 0 || !checkIfArrayIsSorted(testArray2, 10))
+    bubbleSort(testArray2, 10);
+    if (!checkIfArrayIsSorted(testArray2, 10))
     {
         return false;
     }
 
     int testArray3[10] = {4, 8, 2, 3, 1, 9, 7, 5, 10, 6};
-    int errorCode3 = bubbleSort(testArray3, 10);
-    if (errorCode3 != 0 || !checkIfArrayIsSorted(testArray3, 10))
+    bubbleSort(testArray3, 10);
+    if (!checkIfArrayIsSorted(testArray3, 10))
     {
         return false;
     }
 
     int testArray4[10] = {0};
-    int errorCode4 = bubbleSort(testArray4, 10);
-    if (errorCode4 != 0 || !checkIfArrayIsSorted(testArray4, 10))
-    {
-        return false;
-    }
-
-    int testArray5[1] = {1};
-    int errorCode5 = bubbleSort(testArray5, -1);
-    if (errorCode5 != 2)
+    bubbleSort(testArray4, 10);
+    if (!checkIfArrayIsSorted(testArray4, 10))
     {
         return false;
     }
