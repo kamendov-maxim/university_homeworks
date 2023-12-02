@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 
-static bool testCase(size_t testLen, UserInput const *const testCommands, int const *const keys
+static bool testCase(size_t testLen, UserInput const *const testCommands, char ** keys
         , char **values, char const **charAnswers, bool const *const boolAnswers)
 {
     Dictionary *dictionary = createDictionary();
@@ -87,21 +87,21 @@ static bool testCase(size_t testLen, UserInput const *const testCommands, int co
 const bool test(void)
 {
     UserInput testCommands1[5] = {appendCommand, appendCommand, deleteElementCommand, checkKeyCommand, getValueCommand};
-    int const testKeys1[5] = {5, 6, 6, 6, 5};
+    char *testKeys1[5] = {"five", "six", "six", "six", "five"};
     char *testValues1[2] = {"five", "six"};
     char const *charAnswers1[1] = {"five"};
     bool const boolAnswers1[] = {false};
     bool testCase1 = testCase(5, testCommands1, testKeys1, testValues1, charAnswers1, boolAnswers1);
 
     UserInput testCommands2[5] = {checkKeyCommand, appendCommand, checkKeyCommand, deleteElementCommand, checkKeyCommand};
-    int const testKeys2[5] = {1, 1, 1, 1, 1};
+    char *testKeys2[5] = {"one", "one", "one", "one", "one"};
     char *testValues2[1] = {"one"};
     char const *charAnswers2[0] = {};
     bool const boolAnswers2[3] = {false, true, false};
     bool testCase2 = testCase(5, testCommands2, testKeys2, testValues2, charAnswers2, boolAnswers2);
 
     UserInput testCommands3[7] = {appendCommand, getValueCommand, appendCommand, getValueCommand, deleteElementCommand, appendCommand, getValueCommand};
-    int const testKeys3[7] = {1, 1, 1, 1, 1, 1, 1};
+    char *testKeys3[7] = {"one", "one", "one", "one", "one", "one", "one"};
     char *testValues3[3] = {"one", "two", "one"};
     char const *charAnswers3[3] = {"one", "two", "one"};
     bool const boolAnswers3[0] = {};

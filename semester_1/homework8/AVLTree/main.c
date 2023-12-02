@@ -4,7 +4,7 @@
 
 #include "AVLTree/AVLTree.h"
 #include "String/String.h"
-// #include "tests/test.h"
+#include "tests/test.h"
 #include "userInput.h"
 
 #define PROGRAM_FINISHED_CORRECTLY 0
@@ -53,7 +53,12 @@ static const UserInput getCommand(Dictionary *dictionary)
 int main(void)
 {
     setlocale(LC_ALL, "Rus");
-    // 1// }
+
+    if (!test())
+    {
+        printf("К сожалению, сейчас программа не работает\n");
+        return TESTS_ARE_NOT_PASSED;
+    }
 
     Dictionary *dictionary = createDictionary();
     if (dictionary == NULL)
@@ -91,7 +96,6 @@ int main(void)
             }
 
             dictionaryErrorCode = append(dictionary, key, value, false);
-            // free(value);
             break;
         }
 

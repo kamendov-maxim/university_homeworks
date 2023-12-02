@@ -121,17 +121,14 @@ static void rightRotate(Node **root)
 
 static void balance(Node **const root)
 {
-    // printf("edede");
     updateHeight(*root);
     if (nodeBalance(*root) == 2)
     {
-        // printf("e");
         if ((*root)->rightChild >= 0)
         {
             leftRotate(root);
             return;
         }
-        // printf("\nlbr\n");
         leftBigRotate(root);
         return;
     }
@@ -142,7 +139,6 @@ static void balance(Node **const root)
             rightRotate(root);
             return;
         }
-        // printf("\nrbr\n");
 
         rightBigRotate(root);
         return;
@@ -159,7 +155,6 @@ static void balanceTree(Node *node)
 
 DictionaryErrorCode append(Dictionary *dictionary, char *const key, char *const value, bool const copyRequired)
 {
-    // printf("1");
     char *valueCopy = value;
     if (copyRequired)
     {
@@ -169,7 +164,6 @@ DictionaryErrorCode append(Dictionary *dictionary, char *const key, char *const 
             return memoryError;
         }
     }
-    // printf("2");
 
     char *keyCopy = key;
     if (copyRequired)
@@ -181,7 +175,6 @@ DictionaryErrorCode append(Dictionary *dictionary, char *const key, char *const 
             return memoryError;
         }
     }
-    // printf("3");
 
     Node *parent = NULL;
 
@@ -201,10 +194,8 @@ DictionaryErrorCode append(Dictionary *dictionary, char *const key, char *const 
 
     updateHeight(*nodeToWriteTo);
 
-    // printf("4");
 
     balanceTree(*nodeToWriteTo);
-    // printf("5");
 
     return ok;
 }
