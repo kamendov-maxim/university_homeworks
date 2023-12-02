@@ -87,7 +87,6 @@ int main(void)
                 return MEMORY_ERROR;
             }
             dictionaryErrorCode = append(dictionary, key, value, false);
-            // free(value);
             break;
         }
 

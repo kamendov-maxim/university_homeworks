@@ -44,10 +44,14 @@ static Node **searchNode(Node **const root, const int key)
 
 DictionaryErrorCode append(Dictionary *dictionary, int const key, char *const value, bool const copyRequired)
 {
-    char *valueCopy = copyString(value, copyRequired);
-    if (valueCopy == NULL)
+    char *valueCopy = value;
+    if (copyRequired)
     {
-        return memoryError;
+        valueCopy = copyString(value);
+        if (valueCopy == NULL)
+        {
+            return memoryError;
+        }
     }
 
     Node **nodeToWriteTo = searchNode(&(dictionary->root), key);
@@ -77,7 +81,8 @@ static void deleteNode(Node *const nodeToDelete)
 static Node *getMinNode(Node *const root)
 {
     Node *currentNode = root;
-    for (; currentNode->leftChild != NULL; currentNode = currentNode->leftChild);
+    for (; currentNode->leftChild != NULL; currentNode = currentNode->leftChild)
+        ;
     return currentNode;
 }
 
@@ -102,16 +107,19 @@ void deleteElement(Dictionary *const dictionary, int const key)
             if (*nodeToDelete != right)
             {
                 (*nodeToDelete)->rightChild = right;
-                (*nodeToDelete)->leftChild = left;
             }
+            (*nodeToDelete)->leftChild = left;
             return;
         }
         *nodeToDelete = left;
+        return;
     }
     else if (right != NULL)
     {
         *nodeToDelete = right;
+        return;
     }
+    *nodeToDelete = NULL;
 }
 
 static void deleteRecursion(Node *root)
@@ -120,13 +128,8 @@ static void deleteRecursion(Node *root)
     {
         return;
     }
-    printf("check %d\n", root == NULL);
     deleteRecursion(root->leftChild);
     deleteRecursion(root->rightChild);
-    // free(root->value);
-    // free(root);
-    printf("%d", root == NULL);
-    // printf("%d %s", root->key, root->value);
     deleteNode(root);
 }
 

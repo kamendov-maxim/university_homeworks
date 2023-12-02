@@ -15,8 +15,6 @@ static bool testCase(size_t testLen, UserInput const *const testCommands, int co
     {
         return false;
     }
-    // deleteDictionary(dictionary);
-    printf("jgjgjgjg");
     size_t currentKey = 0;
     size_t currentValue = 0;
     size_t currentAnswer = 0;
@@ -25,19 +23,14 @@ static bool testCase(size_t testLen, UserInput const *const testCommands, int co
     DictionaryErrorCode dictionaryErrorCode = ok;
     for (size_t currentTest = 0; currentTest < testLen; ++currentTest)
     {
-        // printf("iteration\n");
         switch (testCommands[currentTest])
         {
         case appendCommand:
         {
-            // return true;
-            // break;
 
-            // printf("opopioo\n");
             dictionaryErrorCode = append(dictionary, keys[currentKey], values[currentValue], true);
             if (dictionaryErrorCode != ok)
             {
-                // printf("ASD");
                 deleteDictionary(dictionary);
                 return false;
             }
@@ -48,7 +41,6 @@ static bool testCase(size_t testLen, UserInput const *const testCommands, int co
 
         case getValueCommand:
         {
-            // return true;
             if (strcmp(getValue(dictionary, keys[currentKey]), charAnswers[currentAnswer]) != 0)
             {
                 deleteDictionary(dictionary);
@@ -61,7 +53,6 @@ static bool testCase(size_t testLen, UserInput const *const testCommands, int co
 
         case checkKeyCommand:
         {
-            // return true;
 
             if (keyCheck(dictionary, keys[currentKey]) != boolAnswers[currentBool])
             {
@@ -75,7 +66,6 @@ static bool testCase(size_t testLen, UserInput const *const testCommands, int co
 
         case deleteElementCommand:
         {
-            // return true;
             deleteElement(dictionary, keys[currentKey]);
             if (keyCheck(dictionary, keys[currentKey]))
             {
