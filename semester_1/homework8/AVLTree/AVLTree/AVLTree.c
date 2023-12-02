@@ -149,6 +149,14 @@ static void balance(Node **const root)
     }
 }
 
+static void balanceTree(Node *node)
+{
+    for (Node *currentNode = node; currentNode != NULL; currentNode = currentNode->parent)
+    {
+        balance(&currentNode);
+    }
+}
+
 DictionaryErrorCode append(Dictionary *dictionary, char *const key, char *const value, bool const copyRequired)
 {
     // printf("1");
@@ -195,12 +203,7 @@ DictionaryErrorCode append(Dictionary *dictionary, char *const key, char *const 
 
     // printf("4");
 
-    for (Node *currentNode = (*nodeToWriteTo); currentNode != NULL; currentNode = currentNode->parent)
-    {
-        // printf("ADFaf");
-        balance(&currentNode);
-    }
-
+    balanceTree(*nodeToWriteTo);
     // printf("5");
 
     return ok;
@@ -216,7 +219,8 @@ static void deleteNode(Node *const nodeToDelete)
 static Node *getMinNode(Node *const root)
 {
     Node *currentNode = root;
-    for (; currentNode->leftChild != NULL; currentNode = currentNode->leftChild);
+    for (; currentNode->leftChild != NULL; currentNode = currentNode->leftChild)
+        ;
     return currentNode;
 }
 
@@ -239,22 +243,28 @@ void deleteElement(Dictionary *const dictionary, char *const key)
         if (right != NULL)
         {
             *nodeToDelete = getMinNode(right);
+            if (*nodeToDelete != right)
+            {
+                (*nodeToDelete)->rightChild = right;
+            }
+            (*nodeToDelete)->leftChild = left;
+            balanceTree(*nodeToDelete);
             return;
         }
         *nodeToDelete = left;
+        balanceTree(*nodeToDelete);
+
+        return;
     }
     else if (right != NULL)
     {
         *nodeToDelete = right;
-    }
+        balanceTree(*nodeToDelete);
 
-    (*nodeToDelete)->parent = parent;
-
-    for (Node *currentNode = (*nodeToDelete); currentNode != NULL; currentNode = currentNode->parent)
-    {
-        // printf("ADFaf");
-        balance(&currentNode);
+        return;
     }
+    *nodeToDelete = NULL;
+    balanceTree(*nodeToDelete);
 }
 
 static void deleteRecursion(Node *root)
@@ -263,7 +273,6 @@ static void deleteRecursion(Node *root)
     {
         return;
     }
-    // printf("check %d\n", root == NULL);
     deleteRecursion(root->leftChild);
     deleteRecursion(root->rightChild);
     deleteNode(root);
