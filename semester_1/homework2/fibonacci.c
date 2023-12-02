@@ -9,13 +9,10 @@
 #define ITERATIVE_FIBONACCI_ERROR 4
 #define TIME_COMPARE_ERROR 5
 #define SOMETHING_WENT_WRONG_MESSAGE "\nSorry but something went wrong\n"
+#define FIBONACCI_OK 0
+#define FIBONACCI_INPUT_ERROR 1
 
-int iterativeFibonacci(int number, long long int *answer);
-int recursiveFibonacci(int number, long long int *answer);
-double compareTimeOfWork(int (*fibonacci1)(int, long long int *), int (*fibonacci2)(int, long long int *), const int input, int *const errorCode);
-bool test(void);
-
-double compareTimeOfWork(int (*fibonacci1)(int, long long int *), int (*fibonacci2)(int, long long int *), const int input, int *const errorCode)
+static double compareTimeOfWork(int (*fibonacci1)(int, long long int *), int (*fibonacci2)(int, long long int *), const int input, bool *const hasError)
 {
     long long answer1 = 0;
     time_t startTime1 = time(NULL);
@@ -29,17 +26,17 @@ double compareTimeOfWork(int (*fibonacci1)(int, long long int *), int (*fibonacc
     time_t finishTime2 = time(NULL);
     double time2 = difftime(finishTime2, startTime2);
 
-    *errorCode = ((errorCode1 != 0 || errorCode2 != 0 || answer1 != answer2) ? 1 : 0);
+    *hasError = ((errorCode1 != FIBONACCI_OK || errorCode2 != FIBONACCI_OK || answer1 != answer2) ? true : false);
 
     return time1 - time2;
 }
 
-int iterativeFibonacci(int number, long long int *answer)
+static int iterativeFibonacci(int number, long long int *answer)
 {
     if (number < 1)
     {
         *answer = -1;
-        return 1;
+        return FIBONACCI_INPUT_ERROR;
     }
 
     long long int currentNumbers[3] = {1, 1, 2};
@@ -47,7 +44,7 @@ int iterativeFibonacci(int number, long long int *answer)
     if (number < 4)
     {
         *answer = currentNumbers[number - 1];
-        return 0;
+        return FIBONACCI_OK;
     }
 
     for (int n = 2; n <= number; ++n)
@@ -58,7 +55,7 @@ int iterativeFibonacci(int number, long long int *answer)
     }
 
     *answer = currentNumbers[0];
-    return 0;
+    return FIBONACCI_OK;
 }
 
 static long long int recursiveFibonacciBody(int number)
@@ -74,16 +71,16 @@ static long long int recursiveFibonacciBody(int number)
     return recursiveFibonacciBody(number - 1) + recursiveFibonacciBody(number - 2);
 }
 
-int recursiveFibonacci(int number, long long int *answer)
+static int recursiveFibonacci(int number, long long int *answer)
 {
     if (number < 1)
     {
-        return 1;
+        return FIBONACCI_INPUT_ERROR;
     }
 
     *answer = recursiveFibonacciBody(number);
 
-    return 0;
+    return FIBONACCI_OK;
 }
 
 static const bool testFibonacciFunction(int (*fibonacci)(int, long long int *))
@@ -97,7 +94,7 @@ static const bool testFibonacciFunction(int (*fibonacci)(int, long long int *))
 
     long long int test2 = 0;
     int errorCode2 = fibonacci(3, &test2);
-    if (test2 != 2 || errorCode2 != 0)
+    if (test2 != 2 || errorCode2 != FIBONACCI_OK)
     {
         return false;
     }
@@ -111,7 +108,7 @@ static const bool testFibonacciFunction(int (*fibonacci)(int, long long int *))
     return true;
 }
 
-bool test(void)
+static bool test(void)
 {
     return testFibonacciFunction(iterativeFibonacci) && testFibonacciFunction(iterativeFibonacci);
 }
@@ -136,7 +133,7 @@ int main(void)
 
     long long int iterativeAnswer = 0;
     int errorCode1 = iterativeFibonacci(number, &iterativeAnswer);
-    if (errorCode1 != 0)
+    if (errorCode1 != FIBONACCI_OK)
     {
         printf("%s", SOMETHING_WENT_WRONG_MESSAGE);
         return ITERATIVE_FIBONACCI_ERROR;
@@ -144,22 +141,22 @@ int main(void)
 
     long long int recursiveAnswer = 0;
     int errorCode2 = recursiveFibonacci(number, &recursiveAnswer);
-    if (errorCode2 != 0)
+    if (errorCode2 != FIBONACCI_OK)
     {
         printf("%s", SOMETHING_WENT_WRONG_MESSAGE);
-        return 1;
+        return RECURSIVE_FIBONACCI_ERROR;
     }
 
     printf("\nResult of work of iterative function: %lld", iterativeAnswer);
     printf("\nResult of work of recursive function: %lld\n", recursiveAnswer);
 
-    int errorCode = 0;
+    bool errorOccured = false;
 
     double timeCompare = 0.0;
     for (int number = 1; timeCompare == 0.0; ++number)
     {
-        timeCompare = compareTimeOfWork(iterativeFibonacci, recursiveFibonacci, number, &errorCode);
-        if (errorCode != 0)
+        timeCompare = compareTimeOfWork(iterativeFibonacci, recursiveFibonacci, number, &errorOccured);
+        if (errorOccured)
         {
             printf("%s", SOMETHING_WENT_WRONG_MESSAGE);
             return TIME_COMPARE_ERROR;
@@ -171,3 +168,4 @@ int main(void)
     }
 
     return PROGRAM_FINISHED_CORRECTLY;
+}
