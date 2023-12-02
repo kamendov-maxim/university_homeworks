@@ -12,40 +12,7 @@ float fastPowerOfNumber(int number, int power);
 float fastPowerOfNumberRecursivePart(int number, int power);
 bool test(void);
 
-int main()
-{
-    if (!test())
-    {
-        printf("\nSorry but it seems like the program does not work correctly\n");
-        return PROGRAM_FAILED_TESTS;
-    }
-    printf("\nWrite your number: ");
-    int number = 0;
-    int errorCodeScanf1 = scanf("%d", &number);
-    if (errorCodeScanf1 != 1)
-    {
-        printf("\nSorry but it seems like the program does not work correctly\n");
-        return INPUT_ERROR;
-    }
-
-    printf("\nWrite your power: ");
-    int power = 0;
-    int errorCodeScanf2 = scanf("%d", &power);
-    if (errorCodeScanf2 != 1)
-    {
-        printf("\nSorry but it seems like the program does not work correctly\n");
-        return INPUT_ERROR;
-    }
-    float answer1 = linearPowerOfNumber(number, power);
-    float answer2 = fastPowerOfNumber(number, power);
-
-    printf("\nlinear function result of work: %f", answer1);
-    printf("\nfast function result of work: %f", answer2);
-
-    return PROGRAM_FINISHED_CORRECTLY;
-}
-
-float linearPowerOfNumber(int number, int power)
+static float linearPowerOfNumber(int number, int power)
 {
     if (power == 0)
     {
@@ -59,15 +26,12 @@ float linearPowerOfNumber(int number, int power)
         answer *= number;
     }
 
-    if (power < 0)
-    {
-        answer = 1 / answer;
-    }
+    answer = (power < 0 ? 1 / answer : answer);
 
     return answer;
 }
 
-float fastPowerOfNumber(int number, int power)
+static float fastPowerOfNumber(int number, int power)
 {
     if (power == 0)
     {
@@ -86,7 +50,7 @@ float fastPowerOfNumber(int number, int power)
         power = abs(power);
     }
 
-    float answer = (power % 2 == 0 ? fastPowerOfNumber(number * number, power / 2) : fastPowerOfNumber(number * number, power / 2) * number);
+    float answer = fastPowerOfNumber(number * number, power / 2) * (power % 2 == 0 ? 1 : number);
 
     if (negativePowerflag)
     {
@@ -104,10 +68,18 @@ static bool testCase(float *test)
     return (linearPowerOfNumber(number, pow) == answer) && (fastPowerOfNumber(number, pow));
 }
 
-bool test(void)
+static bool test(void)
 {
-    float tests[6][3] = {{5, 2, 25}, {3, 4, 81}, {2, -2, 0.25}, {2, -4, 0.0625}, {15, 3, 3375}, {4, 3, 0.01525}};
-    for (size_t i = 0; i < 3; ++i)
+    size_t const amountOfTests = 6;
+    size_t const testSize = 3;
+    float tests[amountOfTests][testSize] = {{5, 2, 25},
+                                            {3, 4, 81},
+                                            {2, -2, 0.25},
+                                            {2, -4, 0.0625},
+                                            {15, 3, 3375},
+                                            {4, -3, 0.015625}};
+
+    for (size_t i = 0; i < amountOfTests; ++i)
     {
         if (!testCase(tests[i]))
         {
@@ -116,4 +88,37 @@ bool test(void)
     }
 
     return true;
+}
+
+int main()
+{
+    if (!test())
+    {
+        printf("\nSorry but it seems like the program does not work correctly\n");
+        return PROGRAM_FAILED_TESTS;
+    }
+
+    printf("\nWrite your number: ");
+    int number = 0;
+    if (scanf("%d", &number) != 1)
+    {
+        printf("\nSorry but it seems like the program does not work correctly\n");
+        return INPUT_ERROR;
+    }
+
+    printf("\nWrite your power: ");
+    int power = 0;
+    if (scanf("%d", &power) != 1)
+    {
+        printf("\nSorry but it seems like the program does not work correctly\n");
+        return INPUT_ERROR;
+    }
+
+    float answer1 = linearPowerOfNumber(number, power);
+    float answer2 = fastPowerOfNumber(number, power);
+
+    printf("\nlinear function result of work: %f", answer1);
+    printf("\nfast function result of work: %f", answer2);
+
+    return PROGRAM_FINISHED_CORRECTLY;
 }
