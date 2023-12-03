@@ -42,7 +42,7 @@ static Node **searchNode(Node **const root, const int key)
     return searchNode((&(*root)->rightChild), key);
 }
 
-DictionaryErrorCode append(Dictionary *dictionary, int const key, char *const value, bool const copyRequired)
+DictionaryErrorCode append(Dictionary * const dictionary, int const key, char * const value, bool const copyRequired)
 {
     char *valueCopy = value;
     if (copyRequired)
@@ -60,6 +60,7 @@ DictionaryErrorCode append(Dictionary *dictionary, int const key, char *const va
         Node *newNode = (Node *)calloc(1, sizeof(Node));
         if (newNode == NULL)
         {
+            free(valueCopy);
             return memoryError;
         }
         newNode->key = key;
@@ -80,9 +81,17 @@ static void deleteNode(Node *const nodeToDelete)
 
 static Node *getMinNode(Node *const root)
 {
+    Node *node = NULL;
     Node *currentNode = root;
     for (; currentNode->leftChild != NULL; currentNode = currentNode->leftChild)
-        ;
+    {
+        if (currentNode->leftChild->leftChild == NULL)
+        {
+            node = currentNode->leftChild;
+            currentNode->leftChild = NULL;
+            return node;
+        }
+    }
     return currentNode;
 }
 

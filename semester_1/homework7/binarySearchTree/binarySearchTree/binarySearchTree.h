@@ -12,6 +12,6 @@ typedef enum DictionaryErrorCode
 Dictionary *createDictionary(void);
 char *getValue(Dictionary *const dictionary, const int key);
 bool keyCheck(Dictionary *const dictionary, const int key);
-DictionaryErrorCode append(Dictionary *dictionary, int const key, char *const value, bool const copyRequired);
-void deleteElement(Dictionary *dictionary, int const key);
-void deleteDictionary(Dictionary *dictionary);
+DictionaryErrorCode append(Dictionary * const dictionary, int const key, char * value, bool const copyRequired);
+void deleteElement(Dictionary * const dictionary, int const key);
+void deleteDictionary(Dictionary * const dictionary);

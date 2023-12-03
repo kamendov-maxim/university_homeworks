@@ -16,7 +16,7 @@
 
 const size_t commandsCount = 5;
 
-static void scanfCheck(int scanned, Dictionary *dictionary)
+static void scanfCheck(int scanned, Dictionary * const dictionary)
 {
     if (scanned != 1)
     {
@@ -26,7 +26,7 @@ static void scanfCheck(int scanned, Dictionary *dictionary)
     }
 }
 
-static UserInput userInput(Dictionary *dictionary)
+static UserInput userInput(Dictionary * const dictionary)
 {
     UserInput input = exitCommand;
     scanfCheck(scanf("%d", &input), dictionary);
@@ -40,7 +40,7 @@ static UserInput userInput(Dictionary *dictionary)
     return input;
 }
 
-static const UserInput getCommand(Dictionary *dictionary)
+static const UserInput getCommand(Dictionary * const dictionary)
 {
     printf("\nДоступные команды:\n0 – выйти\n1 – добавить в словарь значение по ключу \n2 – получить из словаря значение по ключу\n3 – проверить наличие заданного ключа в словаре\n4 - удалить заданный ключ и значение по нему");
     printf("\nВведите номер, соответствующий команде, которую вы хотите выполнить\n");
@@ -84,6 +84,7 @@ int main(void)
             if (value == NULL)
             {
                 printf("Недостаточно памяти\n");
+                deleteDictionary(dictionary);
                 return MEMORY_ERROR;
             }
             dictionaryErrorCode = append(dictionary, key, value, false);
@@ -128,7 +129,6 @@ int main(void)
         {
             printf("Завершение работы\n");
             deleteDictionary(dictionary);
-            exit(PROGRAM_FINISHED_CORRECTLY);
         }
 
         default:
