@@ -2,4 +2,4 @@
 
 #include "../list/list.h"
 
-bool test(void);
+const bool test(void);

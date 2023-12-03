@@ -97,14 +97,7 @@ ListErrorCode pop(List *const list, int const value)
             }
             else
             {
-                if (currentNode->next == NULL)
-                {
-                    temp->next = NULL;
-                }
-                else
-                {
-                    temp->next = currentNode->next;
-                }
+                temp->next = (currentNode->next == NULL ? NULL : currentNode->next);
             }
             free(currentNode);
             return ok;
@@ -121,11 +114,7 @@ bool compareListWithArray(List const *const list, int const *const array, const 
     size_t currentIndex = 0;
     for (Node *currentNode = list->head; currentNode != NULL; currentNode = currentNode->next)
     {
-        if (currentIndex == arraySize)
-        {
-            return false;
-        }
-        if (currentNode->value != array[currentIndex])
+        if (currentIndex == arraySize || currentNode->value != array[currentIndex])
         {
             return false;
         }

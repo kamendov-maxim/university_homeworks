@@ -24,35 +24,36 @@ typedef enum UserInput
 const size_t commandsCount = 4;
 
 
-static void scanfCheck(int scanned)
+static void scanfCheck(int scanned, List *list)
 {
     if (scanned != 1)
     {
         printf("%s", SOMETHING_WENT_WRONG_MESSAGE);
+        deleteList(list);
         exit(INPUT_ERROR);
     }
 }
 
-static UserInput userInput(void)
+static UserInput userInput(List *list)
 {
     UserInput input = exitCommand;
-    scanfCheck(scanf("%d", &input));
+    scanfCheck(scanf("%d", &input), list);
 
     while (input >= commandsCount)
     {
         printf("Проверьте правильность ввода\n");
-        scanfCheck(scanf("%d", &input));
+        scanfCheck(scanf("%d", &input), list);
     }
 
     return input;
 }
 
-static const UserInput getCommand(void)
+static const UserInput getCommand(List *list)
 {
     printf("\nДоступные команды:\n0 – выйти\n1 – добавить значение в сортированный список\n2 – удалить значение из списка\n3 – распечатать список\n");
     printf("\nВведите номер, соответствующий команде, которую вы хотите выполнить\n");
 
-    UserInput input = userInput();
+    UserInput input = userInput(list);
 
     return input;
 }
@@ -67,13 +68,10 @@ int main()
         return TESTS_ARE_NOT_PASSED;
     }
 
-    setlocale(LC_ALL, "Rus");
-
     List *list = createList();
     if (list == NULL)
     {
         printf("Недостаточно памяти\n");
-
         return MEMORY_ERROR;
     }
 
@@ -81,7 +79,7 @@ int main()
     UserInput input = printCommand;
     while (input != exitCommand)
     {
-        UserInput input = getCommand();
+        UserInput input = getCommand(list);
 
         switch (input)
         {
@@ -90,7 +88,7 @@ int main()
             size_t len = 0;
             printf("Ведите значение, которое вы хотите добавить\n");
             int value = 0;
-            scanfCheck(scanf("%d", &value));
+            scanfCheck(scanf("%d", &value), list);
 
             listErrorCode = append(list, value);
             if (listErrorCode != ok)
@@ -109,7 +107,7 @@ int main()
         {
             printf("Введите значение, которое вы хотите удалить:\n");
             int value = 0;
-            scanfCheck(scanf("%d", &value));
+            scanfCheck(scanf("%d", &value), list);
             listErrorCode = pop(list, value);
             if (listErrorCode != ok)
             {

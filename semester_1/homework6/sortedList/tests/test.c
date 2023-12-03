@@ -5,7 +5,7 @@
 
 #define SIZES_ARRAY_SIZE 3
 
-static bool testCase(const int *testArray, const int *referenceArray, const int *popTestArray, const size_t *sizesArray)
+static const bool testCase(const int *testArray, const int *referenceArray, const int *popTestArray, const size_t *sizesArray)
 {
     size_t testArraySize = sizesArray[0];
     size_t popArraySize = sizesArray[1];
@@ -15,6 +15,7 @@ static bool testCase(const int *testArray, const int *referenceArray, const int 
     {
         if (append(list, testArray[i]) != ok)
         {
+            deleteList(list);
             return false;
         }
     }
@@ -22,14 +23,16 @@ static bool testCase(const int *testArray, const int *referenceArray, const int 
     {
         if (pop(list, popTestArray[i]) != ok)
         {
+            deleteList(list);
             return false;
         }
     }
 
+    deleteList(list);
     return compareListWithArray(list, referenceArray, referenceArraySize);
 }
 
-bool test(void)
+const bool test(void)
 {
     const int testArray1[7] = {7, 4, 9, 1, 15, 65, 34};
     const int popTestArray1[3] = {4, 65, 15};
@@ -61,5 +64,5 @@ bool test(void)
     const size_t sizesTestArray5[SIZES_ARRAY_SIZE] = {12, 5, 7};
     bool testCase5 = testCase(testArray5, referenceArray5, popTestArray5, sizesTestArray5);
 
-    return testCase1 && testCase2 && testCase3 && testCase4;
+    return testCase1 && testCase2 && testCase3 && testCase4 && testCase5;
 }
