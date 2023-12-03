@@ -80,20 +80,12 @@ static void deleteNode(Node *const nodeToDelete)
 }
 
 static Node *getMinNode(Node *const root)
-{
-    Node *node = NULL;
-    Node *currentNode = root;
-    for (; currentNode->leftChild != NULL; currentNode = currentNode->leftChild)
-    {
-        if (currentNode->leftChild->leftChild == NULL)
-        {
-            node = currentNode->leftChild;
-            currentNode->leftChild = NULL;
-            return node;
-        }
-    }
-    return currentNode;
-}
+ {
+     Node *currentNode = root;
+     for (; currentNode->leftChild != NULL; currentNode = currentNode->leftChild)
+         ;
+     return currentNode;
+ }
 
 void deleteElement(Dictionary *const dictionary, int const key)
 {
@@ -112,12 +104,9 @@ void deleteElement(Dictionary *const dictionary, int const key)
     {
         if (right != NULL)
         {
-            *nodeToDelete = getMinNode(right);
-            if (*nodeToDelete != right)
-            {
-                (*nodeToDelete)->rightChild = right;
-            }
-            (*nodeToDelete)->leftChild = left;
+            *nodeToDelete = right;
+            Node *minNode = getMinNode(right);
+            minNode->leftChild = left;
             return;
         }
         *nodeToDelete = left;
