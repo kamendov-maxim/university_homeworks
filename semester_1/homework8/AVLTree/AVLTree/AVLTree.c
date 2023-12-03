@@ -32,19 +32,30 @@ static Node **searchNode(Node **const root, char const *const key, Node **parent
         return root;
     }
 
-    if (strcmp(key, ((*root)->key)) == 0)
+    int cmpResult = strcmp(key, (*root)->key);
+
+    if (cmpResult == 0)
     {
         *parent = ((*root)->parent != NULL ? (*root)->parent : NULL);
         return root;
     }
 
     *parent = *root;
-    if (strcmp(key, ((*root)->key)) < 0)
+    if (cmpResult < 0)
     {
         return searchNode(&((*root)->leftChild), key, parent);
     }
-    return searchNode((&(*root)->rightChild), key, parent);
+    return searchNode(&((*root)->rightChild), key, parent);
 }
+
+// static size_t getHeight(Node const * const root)
+// {
+//     if (root->rightChild == NULL && root->rightChild == NULL)
+//     {
+//         root->height = 0;
+//         return;
+//     }
+// }
 
 static int nodeBalance(Node const *const root)
 {
@@ -63,7 +74,7 @@ static int nodeBalance(Node const *const root)
     return rightHeight - leftHeight;
 }
 
-void updateHeight(Node *root)
+static void updateHeight(Node *root)
 {
     if (root->rightChild == NULL && root->rightChild == NULL)
     {
@@ -124,7 +135,7 @@ static void balance(Node **const root)
     updateHeight(*root);
     if (nodeBalance(*root) == 2)
     {
-        if ((*root)->rightChild >= 0)
+        if (nodeBalance((*root)->rightChild) >= 0)
         {
             leftRotate(root);
             return;
@@ -134,7 +145,7 @@ static void balance(Node **const root)
     }
     else if (nodeBalance(*root) == -2)
     {
-        if ((*root)->rightChild <= 0)
+        if (nodeBalance((*root)->rightChild) <= 0)
         {
             rightRotate(root);
             return;
