@@ -11,13 +11,164 @@
 
 #define SOMETHING_WENT_WRONG_MESSAGE "\nSorry but something went wrong\n"
 
+typedef enum SortingErrorCode
+{
+    ok,
+    memoryError
+} SortingErrorCode;
+
 void bubbleSort(int *const array, const size_t size);
-int countingSort(int array[], int size);
+SortingErrorCode countingSort(int array[], const size_t size);
 bool test(void);
-bool checkIfArrayIsSorted(int array[], int size);
+bool checkIfArrayIsSorted(int const *const array, size_t size);
 bool testBubbleSort(void);
 bool testCountingSort(void);
-void printArray(int array[], int size);
+void printArray(int const *const array, const size_t size);
+
+void bubbleSort(int *const array, const size_t size)
+{
+    if (size == 0)
+    {
+        return;
+    }
+
+    int buffer;
+    size_t i = 0;
+    bool alreadySwapped = false;
+
+    do
+    {
+        alreadySwapped = false;
+
+        for (size_t j = 0; j < size - 1 - i; ++j)
+        {
+            if (array[j] > array[j + 1])
+            {
+                buffer = array[j];
+                array[j] = array[j + 1];
+                array[j + 1] = buffer;
+                alreadySwapped = true;
+            }
+        }
+
+        ++i;
+
+    } while (alreadySwapped);
+}
+
+void printArray(int const *const array, const size_t size)
+{
+    for (size_t i = 0; i < size; ++i)
+    {
+        printf("%d ", array[i]);
+    }
+    printf("\n");
+}
+
+SortingErrorCode countingSort(int *const array, const size_t size)
+{
+    if (size == 0)
+    {
+        return ok;
+    }
+
+    int maxElement = array[0];
+    for (size_t i = 0; i < size; ++i)
+    {
+        if (array[i] > maxElement)
+        {
+            maxElement = array[i];
+        }
+    }
+
+    int *countArray = malloc(maxElement * sizeof(int));
+    if (countArray == NULL)
+    {
+        return memoryError;
+    }
+
+    for (size_t i = 0; i < size; ++i)
+    {
+        ++countArray[array[i]];
+    }
+
+    for (size_t i = 1; i < maxElement; ++i)
+    {
+        countArray[i] += countArray[i - 1];
+    }
+
+    for (size_t i = maxElement; i > 0; --i)
+    {
+        countArray[i] = countArray[i - 1];
+    }
+    countArray[0] = 0;
+
+    for (size_t i = 0; i < size; ++i)
+    {
+        int temp = array[i];
+        array[countArray[array[i]]] = array[i];
+        ++countArray[temp];
+    }
+
+    free(countArray);
+    return ok;
+}
+
+bool checkIfArrayIsSorted(int const *const array, size_t size)
+{
+    int previousElement = array[0];
+    for (size_t i = 1; i < size; ++i)
+    {
+        if (previousElement > array[i])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+static const bool testCase(int *const testArray, void * (*sortingFunction)(int *const, const size_t), const size_t testArraySize)
+{
+    int *tempArray = (int *)malloc(testArraySize);
+    if (tempArray == NULL)
+    {
+        return false;
+    }
+
+    for (size_t i = 0; i < testArraySize; ++i)
+    {
+        tempArray[i] = testArray[i];
+    }
+
+    if (sortingFunction(tempArray, testArraySize) == ok)
+    {
+        return false;
+    }
+
+    const bool answer = checkIfArrayIsSorted(tempArray, testArraySize);
+    free(tempArray);
+    return answer;
+}
+
+bool test(void)
+{
+    const size_t amountOfTests = 10;
+    const size_t testArraySize = 10;
+    int tests[amountOfTests][testArraySize] = {
+        {1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+        {10, 9, 8, 7, 6, 5, 4, 3, 2, 1},
+        {4, 8, 2, 3, 1, 9, 7, 5, 10, 6},
+        {0}};
+
+    for (size_t i = 0; i < amountOfTests; ++i)
+    {
+        if (!(testCase(tests[i], bubbleSort, testArraySize) && testCase(tests[i], countingSort, testArraySize)))
+        {
+            return false;
+        }
+    }
+    return true;
+}
 
 int main()
 {
@@ -90,211 +241,4 @@ int main()
     free(countingSortArray);
 
     return PROGRAM_FINISHED_CORRECTLY;
-}
-
-void bubbleSort(int *const array, const size_t size)
-{
-    if (size == 0)
-    {
-        return;
-    }
-
-    int buffer;
-    int i = 0;
-    bool alreadySwapped = false;
-
-    do
-    {
-        alreadySwapped = false;
-
-        for (int j = 0; j < size - 1 - i; ++j)
-        {
-            if (array[j] > array[j + 1])
-            {
-                buffer = array[j];
-                array[j] = array[j + 1];
-                array[j + 1] = buffer;
-                alreadySwapped = true;
-            }
-        }
-
-        ++i;
-
-    } while (alreadySwapped);
-}
-
-void printArray(int array[], int size)
-{
-    for (int i = 0; i < size; ++i)
-    {
-        printf("%d ", array[i]);
-    }
-    printf("\n");
-}
-
-int countingSort(int array[], int size)
-{
-    if (size < 0)
-    {
-        return 2;
-    }
-
-    if (size == 0)
-    {
-        return 0;
-    }
-
-    int maxElement = array[0];
-    for (int i = 0; i < size; ++i)
-    {
-        if (array[i] > maxElement)
-        {
-            maxElement = array[i];
-        }
-    }
-
-    int *countArray = malloc(maxElement * sizeof(int));
-    if (countArray == NULL)
-    {
-        return 1;
-    }
-
-    for (int i = 0; i < size; ++i)
-    {
-        ++countArray[array[i]];
-    }
-
-    for (int i = 1; i < maxElement; ++i)
-    {
-        countArray[i] += countArray[i - 1];
-    }
-
-    for (int i = maxElement; i > 0; --i)
-    {
-        countArray[i] = countArray[i - 1];
-    }
-    countArray[0] = 0;
-
-    int *outputArray = malloc(size * sizeof(int));
-    if (outputArray == NULL)
-    {
-        free(countArray);
-        return 1;
-    }
-
-    for (int i = 0; i < size; ++i)
-    {
-        outputArray[countArray[array[i]]] = array[i];
-        ++countArray[array[i]];
-    }
-
-    for (int i = 0; i < size; ++i)
-    {
-        array[i] = outputArray[i];
-    }
-
-    free(countArray);
-    free(outputArray);
-    return 0;
-}
-
-bool checkIfArrayIsSorted(int array[], int size)
-{
-    int previousElement = array[0];
-    for (int i = 1; i < size; ++i)
-    {
-        if (previousElement > array[i])
-        {
-            return false;
-        }
-    }
-    return true;
-}
-
-bool test()
-{
-    if (!testBubbleSort())
-    {
-        return false;
-    }
-
-    if (!testCountingSort())
-    {
-        return false;
-    }
-
-    return true;
-}
-
-bool testBubbleSort(void)
-{
-    int testArray1[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    bubbleSort(testArray1, 10);
-    if (!checkIfArrayIsSorted(testArray1, 10))
-    {
-        return false;
-    }
-
-    int testArray2[10] = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
-    bubbleSort(testArray2, 10);
-    if (!checkIfArrayIsSorted(testArray2, 10))
-    {
-        return false;
-    }
-
-    int testArray3[10] = {4, 8, 2, 3, 1, 9, 7, 5, 10, 6};
-    bubbleSort(testArray3, 10);
-    if (!checkIfArrayIsSorted(testArray3, 10))
-    {
-        return false;
-    }
-
-    int testArray4[10] = {0};
-    bubbleSort(testArray4, 10);
-    if (!checkIfArrayIsSorted(testArray4, 10))
-    {
-        return false;
-    }
-
-    return true;
-}
-
-bool testCountingSort(void)
-{
-    int testArray1[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    int errorCode1 = countingSort(testArray1, 10);
-    if (errorCode1 != 0 || !checkIfArrayIsSorted(testArray1, 10))
-    {
-        return false;
-    }
-
-    int testArray2[10] = {10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
-    int errorCode2 = countingSort(testArray2, 10);
-    if (errorCode2 != 0 || !checkIfArrayIsSorted(testArray2, 10))
-    {
-        return false;
-    }
-
-    int testArray3[10] = {4, 8, 2, 3, 1, 9, 7, 5, 10, 6};
-    int errorCode3 = countingSort(testArray3, 10);
-    if (errorCode3 != 0 || !checkIfArrayIsSorted(testArray3, 10))
-    {
-        return false;
-    }
-
-    int testArray4[10] = {0};
-    int errorCode4 = countingSort(testArray4, 10);
-    if (errorCode4 != 0 || !checkIfArrayIsSorted(testArray4, 10))
-    {
-        return false;
-    }
-
-    int testArray5[1] = {1};
-    int errorCode5 = countingSort(testArray5, -1);
-    if (errorCode5 != 2)
-    {
-        return false;
-    }
-
-    return true;
 }
