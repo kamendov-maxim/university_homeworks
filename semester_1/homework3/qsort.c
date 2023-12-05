@@ -78,15 +78,6 @@ static void smartQuickSort(int array[], int leftElement, int rightElement)
    }
 }
 
-static void generateRandomArray(int * array, size_t size)
-{
-   for (size_t i = 0; i < size; ++i)
-   {
-      srand(time(NULL));
-      array[i] = rand() % 100;
-   }
-}
-
 static const bool testSwapFunction(void)
 {
    int firstValue = 0;
