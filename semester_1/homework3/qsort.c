@@ -2,106 +2,39 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 
-int partition(int array[], int leftElement, int rightElement);
-void swap(int *firstValue, int *secondValue);
-void printArray(int array[], int size);
-void generateRandomArray(int array[], int size);
-int insertSort(int array[], int leftElement, int rightElement);
-int binarySearch(int array[], int elementWeAreLookingFor, int leftEdge, int rightEdge);
-int smartQuickSort(int array[], int leftElement, int rightElement);
+#define PROGRAM_FINISHED_CORRECTLY 0
+#define PROGRAM_FAILED_TESTS 1
+#define MEMORY_ERROR 2
+#define INPUT_ERROR 3
+#define ELEMENT_NOT_FOUND -1
 
-bool test(void);
-bool testSmartQuickSort(void);
-bool testPartitionFunction(void);
-bool testSwapFunction(void);
-bool testStarterForBinarySearch(int testArray[], int elementWeAreLookingFor, int answer, int size);
-bool testStarterForPartitionFunction(int testArray[], int answerArray[], int size);
-bool testBinarySearch(void);
-bool testSortings(void);
-bool checkIfArrayIsSorted(int array[], int size);
-bool testStarterForArrays(int testArray[], int answerArray[], int size);
+const bool test(void);
 
-int main()
+static void printArray(int *array, size_t size)
 {
-   if (!test())
-   {
-      return 1;
-   }
-
-   printf("\nEnter the size of your array: ");
-   int size = 0;
-   scanf("%d", &size);
-
-   while (size <= 0)
-   {
-      printf("\nSize of your array should be at least 1\n");
-      printf("Enter the size of your array: ");
-      scanf("%d", &size);
-   }
-
-   int *array = malloc(size * sizeof(int));
-   if (array == NULL)
-   {
-      printf("\nSorry but something went wrong\n");
-      return 1;
-   }
-
-   printf("Enter numbers of your array one by one each other on the next line: \n");
-
-   for (int i = 0; i < size; ++i)
-   {
-      printf("Enter %d number of your array: ", i + 1);
-      int currentNumber = 0;
-      scanf("%d", &currentNumber);
-      array[i] = currentNumber;
-   }
-
-   printf("\nYour array before getting sorted: \n");
-   printArray(array, size);
-
-   int errorCode = smartQuickSort(array, 0, size - 1);
-   if (errorCode == 1)
-   {
-      printf("\nSorry but something went wrong\n");
-      return 1;
-   }
-
-   if (errorCode == 2)
-   {
-      printf("\nsmartQuickSort: Incorrect input\n");
-      return 1;
-   }
-
-   printf("\nYour array after getting sorted: \n");
-   printArray(array, size);
-
-   return 0;
-}
-
-void printArray(int array[], int size)
-{
-   for (int i = 0; i < size; ++i)
+   for (size_t i = 0; i < size; ++i)
    {
       printf("%d ", array[i]);
    }
    printf("\n");
 }
 
-void swap(int *firstValue, int *secondValue)
+static void swap(int *firstValue, int *secondValue)
 {
    int buffer = *firstValue;
    *firstValue = *secondValue;
    *secondValue = buffer;
 }
 
-int partition(int array[], int leftElement, int rightElement)
+static size_t partition(int *array, size_t leftElement, size_t rightElement)
 {
    rightElement -= 1;
    int currentSeparator = array[leftElement];
-   int i = rightElement;
+   size_t i = rightElement;
 
-   for (int j = rightElement; j > leftElement; --j)
+   for (size_t j = rightElement; j > leftElement; --j)
    {
       if (array[j] >= currentSeparator)
       {
@@ -115,46 +48,8 @@ int partition(int array[], int leftElement, int rightElement)
    return i;
 }
 
-int smartQuickSort(int array[], int leftElement, int rightElement)
+static void insertSort(int array[], int leftElement, int rightElement)
 {
-   if (rightElement < leftElement)
-   {
-      return 2;
-   }
-
-   if (rightElement - leftElement + 1 < 10)
-   {
-      int errorCode = insertSort(array, leftElement, rightElement + 1);
-      if (errorCode != 0)
-      {
-         return 1;
-      }
-      return 0;
-   }
-   if (leftElement < rightElement)
-   {
-      int currentSeparator = partition(array, 0, rightElement);
-      smartQuickSort(array, leftElement, currentSeparator - 1);
-      smartQuickSort(array, currentSeparator + 1, rightElement);
-   }
-   return 0;
-}
-
-void generateRandomArray(int array[], int size)
-{
-   for (int i = 0; i < size; ++i)
-   {
-      array[i] = rand() % 100;
-   }
-}
-
-int insertSort(int array[], int leftElement, int rightElement)
-{
-   if (rightElement < leftElement)
-   {
-      return 1;
-   }
-
    for (int i = leftElement; i < rightElement; ++i)
    {
       int currentElement = array[i];
@@ -166,59 +61,43 @@ int insertSort(int array[], int leftElement, int rightElement)
       }
       array[j + 1] = currentElement;
    }
-   return 0;
 }
 
-int binarySearch(int array[], int elementWeAreLookingFor, int leftEdge, int rightEdge)
+static void smartQuickSort(int array[], int leftElement, int rightElement)
 {
-   while (leftEdge <= rightEdge)
+   if (rightElement - leftElement + 1 < 10)
    {
-      int middleElement = leftEdge + (rightEdge - leftEdge) / 2;
-
-      if (array[middleElement] == elementWeAreLookingFor)
-      {
-         return middleElement;
-      }
-
-      if (array[middleElement] < elementWeAreLookingFor)
-      {
-         leftEdge = middleElement + 1;
-      }
-
-      else
-      {
-         rightEdge = middleElement - 1;
-      }
+      insertSort(array, leftElement, rightElement + 1);
+      return;
    }
-
-   return -1;
+   if (leftElement < rightElement)
+   {
+      int currentSeparator = partition(array, 0, rightElement);
+      smartQuickSort(array, leftElement, currentSeparator - 1);
+      smartQuickSort(array, currentSeparator + 1, rightElement);
+   }
 }
 
-bool test(void)
+static void generateRandomArray(int * array, size_t size)
 {
-   if (!(testSwapFunction() * testPartitionFunction() * testSmartQuickSort()))
+   for (size_t i = 0; i < size; ++i)
    {
-      return false;
+      srand(time(NULL));
+      array[i] = rand() % 100;
    }
-
-   return true;
 }
 
-bool testSwapFunction(void)
+static const bool testSwapFunction(void)
 {
    int firstValue = 0;
    int secondValue = 1;
    swap(&firstValue, &secondValue);
-   if (firstValue != 1 || secondValue != 0)
-   {
-      return false;
-   }
-   return true;
+   return firstValue == 1 && secondValue == 0;
 }
 
-bool testStarterForArrays(int testArray[], int answerArray[], int size)
+static const bool testStarterForArrays(int testArray[], int answerArray[], int size)
 {
-   for (int i = 0; i < size; ++i)
+   for (size_t i = 0; i < size; ++i)
    {
       if (testArray[i] != answerArray[i])
       {
@@ -228,7 +107,7 @@ bool testStarterForArrays(int testArray[], int answerArray[], int size)
    return true;
 }
 
-bool testPartitionFunction(void)
+static const bool testPartitionFunction(void)
 {
    int testArray1[9] = {61, 99, 60, 80, 27, 57, 35, 81, 80};
    int answerArray1[9] = {27, 57, 60, 35, 61, 99, 80, 81, 80};
@@ -247,17 +126,11 @@ bool testPartitionFunction(void)
    partition(testArray3, 0, 5);
    partition(testArray4, 0, 1);
 
-   if (!(testStarterForArrays(testArray1, answerArray1, 9) * testStarterForArrays(testArray2, answerArray2, 6) * testStarterForArrays(testArray3, answerArray3, 5) * testStarterForArrays(testArray4, answerArray4, 1)))
-   {
-      return false;
-   }
-
-   return true;
+   return testStarterForArrays(testArray1, answerArray1, 9) && testStarterForArrays(testArray2, answerArray2, 6) && testStarterForArrays(testArray3, answerArray3, 5) && testStarterForArrays(testArray4, answerArray4, 1);
 }
 
-bool testSmartQuickSort(void)
+static const bool testSmartQuickSort(void)
 {
-
    int testArray1[5] = {5, 4, 3, 2, 1};
    int answerArray1[5] = {1, 2, 3, 4, 5};
 
@@ -267,28 +140,65 @@ bool testSmartQuickSort(void)
    int testArray3[1] = {1};
    int answerArray3[1] = {1};
 
-   int errorCode = smartQuickSort(testArray1, 0, 5 - 1);
-   if (errorCode != 0)
+   smartQuickSort(testArray1, 0, 5 - 1);
+
+   smartQuickSort(testArray2, 0, 5 - 1);
+
+   smartQuickSort(testArray3, 0, 1 - 1);
+
+   return testStarterForArrays(testArray1, answerArray1, 5) && testStarterForArrays(testArray2, answerArray2, 5) && testStarterForArrays(testArray3, answerArray3, 1);
+}
+
+const bool test(void)
+{
+   return testSwapFunction() && testPartitionFunction() && testSmartQuickSort();
+}
+
+int main(void)
+{
+   if (!test())
    {
-      return false;
+      return PROGRAM_FAILED_TESTS;
    }
 
-   errorCode = smartQuickSort(testArray2, 0, 5 - 1);
-   if (errorCode != 0)
+   int size = 0;
+   while (size <= 0)
    {
-      return false;
+      printf("Enter the size of your array: ");
+      if (scanf("%d", &size) != 1)
+      {
+         return INPUT_ERROR;
+      }
+      if (size <= 0)
+      {
+         printf("\nSize of your array should be at least 1\n");
+      }
    }
 
-   errorCode = smartQuickSort(testArray3, 0, 1 - 1);
-   if (errorCode != 0)
+   int *array = (int *)malloc(size * sizeof(int));
+   if (array == NULL)
    {
-      return false;
+      printf("\nSorry but something went wrong\n");
+      return MEMORY_ERROR;
    }
 
-   if (!(testStarterForArrays(testArray1, answerArray1, 5) * testStarterForArrays(testArray2, answerArray2, 5) * testStarterForArrays(testArray3, answerArray3, 1)))
+   printf("Enter numbers of your array one by one each other on the next line: \n");
+
+   for (size_t i = 0; i < size; ++i)
    {
-      return false;
+      printf("Enter %lu number of your array: ", i + 1);
+      int currentNumber = 0;
+      scanf("%d", &currentNumber);
+      array[i] = currentNumber;
    }
 
-   return true;
+   printf("\nYour array before getting sorted: \n");
+   printArray(array, size);
+
+   smartQuickSort(array, 0, size - 1);
+
+   printf("\nYour array after getting sorted: \n");
+   printArray(array, size);
+
+   return PROGRAM_FINISHED_CORRECTLY;
 }
