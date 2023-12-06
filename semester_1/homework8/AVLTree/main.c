@@ -16,7 +16,7 @@
 
 const size_t commandsCount = 5;
 
-static void scanfCheck(int scanned, Dictionary *dictionary)
+static void scanfCheck(int scanned, Dictionary *const dictionary)
 {
     if (scanned != 1)
     {
@@ -26,7 +26,7 @@ static void scanfCheck(int scanned, Dictionary *dictionary)
     }
 }
 
-static UserInput userInput(Dictionary *dictionary)
+static UserInput userInput(Dictionary *const dictionary)
 {
     UserInput input = exitCommand;
     scanfCheck(scanf("%d", &input), dictionary);
@@ -40,14 +40,33 @@ static UserInput userInput(Dictionary *dictionary)
     return input;
 }
 
-static const UserInput getCommand(Dictionary *dictionary)
+static const UserInput getCommand(Dictionary *const dictionary)
 {
-    printf("\nДоступные команды:\n0 – выйти\n1 – добавить в словарь значение по ключу \n2 – получить из словаря значение по ключу\n3 – проверить наличие заданного ключа в словаре\n4 - удалить заданный ключ и значение по нему");
+    printf("\nДоступные команды: ");
+    printf("\n0 – выйти");
+    printf("\n1 – добавить в словарь значение по ключу");
+    printf("\n2 – получить из словаря значение по ключу");
+    printf("\n3 – проверить наличие заданного ключа в словаре");
+    printf("\n4 - удалить заданный ключ и значение по нему");
     printf("\nВведите номер, соответствующий команде, которую вы хотите выполнить\n");
 
-    UserInput input = userInput(dictionary);
+    return userInput(dictionary);
+}
 
-    return input;
+static char *getKey(Dictionary *dictionary)
+{
+    fgetc(stdin);
+    printf("Введите ключ: ");
+    size_t len = 0;
+
+    char *key = getString(&len, stdin, '\n');
+    if (key == NULL)
+    {
+        printf("Недостаточно памяти\n");
+        deleteDictionary(dictionary);
+        exit(MEMORY_ERROR);
+    }
+    return key;
 }
 
 int main(void)
@@ -76,21 +95,13 @@ int main(void)
         {
         case appendCommand:
         {
-            fgetc(stdin);
-            printf("Введите ключ: ");
-            char *key = getString(&len, stdin, '\n');                                
-            if (key == NULL)
-            {
-                printf("Недостаточно памяти\n");
-                deleteDictionary(dictionary);
-                return MEMORY_ERROR;
-            }                                 
-
+            char *key = getKey(dictionary);
             printf("Введите значение: ");
             char *value = getString(&len, stdin, '\n');
             if (value == NULL)
             {
                 printf("Недостаточно памяти\n");
+                free(key);
                 deleteDictionary(dictionary);
                 return MEMORY_ERROR;
             }
@@ -101,16 +112,7 @@ int main(void)
 
         case getValueCommand:
         {
-            fgetc(stdin);
-            printf("Введите ключ: ");
-            char *key = getString(&len, stdin, '\n');           
-
-            if (key == NULL)
-            {
-                printf("Недостаточно памяти\n");
-                deleteDictionary(dictionary);
-                return MEMORY_ERROR;
-            }
+            char *key = getKey(dictionary);
             char *value = getValue(dictionary, key);
             if (value == NULL)
             {
@@ -124,15 +126,7 @@ int main(void)
 
         case checkKeyCommand:
         {
-            fgetc(stdin);
-            printf("Введите ключ: ");
-            char *key = getString(&len, stdin, '\n');
-            if (key == NULL)
-            {
-                printf("Недостаточно памяти\n");
-                deleteDictionary(dictionary);
-                return MEMORY_ERROR;
-            }
+            char *key = getKey(dictionary);
             printf("%s", (keyCheck(dictionary, key) ? "Такой ключ есть в словаре\n" : "В словаре нет такого ключа\n"));
             free(key);
             break;
@@ -140,15 +134,7 @@ int main(void)
 
         case deleteElementCommand:
         {
-            fgetc(stdin);
-            printf("Введите ключ: ");
-            char *key = getString(&len, stdin, '\n');
-            if (key == NULL)
-            {
-                printf("Недостаточно памяти\n");
-                deleteDictionary(dictionary);
-                return MEMORY_ERROR;
-            }
+            char *key = getKey(dictionary);
             deleteElement(dictionary, key);
             free(key);
             printf("Элемент удален\n");

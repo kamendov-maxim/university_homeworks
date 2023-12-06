@@ -25,7 +25,7 @@ Dictionary *createDictionary(void)
     return (Dictionary *)calloc(1, sizeof(Dictionary));
 }
 
-static Node **searchNode(Node **const root, char const *const key, Node **parent)
+static Node **searchNode(Node **const root, char const *const key, Node **const parent)
 {
     if (*root == NULL)
     {
@@ -48,45 +48,34 @@ static Node **searchNode(Node **const root, char const *const key, Node **parent
     return searchNode(&((*root)->rightChild), key, parent);
 }
 
-// static size_t getHeight(Node const * const root)
-// {
-//     if (root->rightChild == NULL && root->rightChild == NULL)
-//     {
-//         root->height = 0;
-//         return;
-//     }
-// }
+static size_t getHeight(Node const *const root)
+{
+    return (root != NULL ? root->height : 0);
+}
 
 static int nodeBalance(Node const *const root)
 {
-    size_t rightHeight = 0;
-    if (root->rightChild != NULL)
-    {
-        rightHeight = root->rightChild->height;
-    }
-
-    size_t leftHeight = 0;
-    if (root->leftChild != NULL)
-    {
-        leftHeight = root->leftChild->height;
-    }
-
-    return rightHeight - leftHeight;
+    return getHeight(root->rightChild) - getHeight(root->leftChild);
 }
 
 static void updateHeight(Node *root)
 {
+    if (root == NULL)
+    {
+        return;
+    }
+
     if (root->rightChild == NULL && root->rightChild == NULL)
     {
         root->height = 0;
         return;
     }
-    size_t leftHeight = (root->leftChild != NULL ? root->leftChild->height : 0);
-    size_t rightHeight = (root->rightChild != NULL ? root->rightChild->height : 0);
+    size_t leftHeight = getHeight(root->leftChild);
+    size_t rightHeight = getHeight(root->rightChild);
     root->height = (leftHeight > rightHeight ? leftHeight : rightHeight) + 1;
 }
 
-static void leftBigRotate(Node **root)
+static void leftBigRotate(Node **const root)
 {
     Node *a = (*root)->rightChild;
     Node *b = a->leftChild;
@@ -97,7 +86,7 @@ static void leftBigRotate(Node **root)
     *root = a;
 }
 
-static void rightBigRotate(Node **root)
+static void rightBigRotate(Node **const root)
 {
     Node *a = (*root)->leftChild;
     Node *b = a->rightChild;
@@ -108,7 +97,7 @@ static void rightBigRotate(Node **root)
     *root = a;
 }
 
-static void leftRotate(Node **root)
+static void leftRotate(Node **const root)
 {
     Node *a = (*root)->leftChild;
     Node *temp = a->rightChild;
@@ -119,7 +108,7 @@ static void leftRotate(Node **root)
     *root = a;
 }
 
-static void rightRotate(Node **root)
+static void rightRotate(Node **const root)
 {
     Node *a = (*root)->rightChild;
     Node *temp = a->leftChild;
@@ -156,7 +145,7 @@ static void balance(Node **const root)
     }
 }
 
-static void balanceTree(Node *node)
+static void balanceTree(Node *const node)
 {
     for (Node *currentNode = node; currentNode != NULL; currentNode = currentNode->parent)
     {
@@ -164,7 +153,7 @@ static void balanceTree(Node *node)
     }
 }
 
-DictionaryErrorCode append(Dictionary *dictionary, char *const key, char *const value, bool const copyRequired)
+DictionaryErrorCode append(Dictionary *const dictionary, char *const key, char *const value, bool const copyRequired)
 {
     char *valueCopy = value;
     if (copyRequired)
@@ -195,17 +184,19 @@ DictionaryErrorCode append(Dictionary *dictionary, char *const key, char *const 
         Node *newNode = (Node *)calloc(1, sizeof(Node));
         if (newNode == NULL)
         {
+            free(valueCopy);
+            free(keyCopy);
             return memoryError;
         }
         newNode->key = keyCopy;
         newNode->parent = parent;
         *nodeToWriteTo = newNode;
     }
+    else
+    {
+        free((*nodeToWriteTo)->value);
+    }
     (*nodeToWriteTo)->value = valueCopy;
-
-    updateHeight(*nodeToWriteTo);
-
-
     balanceTree(*nodeToWriteTo);
 
     return ok;
@@ -280,7 +271,7 @@ static void deleteRecursion(Node *root)
     deleteNode(root);
 }
 
-void deleteDictionary(Dictionary *dictionary)
+void deleteDictionary(Dictionary * const dictionary)
 {
     deleteRecursion(dictionary->root);
     free(dictionary);
@@ -290,15 +281,10 @@ char *getValue(Dictionary *const dictionary, char *const key)
 {
     Node *parent = NULL;
     Node **foundNode = searchNode(&(dictionary->root), key, &parent);
-    if (*foundNode == NULL)
-    {
-        return NULL;
-    }
-    return (*foundNode)->value;
+    return (*foundNode == NULL ? NULL : (*foundNode)->value);
 }
 
 bool keyCheck(Dictionary *const dictionary, char *const key)
 {
-    Node *parent = NULL;
-    return *(searchNode(&(dictionary->root), key, &parent)) != NULL;
+    return getValue(dictionary, key) != NULL;
 }

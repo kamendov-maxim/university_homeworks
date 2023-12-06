@@ -4,7 +4,7 @@
 
 #include "String.h"
 
-char *getString(size_t * const len, FILE * filename, char const endOfLine)
+char *getString(size_t * const len, FILE * file, char const endOfLine)
 {
     *len = 0;
     size_t capacity = 1;
@@ -14,18 +14,20 @@ char *getString(size_t * const len, FILE * filename, char const endOfLine)
         return NULL;
     }
 
-    for (char c = fgetc(filename); c != endOfLine && c != EOF; c = fgetc(filename))
+    for (char c = fgetc(file); c != endOfLine && c != EOF; c = fgetc(file))
     {
         s[(*len)++] = c;
 
         if (*len >= capacity)
         {
             capacity *= 2;
-            s = (char *)realloc(s, capacity * sizeof(char));
-            if (s == NULL)
+            char *tmp = (char *)realloc(s, capacity * sizeof(char));
+            if (tmp == NULL)
             {
+                free(s);
                 return NULL;
             }
+            s = tmp;
         }
     }
 
@@ -34,7 +36,7 @@ char *getString(size_t * const len, FILE * filename, char const endOfLine)
     return s;
 }
 
-char *copyString(char * const string)
+char *copyString(char const * const string)
 {
     const size_t len = strlen(string);
     char *copy = (char *)malloc(len * sizeof(char));
