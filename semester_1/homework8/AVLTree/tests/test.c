@@ -41,7 +41,13 @@ static bool testCase(size_t testLen, UserInput const *const testCommands, char *
 
         case getValueCommand:
         {
-            if (strcmp(getValue(dictionary, keys[currentKey]), charAnswers[currentAnswer]) != 0)
+            const char * const value = getValue(dictionary, keys[currentKey]);
+            if (value == NULL)
+            {
+                return false;
+            }
+            
+            if (strcmp(value, charAnswers[currentAnswer]) != 0)
             {
                 deleteDictionary(dictionary);
                 return false;
@@ -53,7 +59,6 @@ static bool testCase(size_t testLen, UserInput const *const testCommands, char *
 
         case checkKeyCommand:
         {
-
             if (keyCheck(dictionary, keys[currentKey]) != boolAnswers[currentBool])
             {
                 deleteDictionary(dictionary);
