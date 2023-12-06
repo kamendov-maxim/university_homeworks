@@ -12,7 +12,7 @@
 
 const bool test(void);
 
-static void printArray(int *array, size_t size)
+static void printArray(int const *const array, size_t size)
 {
    for (size_t i = 0; i < size; ++i)
    {
@@ -21,14 +21,14 @@ static void printArray(int *array, size_t size)
    printf("\n");
 }
 
-static void swap(int *firstValue, int *secondValue)
+static void swap(int *const firstValue, int *const secondValue)
 {
    int buffer = *firstValue;
    *firstValue = *secondValue;
    *secondValue = buffer;
 }
 
-static size_t partition(int *array, size_t leftElement, size_t rightElement)
+static size_t partition(int *const array, size_t leftElement, size_t rightElement)
 {
    rightElement -= 1;
    int currentSeparator = array[leftElement];
@@ -48,22 +48,31 @@ static size_t partition(int *array, size_t leftElement, size_t rightElement)
    return i;
 }
 
-static void insertSort(int array[], int leftElement, int rightElement)
+static void insertSort(int *const array, int leftElement, size_t rightElement)
 {
-   for (int i = leftElement; i < rightElement; ++i)
+   for (int i = leftElement + 1; i < rightElement; ++i)
    {
       int currentElement = array[i];
       int j = i - 1;
+      bool f = false;
       while (j >= leftElement && array[j] >= currentElement)
       {
          array[j + 1] = array[j];
+         f = true;
+         if (j == 0)
+         {
+            break;
+         }
          --j;
       }
-      array[j + 1] = currentElement;
+      if (f)
+      {
+         array[j] = currentElement;
+      }
    }
 }
 
-static void smartQuickSort(int array[], int leftElement, int rightElement)
+static void smartQuickSort(int *const array, size_t leftElement, size_t rightElement)
 {
    if (rightElement - leftElement + 1 < 10)
    {
@@ -86,7 +95,7 @@ static const bool testSwapFunction(void)
    return firstValue == 1 && secondValue == 0;
 }
 
-static const bool testStarterForArrays(int testArray[], int answerArray[], int size)
+static const bool compareArrays(int const *const testArray, int const *const answerArray, size_t size)
 {
    for (size_t i = 0; i < size; ++i)
    {
@@ -117,7 +126,7 @@ static const bool testPartitionFunction(void)
    partition(testArray3, 0, 5);
    partition(testArray4, 0, 1);
 
-   return testStarterForArrays(testArray1, answerArray1, 9) && testStarterForArrays(testArray2, answerArray2, 6) && testStarterForArrays(testArray3, answerArray3, 5) && testStarterForArrays(testArray4, answerArray4, 1);
+   return compareArrays(testArray1, answerArray1, 9) && compareArrays(testArray2, answerArray2, 6) && compareArrays(testArray3, answerArray3, 5) && compareArrays(testArray4, answerArray4, 1);
 }
 
 static const bool testSmartQuickSort(void)
@@ -132,12 +141,10 @@ static const bool testSmartQuickSort(void)
    int answerArray3[1] = {1};
 
    smartQuickSort(testArray1, 0, 5 - 1);
-
    smartQuickSort(testArray2, 0, 5 - 1);
-
    smartQuickSort(testArray3, 0, 1 - 1);
 
-   return testStarterForArrays(testArray1, answerArray1, 5) && testStarterForArrays(testArray2, answerArray2, 5) && testStarterForArrays(testArray3, answerArray3, 1);
+   return compareArrays(testArray1, answerArray1, 5) && compareArrays(testArray2, answerArray2, 5) && compareArrays(testArray3, answerArray3, 1);
 }
 
 const bool test(void)
@@ -149,14 +156,15 @@ int main(void)
 {
    if (!test())
    {
+      printf("Sorry but the program doesnt work\n");
       return PROGRAM_FAILED_TESTS;
    }
 
-   int size = 0;
+   size_t size = 0;
    while (size <= 0)
    {
       printf("Enter the size of your array: ");
-      if (scanf("%d", &size) != 1)
+      if (scanf("%lu", &size) != 1)
       {
          return INPUT_ERROR;
       }
@@ -178,9 +186,7 @@ int main(void)
    for (size_t i = 0; i < size; ++i)
    {
       printf("Enter %lu number of your array: ", i + 1);
-      int currentNumber = 0;
-      scanf("%d", &currentNumber);
-      array[i] = currentNumber;
+      scanf("%d", &array[i]);
    }
 
    printf("\nYour array before getting sorted: \n");
