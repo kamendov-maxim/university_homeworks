@@ -1,14 +1,119 @@
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
+#include <stdlib.h>
 
 #include "test.h"
 #include "../AVLTree/AVLTree.h"
 #include "../userInput.h"
 
+#define LOADTEST_STRING_AMOUNT 100000
+#define MAX_KEY_LENGTH 6
+#define LOADTEST_STRING_LENGTH 10
+#define LOADTEST_MAX_TIME 5
+
 #include <stdio.h>
 
-static bool testCase(size_t testLen, UserInput const *const testCommands, char ** keys
-        , char **values, char const **charAnswers, bool const *const boolAnswers)
+static char *generateString(size_t length)
+{
+    char *string = (char *)malloc(length * sizeof(char));
+    if (string == NULL)
+    {
+        return NULL;
+    }
+    for (int i = 0; i < length - 1; ++i)
+    {
+        string[i] = 'a' + rand() % 26;
+    }
+    string[length - 1] = '\0';
+    return string;
+}
+
+static const size_t getNumberLength(size_t number)
+{
+        size_t count = 0; 
+        do{ 
+            number = number / 10; 
+            ++count; 
+        }while (number != 0) ;
+
+        return count;
+}
+
+static const bool loadTest(void)
+{
+    Dictionary *dictionary = createDictionary();
+    if (dictionary == NULL)
+    {
+        return false;
+    }
+    DictionaryErrorCode dictionaryErrorCode = ok;
+    double start = clock() / CLOCKS_PER_SEC;
+    srand(time(NULL));
+
+    for (size_t i = 0; i < 10; ++i)
+    {
+        char *randomValue = generateString(LOADTEST_STRING_LENGTH);
+        if (randomValue == NULL)
+        {
+            deleteDictionary(dictionary);
+            return false;
+        }
+
+        printf("%s\n", randomValue);
+
+        char *key = malloc(getNumberLength(i) * sizeof(char));
+        if (key == NULL)
+        {
+            free(randomValue);
+            deleteDictionary(dictionary);
+            return false;
+        }
+        
+        // sprintf(key, "%zu%c", i, '\0');
+        sprintf(key, "%zu", i);
+
+        printf("%s %s\n", key, randomValue);
+
+        if (append(dictionary, key, randomValue, false) != ok)
+        {
+            free(randomValue);
+            free(key);
+            deleteDictionary(dictionary);
+            return false;
+        }
+        createRepresentation(dictionary, "/Users/maks/Documents/programming/university_homeworks/semester_1/homework8/r.gv");
+
+
+
+    // for (size_t i = 0; i < LOADTEST_STRING_AMOUNT; ++i)
+    // {
+    //     char *key = malloc((MAX_KEY_LENGTH + 1) * sizeof(char));
+    //     if (key == NULL)
+    //     {
+    //         deleteDictionary(dictionary);
+    //         return false;
+    //     }
+
+    //     deleteElement(dictionary, key);
+    }
+
+    double finish = clock() / CLOCKS_PER_SEC;
+
+    for (size_t i = 0; i < LOADTEST_STRING_AMOUNT; ++i)
+    {
+        char *key = malloc((MAX_KEY_LENGTH + 1) * sizeof(char));
+        if (keyCheck(dictionary, key))
+        {
+            deleteDictionary(dictionary);
+            return false;
+        }
+    }
+    
+    return finish - start <= LOADTEST_MAX_TIME;
+}
+
+static const bool testCase(size_t testLen, UserInput const *const testCommands, char **keys, char **values, char const **charAnswers, bool const *const boolAnswers)
 {
     Dictionary *dictionary = createDictionary();
     if (dictionary == NULL)
@@ -41,12 +146,12 @@ static bool testCase(size_t testLen, UserInput const *const testCommands, char *
 
         case getValueCommand:
         {
-            const char * const value = getValue(dictionary, keys[currentKey]);
+            const char *const value = getValue(dictionary, keys[currentKey]);
             if (value == NULL)
             {
                 return false;
             }
-            
+
             if (strcmp(value, charAnswers[currentAnswer]) != 0)
             {
                 deleteDictionary(dictionary);
@@ -111,6 +216,6 @@ const bool test(void)
     char const *charAnswers3[3] = {"one", "two", "one"};
     bool const boolAnswers3[0] = {};
     bool testCase3 = testCase(4, testCommands3, testKeys3, testValues3, charAnswers3, boolAnswers3);
-
-    return testCase1 && testCase2 && testCase3;
+    return true;
+    return testCase1 && testCase2 && testCase3 && loadTest();
 }

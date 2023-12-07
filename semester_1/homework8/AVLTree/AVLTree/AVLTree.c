@@ -55,7 +55,7 @@ static size_t getHeight(Node const *const root)
 
 static int nodeBalance(Node const *const root)
 {
-    return getHeight(root->rightChild) - getHeight(root->leftChild);
+    return (root == NULL? NULL: getHeight(root->rightChild) - getHeight(root->leftChild));
 }
 
 static void updateHeight(Node *root)
@@ -67,89 +67,94 @@ static void updateHeight(Node *root)
 
     if (root->rightChild == NULL && root->rightChild == NULL)
     {
-        root->height = 0;
+        root->height = 1;
         return;
     }
     size_t leftHeight = getHeight(root->leftChild);
     size_t rightHeight = getHeight(root->rightChild);
-    root->height = (leftHeight > rightHeight ? leftHeight : rightHeight) + 1;
+    root->height = (leftHeight >= rightHeight ? leftHeight : rightHeight) + 1;
 }
 
-static void leftBigRotate(Node **const root)
-{
-    Node *a = (*root)->rightChild;
-    Node *b = a->leftChild;
-    (*root)->rightChild = b;
-    a->leftChild = *root;
-    updateHeight(*root);
-    updateHeight(a);
-    *root = a;
-}
+// static void leftBigRotate(Node **const root)
+// {
+//     Node *a = (*root)->rightChild;
+//     Node *b = a->leftChild;
+//     (*root)->rightChild = b;
+//     a->leftChild = *root;
+//     updateHeight(*root);
+//     updateHeight(a);
+//     *root = a;
+// }
 
-static void rightBigRotate(Node **const root)
-{
-    Node *a = (*root)->leftChild;
-    Node *b = a->rightChild;
-    (*root)->leftChild = b;
-    a->rightChild = *root;
-    updateHeight(*root);
-    updateHeight(a);
-    *root = a;
-}
+// static void rightBigRotate(Node **const root)
+// {
+//     Node *a = (*root)->leftChild;
+//     Node *b = a->rightChild;
+//     (*root)->leftChild = b;
+//     a->rightChild = *root;
+//     updateHeight(*root);
+//     updateHeight(a);
+//     *root = a;
+// }
 
 static void leftRotate(Node **const root)
 {
     Node *a = (*root)->leftChild;
-    Node *temp = a->rightChild;
-    (*root)->leftChild = temp;
+    (*root)->leftChild = a->rightChild;
     a->rightChild = *root;
-    updateHeight(*root);
-    updateHeight(a);
+    a->parent = (*root)->parent;
+    (*root)->parent = a;
     *root = a;
+    updateHeight((*root)->rightChild);
+    updateHeight((*root)->leftChild);
+    updateHeight(*root);
 }
 
 static void rightRotate(Node **const root)
 {
     Node *a = (*root)->rightChild;
-    Node *temp = a->leftChild;
-    (*root)->rightChild = temp;
+    (*root)->rightChild = a->leftChild;
     a->leftChild = *root;
-    updateHeight(*root);
-    updateHeight(a);
+    a->parent = (*root)->parent;
+    a->parent = NULL;
+
+    (*root)->parent = a;
     *root = a;
+    updateHeight((*root)->rightChild);
+    updateHeight((*root)->leftChild);
+    updateHeight(*root);
 }
 
 static void balance(Node **const root)
 {
     updateHeight(*root);
-    if (nodeBalance(*root) == 2)
+    if (nodeBalance(*root) == -2)
     {
-        if (nodeBalance((*root)->rightChild) >= 0)
+        if (nodeBalance((*root)->rightChild) > 0)
         {
-            leftRotate(root);
-            return;
+            rightRotate(&((*root)->rightChild));
         }
-        leftBigRotate(root);
+        leftRotate(root);
         return;
     }
-    else if (nodeBalance(*root) == -2)
+    else if (nodeBalance(*root) == 2)
     {
-        if (nodeBalance((*root)->rightChild) <= 0)
+        if (nodeBalance((*root)->leftChild) < 0)
         {
-            rightRotate(root);
-            return;
+            leftRotate(&((*root)->leftChild));
         }
 
-        rightBigRotate(root);
+        rightRotate(root);
         return;
     }
 }
 
-static void balanceTree(Node *const node)
+static void balanceTree(Node **const node)
 {
-    for (Node *currentNode = node; currentNode != NULL; currentNode = currentNode->parent)
+    for (Node **currentNode = node; *currentNode != NULL; currentNode = &((*currentNode)->parent))
     {
-        balance(&currentNode);
+        balance(currentNode);
+
     }
 }
 
@@ -197,7 +202,17 @@ DictionaryErrorCode append(Dictionary *const dictionary, char *const key, char *
         free((*nodeToWriteTo)->value);
     }
     (*nodeToWriteTo)->value = valueCopy;
-    balanceTree(*nodeToWriteTo);
+    
+    balanceTree(nodeToWriteTo);
+    printf("nb %d\n", nodeBalance(dictionary->root));
+    printf("h %d\n", getHeight(dictionary->root));
+    printf("rnb %d\n", nodeBalance(dictionary->root->rightChild));
+    
+    printf("rch %d\n", getHeight(dictionary->root->rightChild));
+    printf("lnb %d\n", nodeBalance(dictionary->root->leftChild));
+
+    printf("lch %d\n", getHeight(dictionary->root->leftChild));
+
 
     return ok;
 }
@@ -241,23 +256,23 @@ void deleteElement(Dictionary *const dictionary, char *const key)
                 (*nodeToDelete)->rightChild = right;
             }
             (*nodeToDelete)->leftChild = left;
-            balanceTree(*nodeToDelete);
+            balanceTree(nodeToDelete);
             return;
         }
         *nodeToDelete = left;
-        balanceTree(*nodeToDelete);
+        balanceTree(nodeToDelete);
 
         return;
     }
     else if (right != NULL)
     {
         *nodeToDelete = right;
-        balanceTree(*nodeToDelete);
+        balanceTree(nodeToDelete);
 
         return;
     }
     *nodeToDelete = NULL;
-    balanceTree(*nodeToDelete);
+    balanceTree(nodeToDelete);
 }
 
 static void deleteRecursion(Node *root)
@@ -288,3 +303,57 @@ bool keyCheck(Dictionary *const dictionary, char *const key)
 {
     return getValue(dictionary, key) != NULL;
 }
+
+// static void recursion(Node *const root, FILE *file, int *const i)
+// {
+//     if (root->leftChild != NULL)
+//     {
+
+//         recursion(root->leftChild, file, i);
+//         fprintf(file, "    %s->%s;\n", root->value, root->leftChild->value);
+//     }
+//     else
+//     {
+//         fprintf(file, "   null%d [shape=point];\n", *i);
+//         fprintf(file, "    %s->null%d\n", root->value, *i);
+//         ++(*i);
+//     }
+
+//     if (root->rightChild != NULL)
+//     {
+
+//         recursion(root->rightChild, file, i);
+//         fprintf(file, "    %s->%s;\n", root->value, root->rightChild->value);
+//     }
+//     else
+//     {
+//         fprintf(file, "   null%d [shape=point];\n", *i);
+//         fprintf(file, "    %s->null%d\n", root->value, *i);
+//         ++(*i);
+//     }
+// }
+
+// void createRepresentation(Dictionary const *const dictionary, const char *const filename)
+// {
+//     FILE *file = NULL;
+//     file = fopen(filename, "w");
+//     if (file == NULL)
+//     {
+//         printf("null");
+//         return;
+//     }
+//     printf("%s", filename);
+
+//     fprintf(file, "digraph { graph [ dpi = 300 ]; node [color=Green style=filled] ; edge [color=brown] ; \n");
+//     int i = 0;
+//     if (dictionary->root == NULL)
+//     {
+//         fprintf(file, "null;");
+//     }
+//     else{
+//         recursion(dictionary->root, file, &i);
+//     }
+//     fprintf(file, "}");
+//     fclose(file);
+//     system("dot -Tpng /Users/maks/Documents/programming/university_homeworks/semester_1/homework8/r.gv -o picture.png ; open picture.png");
+// }
