@@ -8,13 +8,14 @@ typedef struct Node
 {
     struct Node *next;
     struct Node *previous;
+    size_t entries;
     char *value;
 } Node;
-
 
 typedef struct List
 {
     Node *root;
+    size_t listLength;
 } List;
 
 List *createList(void)
@@ -22,7 +23,7 @@ List *createList(void)
     return calloc(1, sizeof(List));
 }
 
-ListErrorCode append(List * const list, char * const value, const bool copyRequired)
+ListErrorCode append(List *const list, char *const value, const bool copyRequired)
 {
     char *valueCopy = value;
     if (copyRequired)
@@ -34,6 +35,31 @@ ListErrorCode append(List * const list, char * const value, const bool copyRequi
         }
     }
 
+    // if (list->root == NULL)
+    // {
+    //     Node *newNode = (Node *)calloc(1, sizeof(Node));
+    //     if (newNode == NULL)
+    //     {
+    //         free(valueCopy);
+    //         return memoryErrorList;
+    //     }
+    //     newNode->value = valueCopy;
+    //     newNode->entries = 1;
+    //     list->root = newNode;
+    //     ++list->listLength;
+    //     return okList;
+    // }
+
+    Node **currentNode = &(list->root);
+    for (; *currentNode != NULL; currentNode = &((*currentNode)->next))
+    {
+        if (strcmp((*currentNode)->value, valueCopy) == 0)
+        {
+            ++(*currentNode)->entries;
+            return okList;
+        }
+    }
+
     Node *newNode = (Node *)calloc(1, sizeof(Node));
     if (newNode == NULL)
     {
@@ -41,24 +67,16 @@ ListErrorCode append(List * const list, char * const value, const bool copyRequi
         return memoryErrorList;
     }
     newNode->value = valueCopy;
-
-    if (list->root == NULL)
-    {
-        list->root = newNode;
-        return okList;
-    }
-
-    Node **currentNode = &(list->root);
-    for (; *currentNode != NULL; currentNode = &((*currentNode)->next));
-
     *currentNode = newNode;
-    
-    return okList;    
+    (*currentNode)->entries = 1;
+
+    ++list->listLength;
+    return okList;
 }
 
-bool checkElement(List const * const list, char const * const value)
+bool checkElement(List const *const list, char const *const value)
 {
-    for (Node * currentNode = list->root; currentNode != NULL; currentNode = currentNode->next)
+    for (Node *currentNode = list->root; currentNode != NULL; currentNode = currentNode->next)
     {
         if (strcmp(value, currentNode->value) == 0)
         {
@@ -68,12 +86,18 @@ bool checkElement(List const * const list, char const * const value)
     return false;
 }
 
-void deleteElement(List * const list, char const * const value)
+void deleteElement(List *const list, char const *const value)
 {
     for (Node **currentNode = &(list->root); *currentNode != NULL; currentNode = &((*currentNode)->next))
     {
         if (strcmp(value, (*currentNode)->value) == 0)
         {
+            --(*currentNode)->entries;
+            if ((*currentNode)->entries != 0)
+            {
+                return;
+            }  
+
             free((*currentNode)->value);
             Node *nextTmp = (*currentNode)->next;
             free(*currentNode);
@@ -83,7 +107,7 @@ void deleteElement(List * const list, char const * const value)
     }
 }
 
-void deleteList(List * const list)
+void deleteList(List *const list)
 {
     Node **currentNode = &(list->root);
     while (*currentNode != NULL)
@@ -94,4 +118,21 @@ void deleteList(List * const list)
         *currentNode = nextTmp;
     }
     free(list);
+}
+
+size_t getLength(List const *const list)
+{
+    return list->listLength;
+}
+
+size_t getNumberOfEntries(List const * const list, char const * const value)
+{
+    for (Node *currentNode = list->root; currentNode != NULL; currentNode = currentNode->next)
+    {
+        if (strcmp(value, currentNode->value) == 0)
+        {
+            return currentNode->entries;
+        }
+    }
+    return 0;
 }
