@@ -1,135 +1,114 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
+#include <locale.h>
 
-int countingSubstrings(char *string, char *subString, int lengthOfString, int lengthOfSubstring);
-int readingLineFromConsole(char *string);
+#define PROGRAM_FINISHED_CORRECTLY 0
+#define MEMORY_ERROR 1
+#define PROGRAM_FAILED_TESTS 2
+
 bool test(void);
 
-int main()
+static char *getString(size_t *const len, FILE *filename, char const endOfLine)
 {
-    if (!test())
+    *len = 0;
+    size_t capacity = 1;
+    char *s = (char *)malloc(sizeof(char));
+    if (s == NULL)
     {
-        printf("Sorry but the program does not work correctly\n");
-        return 1;
+        return NULL;
     }
-    printf("Enter your string\n");
-    char S[1000];
-    int lengthOfS = readingLineFromConsole(S);
-    printf("Enter your substring\n");
-    char S1[1000];
-    int lengthOfS1 = readingLineFromConsole(S1);
-    int numberOfSubstrings = countingSubstrings(S, S1, lengthOfS, lengthOfS1);
 
-    printf("The number of occurances of your substring in your string is %d\n", numberOfSubstrings);
-    return 0;
+    for (char c = fgetc(filename); c != endOfLine && c != EOF; c = fgetc(filename))
+    {
+        s[(*len)++] = c;
+
+        if (*len >= capacity)
+        {
+            capacity *= 2;
+            s = (char *)realloc(s, capacity * sizeof(char));
+            if (s == NULL)
+            {
+                return NULL;
+            }
+        }
+    }
+
+    s[*len] = '\0';
+
+    return s;
 }
 
-int countingSubstrings(char *string, char *subString, int lengthOfString, int lengthOfSubstring)
+size_t countSubstings(char const * const string, char const * const subString)
 {
-    int count = 0;
-    bool doWeCompareRightNow = false;
+    const char *currentPtr = string;
+    const char *hit = NULL;
+    size_t count = 0;
 
-    int currentSubstringCharacter = -1;
-
-    for (int currentCharacter = 0; currentCharacter < lengthOfString; ++currentCharacter)
+    for (; (hit = strstr(currentPtr, subString)) != NULL; ++count)
     {
-        if (doWeCompareRightNow)
-        {
-            if (++currentSubstringCharacter < lengthOfSubstring)
-            {
-                doWeCompareRightNow = (string[currentCharacter] == subString[currentSubstringCharacter] ? true : false);
-            }
-
-            if (!doWeCompareRightNow)
-            {
-                currentSubstringCharacter = -1;
-            }
-        }
-
-        if (string[currentCharacter] == subString[0] && !doWeCompareRightNow)
-        {
-            doWeCompareRightNow = true;
-            ++currentSubstringCharacter;
-        }
-
-        if (currentSubstringCharacter + 1 == lengthOfSubstring && doWeCompareRightNow)
-        {
-            currentSubstringCharacter = -1;
-            doWeCompareRightNow = false;
-            ++count;
-        }
+        currentPtr = hit + 1;
     }
+    
     return count;
 }
 
-int readingLineFromConsole(char *string)
+int main(void)
 {
-    int c = 0;
-    char ch;
-    do
-    {
-        ch = getchar();
-        string[c] = ch;
-        c++;
-    } while (ch != '\n');
 
-    c = c - 1;
-    string[c] = '\0';
-    return c;
+    if (!test())
+    {
+        printf("Программа сейчас не работает\n");
+        return PROGRAM_FAILED_TESTS;
+    }
+
+    size_t len = 0;
+    printf("Введите вашу строку: ");
+    char * const string = getString(&len, stdin, '\n');
+    if (string == NULL)
+    {
+        exit(MEMORY_ERROR);
+    }
+
+    printf("Введите вашу подстроку: ");
+    char *const subString = getString(&len, stdin, '\n');
+    if (subString == NULL)
+    {
+        free(string);
+        exit(MEMORY_ERROR);
+    }
+
+    printf("Количество вхождений подстроки %s в строку %s: %zu\n", subString, string, countSubstings(string, subString));
+
+    free(string);
+    free(subString);
+    return PROGRAM_FINISHED_CORRECTLY;
+}
+
+
+
+bool testCase(char const * const string, char const * const subString, size_t answer)
+{
+    return countSubstings(string, subString) == answer;
 }
 
 bool test(void)
-{
+{ 
+    char const * const testString1 = "aaa";
+    char const * const testSubString1 = "a";
+    size_t answer1 = 3;
+    bool testCase1 = testCase(testString1, testSubString1, answer1);
 
-    char testString1[0] = "";
-    char testSubstring1[6] = "fsdffa";
-    int testStringLength1 = 0;
-    int testSubStringLength1 = 6;
-    int answer1 = 0;
-    if (!(countingSubstrings(testString1, testSubstring1, testStringLength1, testSubStringLength1) == answer1))
-    {
-        printf("%d", 1);
-        return false;
-    }
+    char const * const testString2 = "bababa";
+    char const * const testSubString2 = "ab";
+    size_t answer2 = 2; 
+    bool testCase2 = testCase(testString2, testSubString2, answer2);
 
-    char testString2[23] = "afdaasddfgsafasddasdasd";
-    char testSubstring2[3] = "asd";
-    int testStringLength2 = 23;
-    int testSubStringLength2 = 3;
-    int answer2 = 4;
-    if (!(countingSubstrings(testString2, testSubstring2, testStringLength2, testSubStringLength2) == answer2))
-    {
-        return false;
-    }
+    char const * const testString3 = "dasfazfadsfafazfaaf";
+    char const * const testSubString3 = "zfa";
+    size_t answer3 = 2;
+    bool testCase3 = testCase(testString3, testSubString3, answer3);
 
-    char testString3[9] = "dgaafadfa";
-    char testSubstring3[0] = "";
-    int testStringLength3 = 9;
-    int testSubStringLength3 = 0;
-    int answer3 = 0;
-    if (!(countingSubstrings(testString3, testSubstring3, testStringLength3, testSubStringLength3) == answer3))
-    {
-        return false;
-    }
-    char testString4[5] = "aaaaa";
-    char testSubstring4[1] = "a";
-    int testStringLength4 = 5;
-    int testSubStringLength4 = 1;
-    int answer4 = 5;
-    if (!(countingSubstrings(testString4, testSubstring4, testStringLength4, testSubStringLength4) == answer4))
-    {
-        return false;
-    }
-
-    char testString5[2] = "bb";
-    char testSubstring5[2] = "bb";
-    int testStringLength5 = 2;
-    int testSubStringLength5 = 2;
-    int answer5 = 1;
-    if (!(countingSubstrings(testString5, testSubstring5, testStringLength5, testSubStringLength5) == answer5))
-    {
-        return false;
-    }
-
-    return true;
+    return testCase1 && testCase2 && testCase3;
 }
