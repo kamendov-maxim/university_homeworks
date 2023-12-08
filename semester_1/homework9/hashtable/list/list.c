@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "list.h"
 #include "../String/String.h"
@@ -14,7 +15,7 @@ typedef struct Node
 
 typedef struct List
 {
-    Node *root;
+    Node *head;
     size_t listLength;
 } List;
 
@@ -35,7 +36,7 @@ ListErrorCode append(List *const list, char *const value, const bool copyRequire
         }
     }
 
-    // if (list->root == NULL)
+    // if (list->head == NULL)
     // {
     //     Node *newNode = (Node *)calloc(1, sizeof(Node));
     //     if (newNode == NULL)
@@ -45,12 +46,12 @@ ListErrorCode append(List *const list, char *const value, const bool copyRequire
     //     }
     //     newNode->value = valueCopy;
     //     newNode->entries = 1;
-    //     list->root = newNode;
+    //     list->head = newNode;
     //     ++list->listLength;
     //     return okList;
     // }
 
-    Node **currentNode = &(list->root);
+    Node **currentNode = &(list->head);
     for (; *currentNode != NULL; currentNode = &((*currentNode)->next))
     {
         if (strcmp((*currentNode)->value, valueCopy) == 0)
@@ -76,7 +77,7 @@ ListErrorCode append(List *const list, char *const value, const bool copyRequire
 
 bool checkElement(List const *const list, char const *const value)
 {
-    for (Node *currentNode = list->root; currentNode != NULL; currentNode = currentNode->next)
+    for (Node *currentNode = list->head; currentNode != NULL; currentNode = currentNode->next)
     {
         if (strcmp(value, currentNode->value) == 0)
         {
@@ -88,15 +89,16 @@ bool checkElement(List const *const list, char const *const value)
 
 void deleteElement(List *const list, char const *const value)
 {
-    for (Node **currentNode = &(list->root); *currentNode != NULL; currentNode = &((*currentNode)->next))
+    for (Node **currentNode = &(list->head); *currentNode != NULL; currentNode = &((*currentNode)->next))
     {
         if (strcmp(value, (*currentNode)->value) == 0)
         {
             --(*currentNode)->entries;
+            --list->listLength;
             if ((*currentNode)->entries != 0)
             {
                 return;
-            }  
+            }
 
             free((*currentNode)->value);
             Node *nextTmp = (*currentNode)->next;
@@ -109,10 +111,10 @@ void deleteElement(List *const list, char const *const value)
 
 void deleteList(List *const list)
 {
-    Node **currentNode = &(list->root);
+    Node **currentNode = &(list->head);
     while (*currentNode != NULL)
     {
-        Node *nextTmp = (*currentNode)->value;
+        Node *nextTmp = (*currentNode)->next;
         free((*currentNode)->value);
         free(*currentNode);
         *currentNode = nextTmp;
@@ -125,9 +127,9 @@ size_t getLength(List const *const list)
     return list->listLength;
 }
 
-size_t getNumberOfEntries(List const * const list, char const * const value)
+size_t getNumberOfEntries(List const *const list, char const *const value)
 {
-    for (Node *currentNode = list->root; currentNode != NULL; currentNode = currentNode->next)
+    for (Node *currentNode = list->head; currentNode != NULL; currentNode = currentNode->next)
     {
         if (strcmp(value, currentNode->value) == 0)
         {
@@ -135,4 +137,17 @@ size_t getNumberOfEntries(List const * const list, char const * const value)
         }
     }
     return 0;
+}
+
+void printList(List *const list)
+{
+    for (Node **currentNode = &(list->head); *currentNode != NULL; currentNode = &((*currentNode)->next))
+    {
+        printf("%s - %lu\n", (*currentNode)->value, (*currentNode)->entries);
+    }
+}
+
+const bool isEmpty(List const * const list)
+{
+    return list->head == NULL;
 }

@@ -2,37 +2,38 @@
 
 #include "workWithFile.h"
 #include "../String/String.h"
+#include "../hashtable/hashtable.h"
 
-FileWorkErrorCode scanWords(const char * const filename)
+FileWorkErrorCode scanWords(const char *const filename, HashTable *hashTable)
 {
-    FILE *file = fopen(filename, "w");
+    FILE *file = fopen(filename, "r");
     if (file == NULL)
     {
         return accessErrorFile;
     }
 
-    char * word = NULL;
+    char *word = NULL;
     size_t len = 0;
     do
     {
-        char * word = getString(&len, file, ' ');
+        word = getString(&len, file, ' ');
         if (word == NULL)
         {
             fclose(file);
-            // delete dictionary
             return memoryErrorFile;
         }
-        
-    
 
         if (word[0] != '\0')
         {
-            // add word to dictionary
+            HashTableErrorCode hashTableErrorCode = addValue(hashTable, word, false);
+            if (hashTableErrorCode != okHashTable)
+            {
+                fclose(file);
+                return memoryErrorFile;
+            }
         }
-        
-    } while(word[0] != '\0');
-    
 
+    } while (word[0] != '\0');
     fclose(file);
     return okFile;
 }
