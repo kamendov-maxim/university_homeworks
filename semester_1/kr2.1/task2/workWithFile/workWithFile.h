@@ -1,5 +1,8 @@
 #pragma once
 
+#include <stdlib.h>
+#include "../graph/graph.h"
+
 typedef enum WorkWithFileErrorCode
 {
     okFile,
@@ -7,3 +10,5 @@ typedef enum WorkWithFileErrorCode
     memoryErrorFile,
     fileReadingErrorFile
 } WorkWithFileErrorCode;
+
+WorkWithFileErrorCode readTableFromFile(const char *const fileName, Graph **graph, size_t *nodeAmount);
