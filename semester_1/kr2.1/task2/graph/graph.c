@@ -16,10 +16,11 @@ typedef struct Node
 
 typedef struct Graph
 {
+    size_t edgeAmount;
     Edge **edges;
 } Graph;
 
-Graph *createGraph(const size_t nodes, const size_t edges)
+Graph *createGraph(const size_t nodeAmount, const size_t edgeAmount)
 {
     Graph *graph = calloc(1, sizeof(Graph));
     if (graph == NULL)
@@ -27,12 +28,14 @@ Graph *createGraph(const size_t nodes, const size_t edges)
         return NULL;
     }
 
-    Edge **edges = calloc(edges, sizeof(*Edge));
+    Edge **edges = calloc(edges, sizeof(Edge *));
     if (edges == NULL)
     {
         free(graph);
         return NULL;
     }
+    graph->edgeAmount = edgeAmount;
+    graph->edges = edges;
 }
 
 void connectNode(Graph *graph, size_t index, size_t nodeNumber)
@@ -57,12 +60,28 @@ void connectNode(Graph *graph, size_t index, size_t nodeNumber)
     }
 }
 
-List *createComponentsTable(Graph *graph, const size_t nodes)
+List **createComponentsTable(Graph *graph, const size_t nodeAmount)
 {
-    List **table = calloc(nodes, sizeof(*List));
+    List **table = calloc(nodeAmount, sizeof(List *));
     if (table == NULL)
     {
         return NULL;
+    }
+    
+    ListErrorCode listErrorCode = okList;
+    for (size_t i = 0; i < nodeAmount; i++)
+    {
+        Edge *currentEdge = graph->edges[i];
+        for (size_t j = 0; j < nodeAmount; ++j)
+        {
+            if (!(checkValue(table[i], currentEdge->firstNodeNumber) || checkValue(table[i], currentEdge->secondNodeNumber)))
+            {
+                listErrorCode = append(table[i], currentEdge->firstNodeNumber);
+                listErrorCode = append(table[i], currentEdge->secondNodeNumber);
+            }
+            
+        }
+        
     }
     
 }

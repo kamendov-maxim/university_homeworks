@@ -30,3 +30,6 @@ ListErrorCode popByIndex(List *const list, size_t const index);
 
 //gets value from list by index
 int getValueByIndex(List *list, size_t index, ListErrorCode *listErrorCode);
+
+//checks if value is already in the list
+const bool checkValue(List *list, int value)
