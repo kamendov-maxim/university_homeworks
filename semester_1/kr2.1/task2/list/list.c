@@ -1,61 +1,47 @@
 #include <stdlib.h>
-#include <string.h>
+#include <stdio.h>
 
 #include "list.h"
-#include "../String/String.h"
 
 typedef struct Node
 {
+    int value;
     struct Node *next;
-    struct Node *previous;
-    size_t entries;
-    char *value;
 } Node;
 
 typedef struct List
 {
-    Node *root;
-    size_t listLength;
+    Node *head;
 } List;
+
+void printList(List const *const list)
+{
+    printf("\n[");
+    for (Node *currentNode = list->head; currentNode != NULL; currentNode = currentNode->next)
+    {
+        printf("%d", currentNode->value);
+        if (currentNode->next != NULL)
+        {
+            printf(", ");
+        }
+    }
+    printf("]\n");
+}
 
 List *createList(void)
 {
-    return calloc(1, sizeof(List));
+    List *newList = (List *)calloc(1, sizeof(List));
+
+    return newList;
 }
 
-ListErrorCode append(List *const list, char *const value, const bool copyRequired)
+ListErrorCode append(List *const list, int const value)
 {
-    char *valueCopy = value;
-    if (copyRequired)
-    {
-        valueCopy = copyString(value);
-        if (valueCopy == NULL)
-        {
-            return memoryErrorList;
-        }
-    }
-
-    // if (list->root == NULL)
-    // {
-    //     Node *newNode = (Node *)calloc(1, sizeof(Node));
-    //     if (newNode == NULL)
-    //     {
-    //         free(valueCopy);
-    //         return memoryErrorList;
-    //     }
-    //     newNode->value = valueCopy;
-    //     newNode->entries = 1;
-    //     list->root = newNode;
-    //     ++list->listLength;
-    //     return okList;
-    // }
-
-    Node **currentNode = &(list->root);
+    Node **currentNode = list->head;
     for (; *currentNode != NULL; currentNode = &((*currentNode)->next))
     {
-        if (strcmp((*currentNode)->value, valueCopy) == 0)
+        if ((*currentNode)->value == value)
         {
-            ++(*currentNode)->entries;
             return okList;
         }
     }
@@ -63,22 +49,47 @@ ListErrorCode append(List *const list, char *const value, const bool copyRequire
     Node *newNode = (Node *)calloc(1, sizeof(Node));
     if (newNode == NULL)
     {
-        free(valueCopy);
         return memoryErrorList;
     }
-    newNode->value = valueCopy;
-    *currentNode = newNode;
-    (*currentNode)->entries = 1;
 
-    ++list->listLength;
+    newNode->value = value;
+    *currentNode = newNode;
     return okList;
 }
 
-bool checkElement(List const *const list, char const *const value)
+void deleteList(List *const list)
 {
-    for (Node *currentNode = list->root; currentNode != NULL; currentNode = currentNode->next)
+    while (list->head != NULL)
     {
-        if (strcmp(value, currentNode->value) == 0)
+        Node *currentNode = list->head;
+        list->head = currentNode->next;
+        free(currentNode);
+    }
+    free(list);
+}
+
+int getValueByIndex(List *list, size_t index, ListErrorCode *listErrorCode)
+{
+    size_t currentIndex = 0;
+    for (Node *currentNode = list->head; currentNode != NULL; currentNode = currentNode->next)
+    {
+        if (currentIndex == index)
+        {
+            *listErrorCode = okList;
+            return currentNode->value;
+        }
+
+        ++currentIndex;
+    }
+    *listErrorCode = indexErrorList;
+    return -1;
+}
+
+const bool checkValue(List *list, int value)
+{
+    for (Node *currentNode = list->head; currentNode != NULL; currentNode = currentNode->next)
+    {
+        if (currentNode->value == value)
         {
             return true;
         }
@@ -86,53 +97,36 @@ bool checkElement(List const *const list, char const *const value)
     return false;
 }
 
-void deleteElement(List *const list, char const *const value)
+ListErrorCode popByIndex(List *const list, size_t const index)
 {
-    for (Node **currentNode = &(list->root); *currentNode != NULL; currentNode = &((*currentNode)->next))
+    Node *temp = list->head;
+    Node *previous = NULL;
+    size_t i = 0;
+    for (Node *currentNode = temp; currentNode != NULL; currentNode = currentNode->next)
     {
-        if (strcmp(value, (*currentNode)->value) == 0)
+        if (i == index)
         {
-            --(*currentNode)->entries;
-            if ((*currentNode)->entries != 0)
+            if (i == 0)
             {
-                return;
-            }  
-
-            free((*currentNode)->value);
-            Node *nextTmp = (*currentNode)->next;
-            free(*currentNode);
-            *currentNode = nextTmp;
-            return;
+                list->head = currentNode->next;
+            }
+            else
+            {
+                temp->next = currentNode->next;
+            }
+            free(currentNode);
+            return okList;
         }
+        ++i;
+        previous = temp;
+        temp = currentNode;
     }
-}
 
-void deleteList(List *const list)
-{
-    Node **currentNode = &(list->root);
-    while (*currentNode != NULL)
+    if (index == -1)
     {
-        Node *nextTmp = (*currentNode)->value;
-        free((*currentNode)->value);
-        free(*currentNode);
-        *currentNode = nextTmp;
+        free(temp);
+        previous->next = NULL;
+        return okList;
     }
-    free(list);
-}
-
-size_t getLength(List const *const list)
-{
-    return list->listLength;
-}
-
-size_t getNumberOfEntries(List const * const list, char const * const value)
-{
-    for (Node *currentNode = list->root; currentNode != NULL; currentNode = currentNode->next)
-    {
-        if (strcmp(value, currentNode->value) == 0)
-        {
-            return currentNode->entries;
-        }
-    }
-    return 0;
+    return indexErrorList;
 }
