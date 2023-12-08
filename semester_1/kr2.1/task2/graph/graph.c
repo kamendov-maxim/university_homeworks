@@ -9,11 +9,6 @@ typedef struct Edge
     size_t secondNodeNumber;
 } Edge;
 
-typedef struct Node
-{
-    /* data */
-} Node;
-
 typedef struct Graph
 {
     size_t edgeAmount;
