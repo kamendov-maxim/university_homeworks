@@ -36,27 +36,14 @@ ListErrorCode append(List *const list, char *const value, const bool copyRequire
         }
     }
 
-    // if (list->head == NULL)
-    // {
-    //     Node *newNode = (Node *)calloc(1, sizeof(Node));
-    //     if (newNode == NULL)
-    //     {
-    //         free(valueCopy);
-    //         return memoryErrorList;
-    //     }
-    //     newNode->value = valueCopy;
-    //     newNode->entries = 1;
-    //     list->head = newNode;
-    //     ++list->listLength;
-    //     return okList;
-    // }
-
     Node **currentNode = &(list->head);
     for (; *currentNode != NULL; currentNode = &((*currentNode)->next))
     {
         if (strcmp((*currentNode)->value, valueCopy) == 0)
         {
             ++(*currentNode)->entries;
+            ++list->listLength;
+
             return okList;
         }
     }
@@ -147,7 +134,7 @@ void printList(List *const list)
     }
 }
 
-const bool isEmpty(List const * const list)
+const bool isEmpty(List const *const list)
 {
     return list->head == NULL;
 }

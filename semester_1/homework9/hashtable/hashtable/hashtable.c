@@ -52,6 +52,13 @@ HashTable *createHashTable(const size_t bucketNumber)
     return hashTable;
 }
 
+void deleteElementFromTable(HashTable * const hashTable, char const * const value)
+{
+    size_t index = getHash(value) % hashTable->bucketNumber;
+    List *list = hashTable->buckets[index];
+    deleteElement(list, value);
+}
+
 HashTableErrorCode addValue(HashTable *const hashTable, char *const value, const bool copyRequired)
 {
     char *valueCopy = value;
@@ -101,21 +108,8 @@ void printHashTable(HashTable const *const hashTable)
     }
 }
 
-float getFullnessKoef(HashTable const * const hashTable)
-{
-    size_t answer = 0;
-    for (size_t i = 0; i < hashTable->bucketNumber; ++i)
-    {
-        if (!isEmpty(hashTable->buckets[i]))
-        {
-            ++answer;
-        }
-    }
-    return (float)answer / (float)hashTable->bucketNumber;
-}
-
 void getStatistics(HashTable const * const hashTable, size_t * const averageLength,
-size_t * const maxLength, float * const koef)
+size_t * const maxLength, float * const koefficient)
 {
     size_t k = 0;
     size_t maxLen = 0;
@@ -130,5 +124,5 @@ size_t * const maxLength, float * const koef)
     }
     *averageLength =(size_t)averageLen / hashTable->bucketNumber;
     *maxLength = maxLen;
-    *koef = (float)k / hashTable->bucketNumber;
+    *koefficient = (float)k / hashTable->bucketNumber;
 }

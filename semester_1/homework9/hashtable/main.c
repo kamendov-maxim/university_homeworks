@@ -5,9 +5,10 @@
 #include "hashtable/hashtable.h"
 #include "workWithFile/workWithFile.h"
 #include "list/list.h"
+#include "tests/test.h"
 
 #define NUMBER_OF_BUCKETS 100
-#define FILENAME "/Users/maks/Documents/programming/university_homeworks/semester_1/homework9/hashtable/file.txt"
+#define FILENAME "hashtable/file.txt"
 
 #define PROGRAM_FINISHED_CORRECTLY 0
 #define PROGRAM_FAILED_TESTS 1
@@ -18,10 +19,11 @@ int main(void)
 {
     setlocale(LC_ALL, "Rus");
 
-    // if (!test())
-    // {
-    //     return PROGRAM_FAILED_TESTS;
-    // }
+    if (!test())
+    {
+        printf("Программа сейчас не работает\n");
+        return PROGRAM_FAILED_TESTS;
+    }
 
 
     HashTable *hashTable = createHashTable(NUMBER_OF_BUCKETS);
@@ -36,6 +38,7 @@ int main(void)
         return FILE_READING_ERROR;
     }
 
+    printf("Слова  -  количество появлений в тексте\n\n");
     printHashTable(hashTable);
     // printf("Коэффициент заполнения таблицы: %f\n", getFullnessKoef(hashTable));
 
@@ -44,27 +47,12 @@ int main(void)
     float koef = 0;
     getStatistics(hashTable, &averageLength, &maxLength, &koef);
 
-    printf("Максимальная длина списка в таблице: %lu\n", maxLength);
+    printf("\nМаксимальная длина списка в таблице: %lu\n", maxLength);
     printf("Средняя длина списка в таблице: %lu\n", averageLength);
     printf("Коэффициент заполнения таблицы: %f\n", koef);
 
 
     deleteHashTable(hashTable);
-
-    // HashTable *hashTable = createHashTable(NUMBER_OF_BUCKETS);
-    // if (hashTable == NULL)
-    // {
-    //     return MEMORY_ERROR;
-    // }
-
-    // HashTableErrorCode ec = addValue(hashTable, "dagag", true);
-    // ec = addValue(hashTable, "fagag", true);
-    // ec = addValue(hashTable, "gafdha", true);
-    // ec = addValue(hashTable, "afda", true);
-    // ec = addValue(hashTable, "ahfd", true);
-    // ec = addValue(hashTable, "fagag", true);
-
-    // printHashTable(hashTable);
 
     return PROGRAM_FINISHED_CORRECTLY;
 }
