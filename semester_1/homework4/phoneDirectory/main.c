@@ -21,6 +21,13 @@ int main(void)
 {
     setlocale(LC_ALL, "Rus");
 
+    if (!test())
+    {
+        printf("Программа сейчас не работает\n");
+        return PROGRAM_FAILED_TESTS;
+    }
+    
+
     PhoneBook *phoneBook = createPhoneBook();
     if (phoneBook == NULL)
     {

@@ -173,7 +173,7 @@ ErrorCode saveToDataBase(PhoneBook *phoneBook, char const *const fileName)
         return readingFileError;
     }
 
-    fprintf(file, "%lu", phoneBook->firstEmptyEntry);
+    fprintf(file, "%lu\n", phoneBook->firstEmptyEntry);
     for (size_t i = 0; i < phoneBook->firstEmptyEntry; ++i)
     {
         Entry *entry = phoneBook->entries[i];
