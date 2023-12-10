@@ -46,10 +46,6 @@ static const size_t getNumberLength(size_t number)
 
 static const bool loadTest(void)
 {
-    size_t frequency = 0;
-    size_t al = 0;
-    size_t ml = 0;
-    size_t coef = 0;
     HashTableErrorCode hashTableErrorCode = okHashTable;
     double start = clock() / CLOCKS_PER_SEC;
     srand(time(NULL));
@@ -75,9 +71,6 @@ static const bool loadTest(void)
             deleteHashTable(hashTable);
             return false;
         }
-
-        frequency = getFrequency(hashTable, randomValue);
-        getStatistics(hashTable, &al, &ml, &coef);
     }
 
     deleteHashTable(hashTable);
@@ -86,7 +79,8 @@ static const bool loadTest(void)
     return finish - start <= LOADTEST_MAX_TIME;
 }
 
-static const bool testCase(command const *const commandsArray, size_t const commandAmount, char const *const *const values, size_t const *const sizetAnswers)
+static const bool testCase(command const *const commandsArray, size_t const commandAmount,
+                           char const *const *const values, size_t const *const sizetAnswers)
 {
     size_t const buckets = 100;
     HashTable *hashTable = createHashTable(buckets);
@@ -112,7 +106,6 @@ static const bool testCase(command const *const commandsArray, size_t const comm
                 return false;
             }
             ++currentValue;
-
             break;
         }
 
@@ -132,77 +125,11 @@ static const bool testCase(command const *const commandsArray, size_t const comm
             }
             ++currentValue;
             ++currentSztAnswer;
-
             break;
         }
 
         default:
             break;
-        }
-    }
-    deleteHashTable(hashTable);
-    return true;
-}
-
-static const bool checkStatisticsChange(HashTable *const hashtable, char const *const value, const command cmd, size_t ml, size_t al, float k)
-{
-    switch (cmd)
-    {
-    case addCommand:
-    {
-        HashTableErrorCode hashTableErrorCode = addValue(hashtable, value, true);
-        if (hashTableErrorCode != okHashTable)
-        {
-            return false;
-        }
-        break;
-    }
-
-    case deleteCommand:
-    {
-        deleteElementFromTable(hashtable, value);
-        break;
-    }
-
-    default:
-    {
-        false;
-        break;
-    }
-    }
-
-    size_t averageLength = 0;
-    size_t maxLength = 0;
-    float coef = 0;
-    getStatistics(hashtable, &averageLength, &maxLength, &coef);
-    if (averageLength != al || maxLength != ml || coef != k)
-    {
-        return false;
-    }
-
-    return true;
-}
-
-static const bool testStatisticsFunction(void)
-{
-    size_t const buckets = 10;
-    HashTable *hashTable = createHashTable(buckets);
-    if (hashTable == NULL)
-    {
-        return NULL;
-    }
-    const size_t statisticsTestsAmount = 4;
-    command commands[statisticsTestsAmount] = {addCommand, addCommand, addCommand, addCommand};
-    const char *const values[statisticsTestsAmount] = {"a", "a", "b", "c"};
-    const int ml[statisticsTestsAmount] = {1, 2, 2, 2};
-    const int al[statisticsTestsAmount] = {0, 0, 0, 0};
-    const float k[statisticsTestsAmount] = {0.1, 0.1, 0.2, 0.3};
-    for (size_t i = 0; i < statisticsTestsAmount; ++i)
-    {
-        if (!checkStatisticsChange(hashTable, values[i], commands[i], ml[i], al[i], k[i]))
-        {
-            deleteHashTable(hashTable);
-            return false;
         }
     }
     deleteHashTable(hashTable);

@@ -9,4 +9,4 @@ typedef enum FileWorkErrorCode
     memoryErrorFile
 } FileWorkErrorCode;
 
-FileWorkErrorCode scanWords(const char *const filename, HashTable *hashTable);
+FileWorkErrorCode scanWords(const char *const filename, HashTable * const hashTable);

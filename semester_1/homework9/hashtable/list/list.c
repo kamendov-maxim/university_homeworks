@@ -24,7 +24,7 @@ List *createList(void)
     return calloc(1, sizeof(List));
 }
 
-Node **findNode(List const *const list, char const *const value)
+static Node **findNode(List const *const list, char const *const value)
 {
     Node **currentNode = &(list->head);
     for (; *currentNode != NULL; currentNode = &((*currentNode)->next))
