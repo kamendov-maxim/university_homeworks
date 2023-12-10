@@ -166,7 +166,7 @@ ErrorCode readFromDataBase(PhoneBook * const phoneBook, char const *const fileNa
     return ok;
 }
 
-ErrorCode saveToDataBase(PhoneBook *phoneBook, char const *const fileName)
+ErrorCode saveToDataBase(PhoneBook * const phoneBook, char const *const fileName)
 {
     FILE *file = fopen(fileName, "w");
     if (file == NULL)
