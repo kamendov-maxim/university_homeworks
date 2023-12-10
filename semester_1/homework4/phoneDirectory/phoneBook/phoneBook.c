@@ -171,7 +171,6 @@ ErrorCode saveToDataBase(PhoneBook *phoneBook, char const *const fileName)
     FILE *file = fopen(fileName, "w");
     if (file == NULL)
     {
-        deletePhoneBook(phoneBook);
         return readingFileError;
     }
 
