@@ -12,10 +12,10 @@ typedef enum ErrorCode
 typedef struct PhoneBook PhoneBook;
 
 PhoneBook *createPhoneBook(void);
-void printPhoneBook(PhoneBook *phoneBook);
-ErrorCode addEntry(PhoneBook *phoneBook, char * const name, char * const number, const bool copyRecuired);
+void printPhoneBook(PhoneBook const * const phoneBook);
+ErrorCode addEntry(PhoneBook * const phoneBook, char * const name, char * const number, const bool copyRecuired);
 char * findNumberByName(PhoneBook const * const phoneBook, char const * const name);
 char * findNameByNumber(PhoneBook const * const phoneBook, char const * const number);
 void deletePhoneBook(PhoneBook * const phoneBook);
-ErrorCode readFromDataBase(PhoneBook *phoneBook, char const *const fileName);
-ErrorCode saveToDataBase(PhoneBook *phoneBook, char const *const fileName);
+ErrorCode readFromDataBase(PhoneBook * const phoneBook, char const *const fileName);
+ErrorCode saveToDataBase(PhoneBook * const phoneBook, char const *const fileName);

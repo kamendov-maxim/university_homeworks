@@ -40,7 +40,7 @@ PhoneBook *createPhoneBook(void)
     return phoneBook;
 }
 
-void printPhoneBook(PhoneBook *phoneBook)
+void printPhoneBook(PhoneBook const * const phoneBook)
 {
     for (size_t i = 0; i < phoneBook->firstEmptyEntry; ++i)
     {
@@ -49,9 +49,10 @@ void printPhoneBook(PhoneBook *phoneBook)
     }
 }
 
-ErrorCode addEntry(PhoneBook *phoneBook, char *const name, char *const number, const bool copyRecuired)
+ErrorCode addEntry(PhoneBook * const phoneBook, char *const name, char *const number, const bool copyRecuired)
 {
     char *nameCopy = name;
+    char *numberCopy = number;
     if (copyRecuired)
     {
         nameCopy = copyString(name);
@@ -59,21 +60,13 @@ ErrorCode addEntry(PhoneBook *phoneBook, char *const name, char *const number, c
         {
             return memoryError;
         }
-    }
-
-    // printf("%s\n", number);
-    char *numberCopy = number;
-    if (copyRecuired)
-    {
         numberCopy = copyString(number);
         if (numberCopy == NULL)
         {
-            free(numberCopy);
+            free(nameCopy);
             return memoryError;
         }
     }
-
-    // printf("3 %s %s\n", nameCopy, numberCopy);
 
     Entry *newEntry = calloc(1, sizeof(Entry));
     if (newEntry == NULL)
@@ -126,7 +119,7 @@ void deletePhoneBook(PhoneBook *const phoneBook)
     free(phoneBook);
 }
 
-ErrorCode readFromDataBase(PhoneBook *phoneBook, char const *const fileName)
+ErrorCode readFromDataBase(PhoneBook * const phoneBook, char const *const fileName)
 {
     FILE *file = fopen(fileName, "r");
     if (file == NULL)
@@ -160,7 +153,16 @@ ErrorCode readFromDataBase(PhoneBook *phoneBook, char const *const fileName)
             return memoryError;
         }
         errorCode = addEntry(phoneBook, name, number, false);
+        if (errorCode != ok)
+        {
+            free(name);
+            free(number);
+            fclose(file);
+            return memoryError;
+        }
+        
     }
+
     return ok;
 }
 

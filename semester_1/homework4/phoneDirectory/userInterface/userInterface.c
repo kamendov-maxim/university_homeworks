@@ -19,7 +19,7 @@ static void printOptions(void)
     printf("     - - - - - - - - - - - - - - - \n");
 }
 
-Command userInterface(void)
+Command userInterface(PhoneBook *phoneBook)
 {
     Command input = exitCommand;
     do
@@ -28,6 +28,7 @@ Command userInterface(void)
         if (scanf("%d", &input) != 1)
         {
             printf("%s", ERROR_MESSAGE);
+            deletePhoneBook(phoneBook);
             exit(INPUT_ERROR);
         }
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../phoneBook/phoneBook.h"
+
 typedef enum Command
 {
     exitCommand,
@@ -10,4 +12,5 @@ typedef enum Command
     saveToFileCommand
 } Command;
 
-Command userInterface(void);
+Command userInterface(PhoneBook *PhoneBook);
+

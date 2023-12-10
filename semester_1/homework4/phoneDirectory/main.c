@@ -11,7 +11,7 @@
 #define PROGRAM_FAILED_TESTS 1
 #define MEMORY_ERROR 2
 #define INPUT_ERROR 3
-#define READING_FILE_ERROR 4
+#define FILE_ERROR 4
 
 #define DATABASE_FILENAME "../file.txt"
 
@@ -37,14 +37,14 @@ int main(void)
     if (readFromDataBase(phoneBook, DATABASE_FILENAME) != ok)
     {
         deletePhoneBook(phoneBook);
-        return READING_FILE_ERROR;
+        return FILE_ERROR;
     }
 
     Command userInput = exitCommand;
     size_t len = 0;
     do
     {
-        userInput = userInterface();
+        userInput = userInterface(phoneBook);
         switch (userInput)
         {
         case addEntryCommand:
@@ -132,7 +132,7 @@ int main(void)
             if (saveToDataBase(phoneBook, DATABASE_FILENAME) != ok)
             {
                 deletePhoneBook(phoneBook);
-                return READING_FILE_ERROR;
+                return FILE_ERROR;
             }
 
             break;
@@ -141,7 +141,7 @@ int main(void)
         case exitCommand:
         {
             printf("Завершение работы\n");
-            continue;
+            break;
         }
 
         default:
