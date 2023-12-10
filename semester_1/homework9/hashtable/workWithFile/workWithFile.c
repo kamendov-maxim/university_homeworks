@@ -4,7 +4,7 @@
 #include "../String/String.h"
 #include "../hashtable/hashtable.h"
 
-FileWorkErrorCode scanWords(const char *const filename, HashTable *hashTable)
+FileWorkErrorCode scanWords(const char *const filename, HashTable * const hashTable)
 {
     FILE *file = fopen(filename, "r");
     if (file == NULL)

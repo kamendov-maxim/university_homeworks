@@ -16,6 +16,5 @@ HashTableErrorCode addValue(HashTable *const hashTable, char *const value, const
 void printHashTable(HashTable const *const hashTable);
 void deleteHashTable(HashTable *const hashTable);
 size_t getFrequency(HashTable const *const hashTable, char const *const value);
-float getFullnessKoef(HashTable const * const hashTable);
-void getStatistics(HashTable const * const hashTable, size_t * const averageLength, size_t * const maxLength, float * const koefficient);
+void getStatistics(HashTable const * const hashTable, size_t * const averageLength, size_t * const maxLength, float * const coefficient);
 void deleteElementFromTable(HashTable * const hashTable, char const * const value);

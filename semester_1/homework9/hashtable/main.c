@@ -8,7 +8,7 @@
 #include "tests/test.h"
 
 #define NUMBER_OF_BUCKETS 100
-#define FILENAME "hashtable/file.txt"
+#define FILENAME "../file.txt"
 
 #define PROGRAM_FINISHED_CORRECTLY 0
 #define PROGRAM_FAILED_TESTS 1
@@ -40,7 +40,6 @@ int main(void)
 
     printf("Слова  -  количество появлений в тексте\n\n");
     printHashTable(hashTable);
-    // printf("Коэффициент заполнения таблицы: %f\n", getFullnessKoef(hashTable));
 
     size_t averageLength = 0;
     size_t maxLength = 0;

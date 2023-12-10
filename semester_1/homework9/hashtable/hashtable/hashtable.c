@@ -10,12 +10,12 @@ typedef struct HashTable
     List **buckets;
 } HashTable;
 
-static size_t getHash(char *value)
+static size_t getHash(const char *value)
 {
     size_t hash = 5381;
     size_t c = 0;
+    while (c = *value++)
 
-    while ((c = *value++))
         hash = ((hash << 5) + hash) + c;
 
     return hash;
@@ -36,6 +36,9 @@ HashTable *createHashTable(const size_t bucketNumber)
         return NULL;
     }
 
+    hashTable->bucketNumber = bucketNumber;
+    hashTable->buckets = buckets;
+
     for (size_t i = 0; i < bucketNumber; ++i)
     {
         buckets[i] = createList();
@@ -46,16 +49,18 @@ HashTable *createHashTable(const size_t bucketNumber)
         }
     }
 
-    hashTable->bucketNumber = bucketNumber;
-    hashTable->buckets = buckets;
-
     return hashTable;
 }
 
-void deleteElementFromTable(HashTable * const hashTable, char const * const value)
+static List *getsList(HashTable *const hashTable, char const *const value)
 {
     size_t index = getHash(value) % hashTable->bucketNumber;
-    List *list = hashTable->buckets[index];
+    return hashTable->buckets[index];
+}
+
+void deleteElementFromTable(HashTable *const hashTable, char const *const value)
+{
+    List *list = getsList(hashTable, value);
     deleteElement(list, value);
 }
 
@@ -71,13 +76,14 @@ HashTableErrorCode addValue(HashTable *const hashTable, char *const value, const
         }
     }
 
-    size_t index = getHash(valueCopy) % hashTable->bucketNumber;
-
-    List *list = hashTable->buckets[index];
+    List *list = getsList(hashTable, value);
     ListErrorCode listErrorCode = append(list, valueCopy, false);
     if (listErrorCode != okList)
     {
-        free(valueCopy);
+        if (copyRequired)
+        {
+            free(valueCopy);
+        }
         return memoryErrorHashTable;
     }
     return okHashTable;
@@ -85,16 +91,18 @@ HashTableErrorCode addValue(HashTable *const hashTable, char *const value, const
 
 size_t getFrequency(HashTable const *const hashTable, char const *const value)
 {
-    size_t index = getHash(value) % hashTable->bucketNumber;
-
-    return getNumberOfEntries(hashTable->buckets[index], value);
+    List *list = getsList(hashTable, value);
+    return getNumberOfEntries(list, value);
 }
 
 void deleteHashTable(HashTable *const hashTable)
 {
     for (size_t i = 0; i < hashTable->bucketNumber; i++)
     {
-        deleteList(hashTable->buckets[i]);
+        if (hashTable->buckets[i] != NULL)
+        {
+            deleteList(hashTable->buckets[i]);
+        }
     }
     free(hashTable->buckets);
     free(hashTable);
@@ -108,8 +116,8 @@ void printHashTable(HashTable const *const hashTable)
     }
 }
 
-void getStatistics(HashTable const * const hashTable, size_t * const averageLength,
-size_t * const maxLength, float * const koefficient)
+void getStatistics(HashTable const *const hashTable, size_t *const averageLength,
+                   size_t *const maxLength, float *const coefficient)
 {
     size_t k = 0;
     size_t maxLen = 0;
@@ -120,9 +128,9 @@ size_t * const maxLength, float * const koefficient)
         currentListLength = getLength(hashTable->buckets[i]);
         averageLen += currentListLength;
         maxLen = (currentListLength > maxLen ? currentListLength : maxLen);
-        k += (currentListLength != 0 ? 1 : 0);        
+        k += (currentListLength != 0 ? 1 : 0);
     }
-    *averageLength =(size_t)averageLen / hashTable->bucketNumber;
+    *averageLength = (size_t)averageLen / hashTable->bucketNumber;
     *maxLength = maxLen;
-    *koefficient = (float)k / hashTable->bucketNumber;
+    *coefficient = (float)k / hashTable->bucketNumber;
 }
