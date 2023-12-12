@@ -55,3 +55,8 @@ dkms.conf
 *.DS_Store
 other_files/
 build/
+launch.json
+settings.json
+tasks.json
+*
+!*.*
