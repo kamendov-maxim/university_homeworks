@@ -48,9 +48,9 @@ static size_t partition(int *const array, size_t leftElement, size_t rightElemen
    return i;
 }
 
-static void insertSort(int *const array, int leftElement, size_t rightElement)
+static void insertSort(int *const array, size_t leftElement, size_t rightElement)
 {
-   for (int i = leftElement + 1; i < rightElement; ++i)
+   for (size_t i = leftElement + 1; i < rightElement; ++i)
    {
       int currentElement = array[i];
       int j = i - 1;
@@ -161,14 +161,14 @@ int main(void)
    }
 
    size_t size = 0;
-   while (size <= 0)
+   while (size == 0)
    {
       printf("Enter the size of your array: ");
       if (scanf("%lu", &size) != 1)
       {
          return INPUT_ERROR;
       }
-      if (size <= 0)
+      if (size == 0)
       {
          printf("\nSize of your array should be at least 1\n");
       }
