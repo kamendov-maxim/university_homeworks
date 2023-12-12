@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <locale.h>
+#include <stdlib.h>
 
 #include "../include/subString.h"
 #include "../include/String.h"
@@ -22,7 +23,6 @@ int main(void)
         printf("Программа сейчас не работает\n");
         return PROGRAM_FAILED_TESTS;
     }
-    
 
     size_t len = 0;
     printf("Введите подстроку: ");
@@ -32,23 +32,31 @@ int main(void)
         return MEMORY_ERROR;
     }
     char *text = readFile(FILE_NAME);
+    if (text == NULL)
+    {
+        free(pattern);
+        return MEMORY_ERROR;
+    }
 
     ErrorCode errorCode = ok;
-    size_t answer = findSubstring(pattern, text, &errorCode);
+    long answer = findSubstring(pattern, text, &errorCode);
+    free(text);
+
     if (errorCode != ok)
     {
+        free(pattern);
         printf("Программа не может получить доступ к памяти\n");
         return MEMORY_ERROR;
     }
-    
+
     if (answer == -1)
     {
         printf("Подстрока %s не встречается в тексте ни разу\n", pattern);
+        free(pattern);
         return PROGRAM_FINISHED_CORRECTLY;
     }
-    
 
-    printf("Первое вхождение подстроки %s в тексте начинается на %lu символе\n", pattern, answer);
-
+    printf("Первое вхождение подстроки %s в тексте начинается на %ld символе\n", pattern, answer);
+    free(pattern);
     return PROGRAM_FINISHED_CORRECTLY;
 }

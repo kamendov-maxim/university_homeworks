@@ -22,15 +22,14 @@ static const bool testCase(const char *const testFileName, const char *const ans
     }
 
     char *text = getString(&len, testFile, EOF);
+    fclose(testFile);
     if (text == NULL)
     {
         free(pattern);
-        fclose(testFile);
         return false;
     }
-    fclose(testFile);
     ErrorCode errorCode = ok;
-    size_t position = findSubstring(pattern, text, &errorCode);
+    long position = findSubstring(pattern, text, &errorCode);
     free(pattern);
     free(text);
     if (errorCode != ok)
@@ -39,8 +38,13 @@ static const bool testCase(const char *const testFileName, const char *const ans
     }
 
     FILE *answerFile = fopen(answerFileName, "r");
-    size_t answer = 0;
-    int scanfCheck = fscanf(answerFile, "%lu", &answer);
+    if (answerFile == NULL)
+    {
+        return false;
+    }
+    
+    long answer = 0;
+    int scanfCheck = fscanf(answerFile, "%ld", &answer);
     fclose(answerFile);
     return scanfCheck == 1 && position == answer;
 }

@@ -7,13 +7,17 @@
 
 #define MEMORY_ERROR 2
 
-static size_t *createLPSArray(char const *const pattern, const size_t pLength)
+static long *createLPSArray(char const *const pattern, const long pLength)
 {
-    size_t len = 0;
-    size_t *lps = (size_t *)malloc(pLength * sizeof(size_t));
+    long len = 0;
+    long *lps = (long *)malloc(pLength * sizeof(long));
+    if (lps == NULL)
+    {
+        return NULL;
+    }
 
     lps[0] = 0;
-    size_t i = 1;
+    long i = 1;
 
     while (i < pLength)
     {
@@ -23,27 +27,24 @@ static size_t *createLPSArray(char const *const pattern, const size_t pLength)
             lps[i] = len;
             ++i;
         }
+        else if (len != 0)
+        {
+            len = lps[len - 1];
+        }
         else
         {
-            if (len != 0)
-            {
-                len = lps[len - 1];
-            }
-            else
-            {
-                lps[i] = 0;
-                ++i;
-            }
+            lps[i] = 0;
+            ++i;
         }
     }
 
     return lps;
 }
 
-size_t findSubstring(char const *const pattern, char const *const text, ErrorCode *const errorCode)
+long findSubstring(char const *const pattern, char const *const text, ErrorCode *const errorCode)
 {
-    size_t pLength = strlen(pattern);
-    size_t tLength = strlen(text);
+    long pLength = strlen(pattern);
+    long tLength = strlen(text);
 
     if (pLength == 0)
     {
@@ -55,14 +56,14 @@ size_t findSubstring(char const *const pattern, char const *const text, ErrorCod
         return -1;
     }
 
-    size_t *lps = createLPSArray(pattern, pLength);
+    long *lps = createLPSArray(pattern, pLength);
     if (lps == NULL)
     {
         *errorCode = memoryError;
     }
     *errorCode = ok;
-    size_t j = 0;
-    size_t i = 0;
+    long j = 0;
+    long i = 0;
     while (i < tLength)
     {
         if (pattern[j] == text[i])

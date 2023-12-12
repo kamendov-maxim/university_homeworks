@@ -6,4 +6,4 @@ typedef enum ErrorCode
     memoryError
 } ErrorCode;
 
-size_t findSubstring(char const *const pattern, char const *const text, ErrorCode *const errorCode);
+long findSubstring(char const *const pattern, char const *const text, ErrorCode *const errorCode);
