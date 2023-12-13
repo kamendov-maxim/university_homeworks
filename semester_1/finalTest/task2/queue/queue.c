@@ -6,6 +6,7 @@
 typedef struct Node
 {
     size_t priority;
+    int value;
     struct Node *next;
 } Node;
 
@@ -41,7 +42,7 @@ ErrorCode enqueue(Queue * const queue,const int value, const size_t priority)
     return ok;
 }
 
-int dequeue(Queue * const queue, const int value)
+int dequeue(Queue * const queue)
 {
     if (queue->head == NULL)
     {
@@ -54,7 +55,7 @@ int dequeue(Queue * const queue, const int value)
     return value;
 }
 
-void deleteQueue(Queue * const queue)
+void deleteQueue(Queue * queue)
 {
     for (Node * currentNode = queue->head; currentNode != NULL; currentNode = currentNode->next)
     {
