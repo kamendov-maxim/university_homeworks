@@ -4,7 +4,7 @@
 
 #include "read.h"
 
-char *getString(size_t *const len, char, char const endOfLine)
+char *getString(size_t *const len, FILE *file, char const endOfLine);
 {
     *len = 0;
     size_t capacity = 1;
@@ -16,7 +16,7 @@ char *getString(size_t *const len, char, char const endOfLine)
     char previousChar = '\0';
     for (char c = fgetc(file); c != endOfLine && c != EOF; c = fgetc(file))
     {
-        if (c != previousChar)   
+        if (c != previousChar)
         {
             s[(*len)++] = c;
 

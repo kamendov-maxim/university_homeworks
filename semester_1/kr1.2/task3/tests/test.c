@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "test.h"
 #include "../read/read.h"
@@ -12,7 +13,7 @@ const bool testCase(char const *const testFileName, char const *const answerFile
         return false;
     }
     size_t len = 0;
-    char * str = getString(&len, file, EOF);
+    char *str = getString(&len, file, EOF);
     fclose(file);
     if (str == NULL)
     {
@@ -24,15 +25,17 @@ const bool testCase(char const *const testFileName, char const *const answerFile
         free(str);
         return false;
     }
-    char * str2 = getString(&len, answerFile, EOF);
+    char *str2 = getString(&len, answerFile, EOF);
     fclose(answerFile);
     if (str2 == NULL)
     {
-        free(str1);
+        free(str);
         return false;
     }
-    
-    
+    bool answer = strcmp(str, str2) == 0;
+    free(str);
+    free(str2);
+    return answer;
 }
 
 const bool test(void)
@@ -45,11 +48,10 @@ const bool test(void)
 
     for (size_t i = 0; i < testNumber; ++i)
     {
-        FILE *file = fopen(FILENAME, "r");
-        if (file == NULL)
+        if (!testCase(testFileNames[i], answerFileNames[i]))
         {
             return false;
         }
-        fclose(file);
     }
+    return true;
 }

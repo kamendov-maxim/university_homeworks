@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "read/read.h"
+#include "tests/test.h"
 
 #define PROGRAM_FINISHED_CORRECTLY 0
 #define PROGRAM_FAILED_TESTS 1
