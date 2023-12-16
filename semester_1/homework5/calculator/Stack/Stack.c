@@ -4,7 +4,7 @@
 
 typedef struct Node
 {
-    struct Node* next;
+    struct Node *next;
     float value;
 
 } Node;
@@ -19,16 +19,17 @@ Stack *createStack(void)
     return calloc(1, sizeof(Stack));
 }
 
-void deleteStack(Stack *const stack)
+void deleteStack(Stack **stack)
 {
-    Node *currentNode = stack->head;
+    Node *currentNode = (*stack)->head;
     while (currentNode != NULL)
     {
         Node *temp = currentNode;
         currentNode = currentNode->next;
         free(temp);
     }
-    free(stack);
+    free(*stack);
+    *stack = NULL;
 }
 
 ErrorCode addElement(Stack *const stack, const float value)
@@ -44,7 +45,7 @@ ErrorCode addElement(Stack *const stack, const float value)
         newNode->next = stack->head;
     }
     stack->head = newNode;
-    
+
     // Node **currentNode = &(stack->head);
     // for (; *currentNode != NULL; currentNode = &((*currentNode)->next))
     //     ;

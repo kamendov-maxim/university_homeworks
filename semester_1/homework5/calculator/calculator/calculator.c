@@ -1,6 +1,5 @@
 #include <stdio.h>
 
-
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -96,12 +95,11 @@ float calculator(const char *const expression, CalculatorErrorCode *calculatorEr
             ec = addElement(stack, currentCharacter - '0');
             if (ec != ok)
             {
-                deleteStack(stack);
+                deleteStack(&stack);
                 *calculatorErrorCode = memoryError;
                 return 0;
             }
         }
-
 
         switch (currentCharacter)
         {
@@ -111,6 +109,7 @@ float calculator(const char *const expression, CalculatorErrorCode *calculatorEr
             ec = operation(stack, '-');
             if (ec != ok)
             {
+                deleteStack(&stack);
                 *calculatorErrorCode = algorithmWorkError;
                 return 0;
             }
@@ -122,6 +121,7 @@ float calculator(const char *const expression, CalculatorErrorCode *calculatorEr
             ec = operation(stack, '+');
             if (ec != ok)
             {
+                deleteStack(&stack);
                 *calculatorErrorCode = algorithmWorkError;
                 return 0;
             }
@@ -133,6 +133,7 @@ float calculator(const char *const expression, CalculatorErrorCode *calculatorEr
             ec = operation(stack, '*');
             if (ec != ok)
             {
+                deleteStack(&stack);
                 *calculatorErrorCode = algorithmWorkError;
                 return 0;
             }
@@ -144,6 +145,7 @@ float calculator(const char *const expression, CalculatorErrorCode *calculatorEr
             ec = operation(stack, '/');
             if (ec != ok)
             {
+                deleteStack(&stack);
                 *calculatorErrorCode = algorithmWorkError;
                 return 0;
             }
@@ -157,10 +159,12 @@ float calculator(const char *const expression, CalculatorErrorCode *calculatorEr
     float answer = getElement(stack, &ec);
     if (ec != ok)
     {
+        deleteStack(&stack);
         *calculatorErrorCode = algorithmWorkError;
         return 0;
     }
     *calculatorErrorCode = ok;
+    deleteStack(&stack);
 
     return answer;
 }
