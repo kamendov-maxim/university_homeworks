@@ -1,9 +1,11 @@
+#include <stdio.h>
+
+
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
 #include "calculator.h"
-#include "../Stack/Stack.h"
 
 const char *const numbers = "0123456789";
 const size_t numbersNumber = 10;
@@ -20,111 +22,145 @@ static const bool isDigit(const char character)
     return false;
 }
 
-static ErrorCode operation(Stack *stack, const operand)
+static ErrorCode operation(Stack *stack, const char operand)
 {
-    ErrorCode errorCode = ok;
-    int number1 = getElement(stack, &errorCode);
+    ErrorCode errorCode = okStack;
+    float number2 = getElement(stack, &errorCode);
     if (errorCode != ok)
     {
         return errorCode;
     }
-    int number2 = getElement(stack, &errorCode);
+    float number1 = getElement(stack, &errorCode);
     if (errorCode != ok)
     {
         return errorCode;
     }
+
+    float result = 0;
 
     switch (operand)
     {
-    case /* constant-expression */:
-        /* code */
+    case '-':
+    {
+        result = number1 - number2;
         break;
-    
+    }
+
+    case '+':
+    {
+        result = number1 + number2;
+        break;
+    }
+
+    case '*':
+    {
+        result = number1 * number2;
+        break;
+    }
+
+    case '/':
+    {
+        result = number1 / number2;
+        break;
+    }
+
     default:
         break;
     }
-    
-    return 1
+
+    errorCode = addElement(stack, result);
+    if (errorCode != ok)
+    {
+        return errorCode;
+    }
+    return errorCode;
 }
 
-int calculator(const char *const expression, ErrorCode *errorCode)
+float calculator(const char *const expression, CalculatorErrorCode *calculatorErrorCode)
 {
     Stack *stack = createStack();
     if (stack == NULL)
     {
-        *errorCode = memoryError;
-        return 0
+        *calculatorErrorCode = memoryError;
+        return 0;
     }
 
     size_t length = strlen(expression);
-    int currentInt = 0;
-    int multiplier = 1;
-    bool readingNumber = false;
-    bool firstCharacterZero = false;
-    bool minusPreviousCharacter = false;
-    ErrorCode ec = ok;
+    ErrorCode ec = okStack;
     for (size_t i = 0; i < length; ++i)
     {
         char currentCharacter = expression[i];
+
         if (isDigit(currentCharacter))
         {
-            firstCharacterZero = (currentCharacter == '0' ? true : false);
-            bool readingNumber = false;
-            int currentDigit = (currentCharacter - '0') * multiplier;
-            currentInt = (readingNumber && firstCharacterZero ? currentDigit : currentInt * 10 + currentDigit);
-
-            break;
+            ec = addElement(stack, currentCharacter - '0');
+            if (ec != ok)
+            {
+                deleteStack(stack);
+                *calculatorErrorCode = memoryError;
+                return 0;
+            }
         }
+
 
         switch (currentCharacter)
         {
 
-        case ' ':
+        case '-':
         {
-            if (readingNumber)
-            {
-                ec = addElement(stack, currentInt);
-                if (ec != ok)
-                {
-                    *errorCode = ec;
-                    deleteStack(stack);
-                    return 0;
-                }
-                bool readingNumber = false;
-                bool firstCharacterZero = false;
-                break;
-            }
-
-            if (minusPreviousCharacter)
-            {
-                ec = addElement(stack, operation(stack, '-'));
-                if (ec != ok)
-                {
-                    *errorCode = ec;
-                    deleteStack(stack);
-                    return 0;
-                }
-                bool minusPreviousCharacter = false;
-                break;
-            }
-        }
-
-        case '+':
-        {
-            ec = addElement(stack, operation(stack, '+'));
+            ec = operation(stack, '-');
             if (ec != ok)
             {
-                *errorCode = ec;
-                deleteStack(stack);
+                *calculatorErrorCode = algorithmWorkError;
                 return 0;
             }
             break;
         }
 
-        case - 
+        case '+':
+        {
+            ec = operation(stack, '+');
+            if (ec != ok)
+            {
+                *calculatorErrorCode = algorithmWorkError;
+                return 0;
+            }
+            break;
+        }
+
+        case '*':
+        {
+            ec = operation(stack, '*');
+            if (ec != ok)
+            {
+                *calculatorErrorCode = algorithmWorkError;
+                return 0;
+            }
+            break;
+        }
+
+        case '/':
+        {
+            ec = operation(stack, '/');
+            if (ec != ok)
+            {
+                *calculatorErrorCode = algorithmWorkError;
+                return 0;
+            }
+            break;
+        }
 
         default:
             break;
         }
     }
+    float answer = getElement(stack, &ec);
+    if (ec != ok)
+    {
+        *calculatorErrorCode = algorithmWorkError;
+        return 0;
+    }
+    *calculatorErrorCode = ok;
+
+    return answer;
 }
