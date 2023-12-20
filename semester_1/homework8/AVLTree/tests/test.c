@@ -31,13 +31,14 @@ static char *generateString(size_t length)
 
 static const size_t getNumberLength(size_t number)
 {
-        size_t count = 0; 
-        do{ 
-            number = number / 10; 
-            ++count; 
-        }while (number != 0) ;
+    size_t count = 0;
+    do
+    {
+        number = number / 10;
+        ++count;
+    } while (number != 0);
 
-        return count;
+    return count;
 }
 
 static const bool loadTest(void)
@@ -69,7 +70,7 @@ static const bool loadTest(void)
             deleteDictionary(dictionary);
             return false;
         }
-        
+
         // sprintf(key, "%zu%c", i, '\0');
         sprintf(key, "%zu", i);
 
@@ -83,18 +84,16 @@ static const bool loadTest(void)
             return false;
         }
 
+        // for (size_t i = 0; i < LOADTEST_STRING_AMOUNT; ++i)
+        // {
+        //     char *key = malloc((MAX_KEY_LENGTH + 1) * sizeof(char));
+        //     if (key == NULL)
+        //     {
+        //         deleteDictionary(dictionary);
+        //         return false;
+        //     }
 
-
-    // for (size_t i = 0; i < LOADTEST_STRING_AMOUNT; ++i)
-    // {
-    //     char *key = malloc((MAX_KEY_LENGTH + 1) * sizeof(char));
-    //     if (key == NULL)
-    //     {
-    //         deleteDictionary(dictionary);
-    //         return false;
-    //     }
-
-    //     deleteElement(dictionary, key);
+        //     deleteElement(dictionary, key);
     }
 
     double finish = clock() / CLOCKS_PER_SEC;
@@ -108,7 +107,7 @@ static const bool loadTest(void)
             return false;
         }
     }
-    
+
     return finish - start <= LOADTEST_MAX_TIME;
 }
 
@@ -215,6 +214,20 @@ const bool test(void)
     char const *charAnswers3[3] = {"one", "two", "one"};
     bool const boolAnswers3[0] = {};
     bool testCase3 = testCase(4, testCommands3, testKeys3, testValues3, charAnswers3, boolAnswers3);
+
+
+
+
+    UserInput testCommands4[7] = {appendCommand, appendCommand, appendCommand, appendCommand, appendCommand, appendCommand, appendCommand};
+    char *testKeys4[7] = {"1", "2", "3", "4", "5", "6", "7"};
+    char *testValues4[3] = {"1", "2", "3", "4", "5", "6", "7"};
+    char const *charAnswers4[0] = {};
+    bool const boolAnswers4[0] = {};
+    bool testCase4 = testCase(4, testCommands4, testKeys4, testValues4, charAnswers4, boolAnswers4);
+
+
+
+
     return true;
-    return testCase1 && testCase2 && testCase3 && loadTest();
+    return testCase1 && testCase2 && testCase3 && testCase4 && loadTest();
 }
