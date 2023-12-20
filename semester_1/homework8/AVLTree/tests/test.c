@@ -82,7 +82,6 @@ static const bool loadTest(void)
             deleteDictionary(dictionary);
             return false;
         }
-        // createRepresentation(dictionary, "/Users/maks/Documents/programming/university_homeworks/semester_1/homework8/r.gv");
 
 
 

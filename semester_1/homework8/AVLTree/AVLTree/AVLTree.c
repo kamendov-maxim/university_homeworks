@@ -94,19 +94,15 @@ static void leftRotate(Node **const root)
     // updateHeight(b);
 }
 
-// parent + почему то не работают повороты
-
-static Node *rightRotate(Node *const root)
+static void rightRotate(Node **const root)
 {
-    Node *a = root;
+    Node *a = *root;
     Node *b = a->rightChild;
-    // Node *aParent = a->parent;
     a->rightChild = b->leftChild;
     b->leftChild = a;
     b->parent = a->parent;
     a->parent = b;
-    return b;
-    // **root = b;
+    *root = b;
     // updateHeight(a);
     // updateHeight(b);
 }
@@ -147,56 +143,56 @@ static void rightBigRotate(Node **const root)
     // updateHeight(c);
 }
 
-// static void balanceTree(Node ** const root)
-// {
-//     updateHeight(*root);
-//     if (nodeBalance(*root) == 2)
-//     {
-//         if (nodeBalance((*root)->leftChild) <= 0)
-//         {
-//             leftRotate(root);
-//             return;
-//         }
-//         leftBigRotate(root);
-//         return;
-//     }
-//     else if (nodeBalance(*root) == -2)
-//     {
-//         if (nodeBalance((*root)->rightChild) >= 0)
-//         {
-//             * root = rightRotate(*root);
-//             return;
-//         }
-//         rightBigRotate(root);
-//         return;
-//     }
-
-// }
-
-static Node *balanceTree(Node *const root)
+static void balanceTree(Node ** const root)
 {
-    updateHeight(root);
-    if (nodeBalance(root) == 2)
+    updateHeight(*root);
+    if (nodeBalance(*root) == 2)
     {
-        if (nodeBalance((root)->leftChild) <= 0)
+        if (nodeBalance((*root)->leftChild) <= 0)
         {
-            // leftRotate(root);
-            return root;
+            leftRotate(root);
+            return;
         }
-        // leftBigRotate(root);
-        return root;
+        leftBigRotate(root);
+        return;
     }
-    else if (nodeBalance(root) == -2)
+    else if (nodeBalance(*root) == -2)
     {
-        if (nodeBalance(root->rightChild) >= 0)
-            {
-                return rightRotate(root);
-            }
+        if (nodeBalance((*root)->rightChild) >= 0)
+        {
+            rightRotate(root);
+            return;
+        }
         rightBigRotate(root);
-        return root;
+        return;
     }
-    return root;
+
 }
+
+// static Node *balanceTree(Node *const root)
+// {
+//     updateHeight(root);
+//     if (nodeBalance(root) == 2)
+//     {
+//         if (nodeBalance((root)->leftChild) <= 0)
+//         {
+//             // leftRotate(root);
+//             return root;
+//         }
+//         // leftBigRotate(root);
+//         return root;
+//     }
+//     else if (nodeBalance(root) == -2)
+//     {
+//         if (nodeBalance(root->rightChild) >= 0)
+//             {
+//                 return rightRotate(root);
+//             }
+//         rightBigRotate(root);
+//         return root;
+//     }
+//     return root;
+// }
 
 DictionaryErrorCode append(Dictionary *const dictionary, char *const key, char *const value, bool const copyRequired)
 {
@@ -234,7 +230,7 @@ DictionaryErrorCode append(Dictionary *const dictionary, char *const key, char *
             return memoryError;
         }
         newNode->key = keyCopy;
-        newNode->parent = parent;
+        newNode->parent = &(*parent);
         *nodeToWriteTo = newNode;
     }
     else
@@ -243,24 +239,12 @@ DictionaryErrorCode append(Dictionary *const dictionary, char *const key, char *
     }
     (*nodeToWriteTo)->value = valueCopy;
     updateHeight(*nodeToWriteTo);
-    // for (Node **currentNode = nodeToWriteTo; *currentNode != NULL; currentNode = &((*currentNode)->parent))
-    // {
-    //     balanceTree(currentNode);
-    //     createRepresentation(dictionary, "/Users/maks/Documents/programming/university_homeworks/semester_1/homework8/r.gv");
-    // }
-
-    // for (Node *currentNode = *nodeToWriteTo; currentNode != NULL; currentNode = currentNode->parent)
-    // {
-    //     balanceTree(currentNode);
-    //     createRepresentation(dictionary, "/Users/maks/Documents/programming/university_homeworks/semester_1/homework8/r.gv");
-
-    // }
-
-     for (Node **currentNode = nodeToWriteTo; *currentNode != NULL; currentNode = &((*currentNode)->parent))
+    for (Node **currentNode = nodeToWriteTo; *currentNode != NULL; currentNode = &((*currentNode)->parent))
     {
-        *currentNode = balanceTree(currentNode);
-        createRepresentation(dictionary, "/Users/maks/Documents/programming/university_homeworks/semester_1/homework8/r.gv");
+        balanceTree(currentNode);
+
     }
+
     
 
     return ok;
@@ -351,59 +335,4 @@ char *getValue(Dictionary *const dictionary, char *const key)
 bool keyCheck(Dictionary *const dictionary, char *const key)
 {
     return getValue(dictionary, key) != NULL;
-}
-
-static void recursion(Node *const root, FILE *file, int *const i)
-{
-    if (root->leftChild != NULL)
-    {
-
-        recursion(root->leftChild, file, i);
-        fprintf(file, "    %s->%s;\n", root->value, root->leftChild->value);
-    }
-    else
-    {
-        fprintf(file, "   null%d [shape=point];\n", *i);
-        fprintf(file, "    %s->null%d\n", root->value, *i);
-        ++(*i);
-    }
-
-    if (root->rightChild != NULL)
-    {
-
-        recursion(root->rightChild, file, i);
-        fprintf(file, "    %s->%s;\n", root->value, root->rightChild->value);
-    }
-    else
-    {
-        fprintf(file, "   null%d [shape=point];\n", *i);
-        fprintf(file, "    %s->null%d\n", root->value, *i);
-        ++(*i);
-    }
-}
-
-void createRepresentation(Dictionary const *const dictionary, const char *const filename)
-{
-    FILE *file = NULL;
-    file = fopen(filename, "w");
-    if (file == NULL)
-    {
-        printf("null");
-        return;
-    }
-    printf("%s", filename);
-
-    fprintf(file, "digraph { graph [ dpi = 300 ]; node [color=Green style=filled] ; edge [color=brown] ; \n");
-    int i = 0;
-    if (dictionary->root == NULL)
-    {
-        fprintf(file, "null;");
-    }
-    else
-    {
-        recursion(dictionary->root, file, &i);
-    }
-    fprintf(file, "}");
-    fclose(file);
-    system("dot -Tpng /Users/maks/Documents/programming/university_homeworks/semester_1/homework8/r.gv -o picture.png ; open picture.png");
 }
