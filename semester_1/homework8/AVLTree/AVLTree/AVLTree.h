@@ -15,3 +15,5 @@ bool keyCheck(Dictionary *const dictionary, char * const key);
 DictionaryErrorCode append(Dictionary *const dictionary, char *const key, char *const value, bool const copyRequired);
 void deleteElement(Dictionary *const dictionary, char *const key);
 void deleteDictionary(Dictionary * const dictionary);
+
+void createRepresentation(Dictionary const *const dictionary, const char *const filename);

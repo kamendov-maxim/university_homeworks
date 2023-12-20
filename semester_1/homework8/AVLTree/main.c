@@ -73,11 +73,11 @@ int main(void)
 {
     setlocale(LC_ALL, "Rus");
 
-    if (!test())
-    {
-        printf("К сожалению, сейчас программа не работает\n");
-        return TESTS_ARE_NOT_PASSED;
-    }
+    // if (!test())
+    // {
+    //     printf("К сожалению, сейчас программа не работает\n");
+    //     return TESTS_ARE_NOT_PASSED;
+    // }
 
     Dictionary *dictionary = createDictionary();
     if (dictionary == NULL)
@@ -90,6 +90,7 @@ int main(void)
     UserInput input = checkKeyCommand;
     while (input != exitCommand)
     {
+        // createRepresentation(dictionary, "/Users/maks/Documents/programming/university_homeworks/semester_1/homework8/r.gv");
         input = getCommand(dictionary);
         switch (input)
         {
