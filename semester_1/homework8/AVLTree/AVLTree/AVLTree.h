@@ -1,7 +1,6 @@
 #pragma once
-#include <stdbool.h>
 
-typedef struct Dictionary Dictionary;
+#include <stdbool.h>
 
 typedef enum DictionaryErrorCode
 {
@@ -9,9 +8,11 @@ typedef enum DictionaryErrorCode
     memoryError
 } DictionaryErrorCode;
 
+typedef struct Dictionary Dictionary;
+
 Dictionary *createDictionary(void);
-char *getValue(Dictionary *const dictionary, char * const key);
-bool keyCheck(Dictionary *const dictionary, char * const key);
-DictionaryErrorCode append(Dictionary *const dictionary, char *const key, char *const value, bool const copyRequired);
-void deleteElement(Dictionary *const dictionary, char *const key);
-void deleteDictionary(Dictionary * const dictionary);
+DictionaryErrorCode addElement(Dictionary *const dictionary, char *const key, char *const value, const bool copyRequired);
+char *getValue(Dictionary *const dictionary, char const *const key);
+bool keyCheck(Dictionary *const dictionary, char const *const key);
+void deleteElement(Dictionary *const dictionary, char const *const key);
+void deleteDictionary(Dictionary **dictionary);

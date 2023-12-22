@@ -90,6 +90,7 @@ int main(void)
     UserInput input = checkKeyCommand;
     while (input != exitCommand)
     {
+        createRepresentation(dictionary);
         input = getCommand(dictionary);
 
         switch (input)
@@ -107,7 +108,7 @@ int main(void)
                 return MEMORY_ERROR;
             }
 
-            dictionaryErrorCode = append(dictionary, key, value, false);
+            dictionaryErrorCode = addElement(dictionary, key, value, false);
             break;
         }
 

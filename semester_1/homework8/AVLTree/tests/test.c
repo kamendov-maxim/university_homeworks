@@ -57,7 +57,7 @@ static const bool loadTest(void)
         char *randomValue = generateString(LOADTEST_STRING_LENGTH);
         if (randomValue == NULL)
         {
-            deleteDictionary(dictionary);
+            deleteDictionary(&dictionary);
             return false;
         }
 
@@ -67,7 +67,7 @@ static const bool loadTest(void)
         if (key == NULL)
         {
             free(randomValue);
-            deleteDictionary(dictionary);
+            deleteDictionary(&dictionary);
             return false;
         }
 
@@ -76,11 +76,11 @@ static const bool loadTest(void)
 
         printf("%s %s\n", key, randomValue);
 
-        if (append(dictionary, key, randomValue, false) != ok)
+        if (addElement(dictionary, key, randomValue, false) != ok)
         {
             free(randomValue);
             free(key);
-            deleteDictionary(dictionary);
+            deleteDictionary(&dictionary);
             return false;
         }
 
@@ -103,7 +103,7 @@ static const bool loadTest(void)
         char *key = malloc((MAX_KEY_LENGTH + 1) * sizeof(char));
         if (keyCheck(dictionary, key))
         {
-            deleteDictionary(dictionary);
+            deleteDictionary(&dictionary);
             return false;
         }
     }
@@ -131,10 +131,10 @@ static const bool testCase(size_t testLen, UserInput const *const testCommands, 
         case appendCommand:
         {
 
-            dictionaryErrorCode = append(dictionary, keys[currentKey], values[currentValue], true);
+            dictionaryErrorCode = addElement(dictionary, keys[currentKey], values[currentValue], true);
             if (dictionaryErrorCode != ok)
             {
-                deleteDictionary(dictionary);
+                deleteDictionary(&dictionary);
                 return false;
             }
             ++currentKey;
@@ -152,7 +152,7 @@ static const bool testCase(size_t testLen, UserInput const *const testCommands, 
 
             if (strcmp(value, charAnswers[currentAnswer]) != 0)
             {
-                deleteDictionary(dictionary);
+                deleteDictionary(&dictionary);
                 return false;
             }
             ++currentKey;
@@ -164,7 +164,7 @@ static const bool testCase(size_t testLen, UserInput const *const testCommands, 
         {
             if (keyCheck(dictionary, keys[currentKey]) != boolAnswers[currentBool])
             {
-                deleteDictionary(dictionary);
+                deleteDictionary(&dictionary);
                 return false;
             }
             ++currentKey;
@@ -177,7 +177,7 @@ static const bool testCase(size_t testLen, UserInput const *const testCommands, 
             deleteElement(dictionary, keys[currentKey]);
             if (keyCheck(dictionary, keys[currentKey]))
             {
-                deleteDictionary(dictionary);
+                deleteDictionary(&dictionary);
                 return false;
             }
             ++currentKey;
@@ -188,7 +188,7 @@ static const bool testCase(size_t testLen, UserInput const *const testCommands, 
             break;
         }
     }
-    deleteDictionary(dictionary);
+    deleteDictionary(&dictionary);
     return true;
 }
 
@@ -220,7 +220,7 @@ const bool test(void)
 
     UserInput testCommands4[7] = {appendCommand, appendCommand, appendCommand, appendCommand, appendCommand, appendCommand, appendCommand};
     char *testKeys4[7] = {"1", "2", "3", "4", "5", "6", "7"};
-    char *testValues4[3] = {"1", "2", "3", "4", "5", "6", "7"};
+    char *testValues4[7] = {"1", "2", "3", "4", "5", "6", "7"};
     char const *charAnswers4[0] = {};
     bool const boolAnswers4[0] = {};
     bool testCase4 = testCase(4, testCommands4, testKeys4, testValues4, charAnswers4, boolAnswers4);
@@ -228,6 +228,6 @@ const bool test(void)
 
 
 
-    return true;
+    // return true;
     return testCase1 && testCase2 && testCase3 && testCase4 && loadTest();
 }
