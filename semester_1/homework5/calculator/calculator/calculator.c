@@ -3,25 +3,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #include "calculator.h"
 
-const char *const numbers = "0123456789";
-const size_t numbersNumber = 10;
-
-static const bool isDigit(const char character)
-{
-    for (size_t i = 0; i < numbersNumber; i++)
-    {
-        if (numbers[i] == character)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-static ErrorCode operation(Stack *stack, const char operand)
+static ErrorCode operation(Stack *stack, const char operand, CalculatorErrorCode *const calculatorErrorCode)
 {
     ErrorCode errorCode = okStack;
     float number2 = getElement(stack, &errorCode);
@@ -44,38 +30,37 @@ static ErrorCode operation(Stack *stack, const char operand)
         result = number1 - number2;
         break;
     }
-
     case '+':
     {
         result = number1 + number2;
         break;
     }
-
     case '*':
     {
         result = number1 * number2;
         break;
     }
-
     case '/':
     {
+        if (number2 == 0)
+        {
+            *calculatorErrorCode = zeroDivisionError;
+            return okStack;
+        }
         result = number1 / number2;
         break;
     }
 
     default:
+        *calculatorErrorCode = wrongOperationError;
+        return okStack;
         break;
     }
 
-    errorCode = addElement(stack, result);
-    if (errorCode != ok)
-    {
-        return errorCode;
-    }
-    return errorCode;
+    return addElement(stack, result);
 }
 
-float calculator(const char *const expression, CalculatorErrorCode *calculatorErrorCode)
+float calculator(const char *const expression, CalculatorErrorCode *const calculatorErrorCode)
 {
     Stack *stack = createStack();
     if (stack == NULL)
@@ -89,82 +74,38 @@ float calculator(const char *const expression, CalculatorErrorCode *calculatorEr
     for (size_t i = 0; i < length; ++i)
     {
         char currentCharacter = expression[i];
-
-        if (isDigit(currentCharacter))
+        if (currentCharacter != ' ')
         {
-            ec = addElement(stack, currentCharacter - '0');
-            if (ec != ok)
+            if (isdigit(currentCharacter))
             {
-                deleteStack(&stack);
-                *calculatorErrorCode = memoryError;
-                return 0;
+                ec = addElement(stack, currentCharacter - '0');
+                if (ec != ok)
+                {
+                    deleteStack(&stack);
+                    *calculatorErrorCode = memoryError;
+                    return 0;
+                }
             }
-        }
-
-        switch (currentCharacter)
-        {
-
-        case '-':
-        {
-            ec = operation(stack, '-');
-            if (ec != ok)
+            else
             {
-                deleteStack(&stack);
-                *calculatorErrorCode = algorithmWorkError;
-                return 0;
+                ec = operation(stack, currentCharacter, calculatorErrorCode);
+                if (ec != okStack || *calculatorErrorCode != ok)
+                {
+                    deleteStack(&stack);
+                    return 0;
+                }
             }
-            break;
-        }
-
-        case '+':
-        {
-            ec = operation(stack, '+');
-            if (ec != ok)
-            {
-                deleteStack(&stack);
-                *calculatorErrorCode = algorithmWorkError;
-                return 0;
-            }
-            break;
-        }
-
-        case '*':
-        {
-            ec = operation(stack, '*');
-            if (ec != ok)
-            {
-                deleteStack(&stack);
-                *calculatorErrorCode = algorithmWorkError;
-                return 0;
-            }
-            break;
-        }
-
-        case '/':
-        {
-            ec = operation(stack, '/');
-            if (ec != ok)
-            {
-                deleteStack(&stack);
-                *calculatorErrorCode = algorithmWorkError;
-                return 0;
-            }
-            break;
-        }
-
-        default:
-            break;
         }
     }
+
     float answer = getElement(stack, &ec);
-    if (ec != ok)
+    deleteStack(&stack);
+    if (ec != okStack)
     {
-        deleteStack(&stack);
         *calculatorErrorCode = algorithmWorkError;
         return 0;
     }
     *calculatorErrorCode = ok;
-    deleteStack(&stack);
 
     return answer;
 }

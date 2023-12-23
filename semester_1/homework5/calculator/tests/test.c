@@ -1,5 +1,7 @@
 #include <stdlib.h>
 
+#include <stdio.h>
+
 #include "test.h"
 #include "../calculator/calculator.h"
 
@@ -21,9 +23,10 @@ const bool test(void)
     for (size_t i = 0; i < testNumber; ++i)
     {
         if (!testCase(expresions[i], answers[i]))
-            {
-                return false;
-            }
+        {
+            printf("%d\n", i);
+            return false;
+        }
     }
     return true;
 }

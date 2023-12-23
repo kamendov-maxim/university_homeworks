@@ -10,6 +10,7 @@
 #define PROGRAM_FAILED_TESTS 1
 #define MEMORY_ERROR 2
 #define RUNTIME_ERROR 3
+#define WRONG_INPUT 4
 
 int main(void)
 {
@@ -33,6 +34,17 @@ int main(void)
     CalculatorErrorCode calculatorErrorCode = ok;
     float answer = calculator(input, &calculatorErrorCode);
     free(input);
+    if (calculatorErrorCode == zeroDivisionError)
+    {
+        printf("Нельзя делить на ноль\n");
+        return WRONG_INPUT;
+    }
+    else if (calculatorErrorCode == wrongOperationError)
+    {
+        printf("Неправильная операция\n");
+        return WRONG_INPUT;
+    }
+    
     if (calculatorErrorCode != ok)
     {
         printf("Ошибка\n");

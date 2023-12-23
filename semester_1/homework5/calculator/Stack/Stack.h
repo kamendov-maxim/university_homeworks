@@ -9,6 +9,6 @@ typedef enum ErrorCode
 } ErrorCode;
 
 Stack *createStack(void);
-void deleteStack(Stack ** stack);
+void deleteStack(Stack ** const stack);
 ErrorCode addElement(Stack *const stack, const float value);
-float getElement(Stack *const stack, ErrorCode *errorCode);
+float getElement(Stack *const stack, ErrorCode * const errorCode);

@@ -6,7 +6,6 @@ typedef struct Node
 {
     struct Node *next;
     float value;
-
 } Node;
 
 typedef struct Stack
@@ -19,7 +18,7 @@ Stack *createStack(void)
     return calloc(1, sizeof(Stack));
 }
 
-void deleteStack(Stack **stack)
+void deleteStack(Stack **const stack)
 {
     Node *currentNode = (*stack)->head;
     while (currentNode != NULL)
@@ -46,14 +45,10 @@ ErrorCode addElement(Stack *const stack, const float value)
     }
     stack->head = newNode;
 
-    // Node **currentNode = &(stack->head);
-    // for (; *currentNode != NULL; currentNode = &((*currentNode)->next))
-    //     ;
-    // *currentNode = newNode;
     return okStack;
 }
 
-float getElement(Stack *const stack, ErrorCode *errorCode)
+float getElement(Stack *const stack, ErrorCode * const errorCode)
 {
     if (stack->head == NULL)
     {

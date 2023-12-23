@@ -39,7 +39,7 @@ char *getString(size_t * const len, FILE * file, char const endOfLine)
 char *copyString(char const * const string)
 {
     const size_t len = strlen(string);
-    char *copy = (char *)malloc(len * sizeof(char));
+    char *copy = (char *)malloc((len + 1) * sizeof(char));
     if (copy != NULL)
     {
         strcpy(copy, string);

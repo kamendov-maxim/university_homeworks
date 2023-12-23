@@ -6,7 +6,9 @@ typedef enum CalculatorErrorCode
 {
     ok,
     memoryError,
-    algorithmWorkError
+    algorithmWorkError,
+    zeroDivisionError,
+    wrongOperationError
 } CalculatorErrorCode;
 
-float calculator(const char *const expression, CalculatorErrorCode *calculatorErrorCode);
+float calculator(const char *const expression, CalculatorErrorCode * const calculatorErrorCode);
