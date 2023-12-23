@@ -5,13 +5,11 @@
 
 typedef struct Node
 {
-    struct Node *rightChild;
-    struct Node *leftChild;
-
     char *key;
     char *value;
-    size_t height;
-    struct Node *parent;
+    long height;
+    struct Node *rightChild;
+    struct Node *leftChild;
 } Node;
 
 typedef struct Dictionary
@@ -19,15 +17,79 @@ typedef struct Dictionary
     Node *root;
 } Dictionary;
 
-Dictionary *createDictionary(void)
+Dictionary *createDictionary()
 {
     return calloc(1, sizeof(Dictionary));
 }
 
-static size_t getHeight(Node const *const root)
+static void recursion(Node *const root, FILE *file, int *const i)
+{
+    if (root->leftChild != NULL)
+    {
+
+        recursion(root->leftChild, file, i);
+        fprintf(file, "    %s->%s;\n", root->value, root->leftChild->value);
+    }
+    else
+    {
+        fprintf(file, "   null%d [shape=point];\n", *i);
+        fprintf(file, "    %s->null%d\n", root->value, *i);
+        ++(*i);
+    }
+
+    if (root->rightChild != NULL)
+    {
+
+        recursion(root->rightChild, file, i);
+        fprintf(file, "    %s->%s;\n", root->value, root->rightChild->value);
+    }
+    else
+    {
+        fprintf(file, "   null%d [shape=point];\n", *i);
+        fprintf(file, "    %s->null%d\n", root->value, *i);
+        ++(*i);
+    }
+}
+
+void createRepresentation(Dictionary const *const dictionary)
+{
+    char *filename = "/Users/maks/Documents/programming/university_homeworks/semester_1/homework8/AVLTree/r.gv";
+    FILE *file = NULL;
+    file = fopen(filename, "w");
+    if (file == NULL)
+    {
+        printf("null");
+        return;
+    }
+    printf("%s", filename);
+
+    fprintf(file, "digraph { graph [ dpi = 300 ]; node [color=Green style=filled] ; edge [color=brown] ; \n");
+    int i = 0;
+    if (dictionary->root == NULL)
+    {
+        fprintf(file, "null;");
+    }
+    else
+    {
+        recursion(dictionary->root, file, &i);
+    }
+    fprintf(file, "}");
+    fclose(file);
+    system("dot -Tpng /Users/maks/Documents/programming/university_homeworks/semester_1/homework8/AVLTree/r.gv -o picture.png ; open picture.png");
+}
+
+static int getHeight(Node const *const root)
 {
     return (root == NULL ? 0 : root->height);
 }
+
+static long nodeBalance(Node const *const root)
+{
+    
+    return getHeight(root->leftChild) - getHeight(root->rightChild);
+}
+
+
 
 static void updateHeight(Node *const root)
 {
@@ -35,422 +97,161 @@ static void updateHeight(Node *const root)
     {
         return;
     }
-
-    size_t rHeight = getHeight(root->rightChild);
-    size_t lHeight = getHeight(root->leftChild);
-
+    long rHeight = getHeight(root->rightChild);
+    long lHeight = getHeight(root->leftChild);
     root->height = (rHeight > lHeight ? rHeight : lHeight) + 1;
 }
 
-static size_t nodeBalance(Node const *const root)
+Node *leftRotate(Node *root)
 {
-    if (root == NULL)
-    {
-        return 0;
-    }
-
-    return getHeight(root->leftChild) - getHeight(root->rightChild);
-}
-
-static void leftRotate(Node **const root)
-{
-    Node *a = (*root);
-    Node *b = a->leftChild;
-    a->leftChild = b->rightChild;
-    b->rightChild = a;
-    b->parent = a->parent;
-    a->parent = b;
-    *root = b;
-    updateHeight(a);
+    Node *b = root->rightChild;
+    root->rightChild = b->leftChild;
+    b->leftChild = root;
+    updateHeight(root);
     updateHeight(b);
+    return b;
 }
 
-static void rightRotate(Node **const root)
+Node *rightRotate(Node *root)
 {
-    Node *a = (*root);
-    Node *b = a->rightChild;
-    a->rightChild = b->leftChild;
-    b->leftChild = a;
-    b->parent = a->parent;
-    a->parent = b;
-    *root = b;
-    updateHeight(a);
+    Node *b = root->leftChild;
+    root->leftChild = b->rightChild;
+    b->rightChild = root;
+    updateHeight(root);
     updateHeight(b);
+    return b;
 }
 
-static void bigLeftRotate(Node **const root)
+Node *bigLeftRotate(Node *root)
 {
-    Node *a = *root;
-    Node *b = a->leftChild;
-    Node *c = b->rightChild;
-    b->rightChild = c->leftChild;
-    a->leftChild = c->rightChild;
-    c->leftChild = b;
-    c->rightChild = a;
-    c->parent = a->parent;
-    a->parent = c;
-    b->parent = c;
-    *root = c;
-    updateHeight(a);
-    updateHeight(b);
-    updateHeight(c);
-}
-
-static void bigRightRotate(Node **const root)
-{
-    Node *a = *root;
-    Node *b = a->rightChild;
+    Node *b = root->rightChild;
     Node *c = b->leftChild;
     b->leftChild = c->rightChild;
-    a->rightChild = c->leftChild;
+    root->rightChild = c->leftChild;
     c->rightChild = b;
-    c->leftChild = a;
-    c->parent = a->parent;
-    a->parent = c;
-    b->parent = c;
-    *root = c;
-    updateHeight(a);
+    c->leftChild = root;
+    updateHeight(root);
     updateHeight(b);
     updateHeight(c);
+    return c;
 }
 
-static void balance(Node **const root)
+Node *bigRightRotate(Node *root)
 {
-    updateHeight(*root);
-    size_t nb = nodeBalance(*root);
+    Node *b = root->leftChild;
+    Node *c = b->rightChild;
+    b->rightChild = c->leftChild;
+    root->leftChild = c->rightChild;
+    c->leftChild = b;
+    c->rightChild = root;
+    updateHeight(root);
+    updateHeight(b);
+    updateHeight(c);
+    return c;
+}
+
+static Node *balance(Node *root)
+{
+    // updateHeight(root);
+    long nb = nodeBalance(root);
     if (nb == 2)
     {
-        if (nodeBalance((*root)->rightChild) <= 0)
+        if (nodeBalance(root->leftChild) >= 0)
         {
-            leftRotate(root);
-            return;
+            return rightRotate(root);
         }
-        bigLeftRotate(root);
+        return bigRightRotate(root);
     }
     else if (nb == -2)
     {
-        if (nodeBalance((*root)->leftChild) >= 0)
+        if (nodeBalance(root->rightChild) <= 0)
         {
-            rightRotate(root);
-            return;
+            return leftRotate(root);
         }
-        bigRightRotate(root);
+        return bigLeftRotate(root);
     }
+
+    return root;
 }
 
-
-// static Node * balance(Node **const root)
-// {
-//     updateHeight(*root);
-//     size_t nb = nodeBalance(*root);
-//     if (nb == 2)
-//     {
-//         if (nodeBalance((*root)->rightChild) <= 0)
-//         {
-//             leftRotate(root);
-//             return *root;
-//         }
-//         bigLeftRotate(root);
-//             return *root;
-
-//     }
-//     else if (nb == -2)
-//     {
-//         if (nodeBalance((*root)->leftChild) >= 0)
-//         {
-//             rightRotate(root);
-//             return *root;
-//         }
-//         bigRightRotate(root);
-//             return *root;
-
-//     }
-// }
-
-
-// static void balanceTree(Dictionary *const dictionary, Node *startNode)
-// {
-//     for (Node *currentNode = startNode; currentNode != NULL; currentNode = currentNode->parent)
-//     {
-//         balance(&currentNode);
-//         if (currentNode->parent == NULL)
-//         {
-//             startNode = currentNode;
-//         }
-//     }
-//     dictionary->root = startNode;
-// }
-
-static void balanceTree(Dictionary *const dictionary, Node *startNode)
+static Node *insert(Node *root, char *const key, char *const value)
 {
-    // char *pNo = NULL;
-    Node *pNode = NULL;
-    Node *pBalancedNode = NULL;
-
-    // Node *currentNode = startNode;
-    // while (currentNode != NULL)
-    // {
-    //     pNode = currentNode;
-    //     balance(&currentNode);
-    //     pBalancedNode = (currentNode == pNode? NULL: currentNode);
-
-    //     currentNode = currentNode->parent;
-    //     if (pBalancedNode != NULL)
-    //     {
-    //         if (currentNode->leftChild == NULL)
-    //         {
-    //             currentNode->rightChild = pBalancedNode;
-    //         }
-    //         else if (currentNode->leftChild != pNode)
-    //         {
-    //             currentNode->rightChild = pBalancedNode;
-    //         }
-    //         else
-    //         {
-    //             currentNode->leftChild = pBalancedNode;
-    //         }
-    //         pBalancedNode = NULL; 
-    //         if (currentNode->parent == NULL)
-    //         {
-    //             pNode = pBalancedNode;
-    //         }
-            
-    //     }
-    // }
-    
-
-    for (Node *currentNode = startNode; currentNode != NULL; currentNode = currentNode->parent)
+    if (root == NULL)
     {
-        if (pBalancedNode != NULL)
+        Node *newNode = calloc(1, sizeof(Node));
+        if (newNode == NULL)
         {
-            if (currentNode->leftChild != pNode)
-            {
-                currentNode->rightChild = pBalancedNode;
-            }
-            else
-            {
-                currentNode->leftChild = pBalancedNode;
-            }
-            pBalancedNode = NULL; 
-            
-            
+            return NULL;
         }
-        
-        pNode = currentNode;
-        balance(&currentNode);
-        // pBalancedNode = (currentNode == pNode? NULL: currentNode);
-        // if (currentNode->parent == NULL)
-        //     {
-        //         pNode = pBalancedNode;
-        //     }
+        newNode->key = key;
+        newNode->value = value;
+        updateHeight(newNode);
+        return newNode;
+    }
 
-        if (currentNode != pNode)
+    int comparison = strcmp(root->key, key);
+
+    if (comparison == 0)
+    {
+        free(key);
+        free(root->value);
+        root->value = value;
+    }
+    else if (comparison < 0)
+    {
+        Node *child = insert(root->rightChild, key, value);
+        if (child == NULL)
         {
-            pBalancedNode = currentNode;
-            if (currentNode->parent == NULL)
-            {
-                pNode = currentNode;
-            }
+            return NULL;
         }
-        
-        // pKey = currentNode->key;
+        root->rightChild = child;
+        updateHeight(root);
     }
-    dictionary->root = pNode;
-}
-
-// static void balanceTree(Dictionary *const dictionary, Node ** const startNode)
-// {
-//     Node ** currentNodeDPtr = startNode;
-//     for (Node *currentNode = *startNode; currentNode != NULL; currentNode = currentNode->parent)
-//     {
-//         balance(&currentNode);
-//         *currentNodeDPtr = currentNode;
-//         // if (currentNode->parent == NULL)
-//         // {
-//         //     startNode = currentNode;
-//         // }
-
-//         currentNodeDPtr = &((*currentNodeDPtr)->parent);
-//     }
-//     // dictionary->root = startNode;
-// }
-
-static Node **searchNode(Node **const root, char const *const key, Node **const parent)
-{
-    if (*root == NULL)
+    else
     {
-        return root;
+        Node *child = insert(root->leftChild, key, value);
+        if (child == NULL)
+        {
+            return NULL;
+        }
+        root->leftChild = child;
+        updateHeight(root);
     }
 
-    int cmpResult = strcmp(key, (*root)->key);
-
-    if (cmpResult == 0)
-    {
-        *parent = ((*root)->parent != NULL ? (*root)->parent : NULL);
-        return root;
-    }
-
-    *parent = *root;
-    if (cmpResult < 0)
-    {
-        return searchNode(&((*root)->leftChild), key, parent);
-    }
-    return searchNode(&((*root)->rightChild), key, parent);
+    return balance(root);
 }
 
 DictionaryErrorCode addElement(Dictionary *const dictionary, char *const key, char *const value, const bool copyRequired)
 {
+    char *keyCopy = key;
+    if (copyRequired)
+    {
+        keyCopy = copyString(key);
+        if (keyCopy == NULL)
+        {
+            return memoryError;
+        }
+    }
+
     char *valueCopy = value;
     if (copyRequired)
     {
         valueCopy = copyString(value);
-        if (value == NULL)
-        {
-            return memoryError;
-        }
-    }
-
-    Node *parent = NULL;
-    Node **nodeToWriteTo = searchNode(&(dictionary->root), key, &parent);
-    if (*nodeToWriteTo == NULL)
-    {
-        char *keyCopy = key;
-        if (copyRequired)
-        {
-            keyCopy = copyString(key);
-            if (keyCopy == NULL)
-            {
-                free(valueCopy);
-                return memoryError;
-            }
-        }
-        Node *newNode = calloc(1, sizeof(Node));
-        if (newNode == NULL)
+        if (valueCopy == NULL)
         {
             free(keyCopy);
-            free(valueCopy);
             return memoryError;
         }
-        newNode->parent = parent;
-        newNode->key = keyCopy;
-        *nodeToWriteTo = newNode;
     }
-    else
+    Node *newRoot = insert(dictionary->root, keyCopy, valueCopy);
+    if (newRoot == NULL)
     {
-        free((*nodeToWriteTo)->value);
+        free(valueCopy);
+        free(keyCopy);
+        return memoryError;
     }
-    (*nodeToWriteTo)->value = valueCopy;
 
-    // Node *node = *nodeToWriteTo;
-    // for (Node * currentNode = node; currentNode != NULL; currentNode = currentNode->parent)
-    // {
-    //     balance(&currentNode);
-    //     if (currentNode->parent == NULL)
-    //     {
-    //         node = currentNode;
-    //     }
-    // }
-    // dictionary->root = node;
-
-    balanceTree(dictionary, *nodeToWriteTo);
+    dictionary->root = newRoot;
 
     return ok;
-}
-
-bool keyCheck(Dictionary *const dictionary, char const *const key)
-{
-    return getValue(dictionary, key) != NULL;
-}
-
-char *getValue(Dictionary *const dictionary, char const *const key)
-{
-    Node *parent = NULL;
-    Node **foundNode = searchNode(&(dictionary->root), key, &parent);
-    if (*foundNode == NULL)
-    {
-        return NULL;
-    }
-
-    return (*foundNode)->value;
-}
-
-static void deleteNode(Node *const nodeToDelete)
-{
-    if (nodeToDelete != NULL)
-    {
-        free(nodeToDelete->value);
-        free(nodeToDelete->key);
-        free(nodeToDelete);
-    }
-}
-
-static Node *getMinNode(Node *const root)
-{
-    Node *currentNode = root;
-    for (; currentNode->leftChild != NULL; currentNode = currentNode->leftChild)
-        ;
-    return currentNode;
-}
-
-void deleteElement(Dictionary *const dictionary, char const * const key)
-{
-    Node * parent = NULL;
-    Node **nodeToDelete = searchNode(&(dictionary->root), key, &parent);
-    if (*nodeToDelete == NULL)
-    {
-        return;
-    }
-
-    Node *left = (*nodeToDelete)->leftChild;
-    Node *right = (*nodeToDelete)->rightChild;
-
-    deleteNode(*nodeToDelete);
-
-    if (left != NULL)
-    {
-        if (right != NULL)
-        {
-            *nodeToDelete = right;
-            right->parent = parent;
-            Node *minNode = getMinNode(right);
-            minNode->leftChild = left;
-            updateHeight(minNode);
-            left->parent = minNode;
-            balanceTree(dictionary, minNode);
-            return;
-        }
-        *nodeToDelete = left;
-        left->parent = parent;
-        balanceTree(dictionary, *nodeToDelete);
-        return;
-    }
-    else if (right != NULL)
-    {
-        *nodeToDelete = right;
-        right->parent = parent;
-        balanceTree(dictionary, *nodeToDelete);
-
-        return;
-    }
-    
-    *nodeToDelete = NULL;
-}
-
-static void deleteRecursion(Node *root)
-{
-    if (root == NULL)
-    {
-        return;
-    }
-
-    deleteRecursion(root->rightChild);
-    deleteRecursion(root->leftChild);
-    deleteNode(root);
-}
-
-void deleteDictionary(Dictionary **dictionary)
-{
-    deleteRecursion((*dictionary)->root);
-    free(*dictionary);
-    *dictionary = NULL;
 }
