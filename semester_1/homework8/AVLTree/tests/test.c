@@ -7,7 +7,7 @@
 #include "../AVLTree/AVLTree.h"
 #include "../userInput.h"
 
-#define LOADTEST_STRING_AMOUNT 100000
+#define LOADTEST_STRING_NUMBER 100000
 #define MAX_KEY_LENGTH 6
 #define LOADTEST_STRING_LENGTH 10
 #define LOADTEST_MAX_TIME 5
@@ -52,7 +52,7 @@ static const bool loadTest(void)
     double start = clock() / CLOCKS_PER_SEC;
     srand(time(NULL));
 
-    for (size_t i = 0; i < 10; ++i)
+    for (size_t i = 0; i < LOADTEST_STRING_NUMBER; ++i)
     {
         char *randomValue = generateString(LOADTEST_STRING_LENGTH);
         if (randomValue == NULL)
@@ -60,8 +60,6 @@ static const bool loadTest(void)
             deleteDictionary(&dictionary);
             return false;
         }
-
-        printf("%s\n", randomValue);
 
         char *key = malloc(getNumberLength(i) * sizeof(char));
         if (key == NULL)
@@ -71,10 +69,7 @@ static const bool loadTest(void)
             return false;
         }
 
-        // sprintf(key, "%zu%c", i, '\0');
         sprintf(key, "%zu", i);
-
-        printf("%s %s\n", key, randomValue);
 
         if (addElement(dictionary, key, randomValue, false) != ok)
         {
@@ -83,22 +78,11 @@ static const bool loadTest(void)
             deleteDictionary(&dictionary);
             return false;
         }
-
-        // for (size_t i = 0; i < LOADTEST_STRING_AMOUNT; ++i)
-        // {
-        //     char *key = malloc((MAX_KEY_LENGTH + 1) * sizeof(char));
-        //     if (key == NULL)
-        //     {
-        //         deleteDictionary(dictionary);
-        //         return false;
-        //     }
-
-        //     deleteElement(dictionary, key);
     }
 
     double finish = clock() / CLOCKS_PER_SEC;
 
-    for (size_t i = 0; i < LOADTEST_STRING_AMOUNT; ++i)
+    for (size_t i = 0; i < LOADTEST_STRING_NUMBER; ++i)
     {
         char *key = malloc((MAX_KEY_LENGTH + 1) * sizeof(char));
         if (keyCheck(dictionary, key))
@@ -215,9 +199,6 @@ const bool test(void)
     bool const boolAnswers3[0] = {};
     bool testCase3 = testCase(4, testCommands3, testKeys3, testValues3, charAnswers3, boolAnswers3);
 
-
-
-
     UserInput testCommands4[7] = {appendCommand, appendCommand, appendCommand, appendCommand, appendCommand, appendCommand, appendCommand};
     char *testKeys4[7] = {"1", "2", "3", "4", "5", "6", "7"};
     char *testValues4[7] = {"1", "2", "3", "4", "5", "6", "7"};
@@ -225,9 +206,5 @@ const bool test(void)
     bool const boolAnswers4[0] = {};
     bool testCase4 = testCase(4, testCommands4, testKeys4, testValues4, charAnswers4, boolAnswers4);
 
-
-
-
-    // return true;
     return testCase1 && testCase2 && testCase3 && testCase4 && loadTest();
 }

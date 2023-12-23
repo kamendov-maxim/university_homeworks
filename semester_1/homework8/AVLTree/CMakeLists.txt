@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.8.0)
 project(AVLTree VERSION 1.0)
 
 add_executable(${PROJECT_NAME}
-# asdfadf.c
 main.c
 AVLTree/AVLTree.c
 String/String.c

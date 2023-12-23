@@ -21,7 +21,7 @@ static void scanfCheck(int scanned, Dictionary *const dictionary)
     if (scanned != 1)
     {
         printf("%s", SOMETHING_WENT_WRONG_MESSAGE);
-        deleteDictionary(dictionary);
+        deleteDictionary(&dictionary);
         exit(INPUT_ERROR);
     }
 }
@@ -73,11 +73,11 @@ int main(void)
 {
     setlocale(LC_ALL, "Rus");
 
-    // if (!test())
-    // {
-    //     printf("К сожалению, сейчас программа не работает\n");
-    //     return TESTS_ARE_NOT_PASSED;
-    // }
+    if (!test())
+    {
+        printf("К сожалению, сейчас программа не работает\n");
+        return TESTS_ARE_NOT_PASSED;
+    }
 
     Dictionary *dictionary = createDictionary();
     if (dictionary == NULL)
@@ -90,7 +90,6 @@ int main(void)
     UserInput input = checkKeyCommand;
     while (input != exitCommand)
     {
-        createRepresentation(dictionary);
         input = getCommand(dictionary);
 
         switch (input)
@@ -146,7 +145,7 @@ int main(void)
         case exitCommand:
         {
             printf("Завершение работы\n");
-            deleteDictionary(dictionary);
+            deleteDictionary(&dictionary);
             exit(PROGRAM_FINISHED_CORRECTLY);
         }
 

@@ -51,33 +51,6 @@ static void recursion(Node *const root, FILE *file, int *const i)
     }
 }
 
-void createRepresentation(Dictionary const *const dictionary)
-{
-    char *filename = "/Users/maks/Documents/programming/university_homeworks/semester_1/homework8/AVLTree/r.gv";
-    FILE *file = NULL;
-    file = fopen(filename, "w");
-    if (file == NULL)
-    {
-        printf("null");
-        return;
-    }
-    printf("%s", filename);
-
-    fprintf(file, "digraph { graph [ dpi = 300 ]; node [color=Green style=filled] ; edge [color=brown] ; \n");
-    int i = 0;
-    if (dictionary->root == NULL)
-    {
-        fprintf(file, "null;");
-    }
-    else
-    {
-        recursion(dictionary->root, file, &i);
-    }
-    fprintf(file, "}");
-    fclose(file);
-    system("dot -Tpng /Users/maks/Documents/programming/university_homeworks/semester_1/homework8/AVLTree/r.gv -o picture.png ; open picture.png");
-}
-
 static int getHeight(Node const *const root)
 {
     return (root == NULL ? 0 : root->height);
@@ -85,11 +58,9 @@ static int getHeight(Node const *const root)
 
 static long nodeBalance(Node const *const root)
 {
-    
+
     return getHeight(root->leftChild) - getHeight(root->rightChild);
 }
-
-
 
 static void updateHeight(Node *const root)
 {
@@ -152,7 +123,6 @@ Node *bigRightRotate(Node *root)
 
 static Node *balance(Node *root)
 {
-    // updateHeight(root);
     long nb = nodeBalance(root);
     if (nb == 2)
     {
@@ -254,4 +224,115 @@ DictionaryErrorCode addElement(Dictionary *const dictionary, char *const key, ch
     dictionary->root = newRoot;
 
     return ok;
+}
+
+static Node *getMin(Node *root)
+{
+    return (root->leftChild == NULL ? root : getMin(root->leftChild));
+}
+
+Node *removeMin(Node *root)
+{
+    if (root->leftChild == NULL)
+    {
+        return root->rightChild;
+    }
+    root->leftChild = removeMin(root->leftChild);
+    return balance(root);
+}
+
+static void deleteNode(Node *const node)
+{
+    free(node->key);
+    free(node->value);
+    free(node);
+}
+
+Node *deleteRecursion(Node *root, char const *const key)
+{
+    if (root == NULL)
+    {
+        return NULL;
+    }
+
+    int comparison = strcmp(root->key, key);
+    if (comparison > 0)
+    {
+        root->leftChild = deleteRecursion(root->leftChild, key);
+    }
+    else if (comparison < 0)
+    {
+        root->rightChild = deleteRecursion(root->rightChild, key);
+    }
+    else
+    {
+        Node *right = root->rightChild;
+        Node *left = root->leftChild;
+        deleteNode(root);
+        if (right == NULL)
+        {
+            return left;
+        }
+        Node *minNode = getMin(right);
+        minNode->rightChild = removeMin(right);
+        minNode->leftChild = left;
+        return balance(minNode);
+    }
+    return balance(root);
+}
+
+void deleteElement(Dictionary *const dictionary, char const *const key)
+{
+    dictionary->root = deleteRecursion(dictionary->root, key);
+}
+
+void deleteDictionaryRecursion(Node *root)
+{
+    if (root == NULL)
+    {
+        return;
+    }
+
+    deleteDictionaryRecursion(root->rightChild);
+    deleteDictionaryRecursion(root->leftChild);
+    deleteNode(root);
+}
+
+void deleteDictionary(Dictionary **dictionary)
+{
+    deleteDictionaryRecursion((*dictionary)->root);
+    free(*dictionary);
+    *dictionary = NULL;
+}
+
+char *findNode(Node *root, char const *const key)
+{
+    if (root == NULL)
+    {
+        return NULL;
+    }
+
+    int comparison = strcmp(root->key, key);
+    if (comparison > 0)
+    {
+        return findNode(root->leftChild, key);
+    }
+    else if (comparison < 0)
+    {
+        return findNode(root->rightChild, key);
+    }
+    else
+    {
+        return root->value;
+    }
+}
+
+char *getValue(Dictionary *const dictionary, char const *const key)
+{
+    return findNode(dictionary->root, key);
+}
+
+bool keyCheck(Dictionary *const dictionary, char const *const key)
+{
+    return getValue(dictionary, key) != NULL;
 }
