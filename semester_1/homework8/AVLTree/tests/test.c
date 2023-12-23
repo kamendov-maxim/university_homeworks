@@ -95,7 +95,8 @@ static const bool loadTest(void)
     return finish - start <= LOADTEST_MAX_TIME;
 }
 
-static const bool testCase(size_t testLen, UserInput const *const testCommands, char **keys, char **values, char const **charAnswers, bool const *const boolAnswers)
+static const bool testCase(size_t testLen, UserInput const *const testCommands,
+                           char **keys, char **values, char const **charAnswers, bool const *const boolAnswers)
 {
     Dictionary *dictionary = createDictionary();
     if (dictionary == NULL)
