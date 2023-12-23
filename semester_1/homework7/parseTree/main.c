@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <locale.h>
 
 #include "parseTree/parseTree.h"
 #include "String/String.h"
@@ -35,6 +36,8 @@ static char * readFile(char const * const fileName)
 
 exitCode main(void)
 {
+    setlocale(LC_ALL, "Russian");
+    
     if (!test())
     {
         printf("Программа сейчас не рабоатет\n");
