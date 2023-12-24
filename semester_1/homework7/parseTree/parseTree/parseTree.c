@@ -1,16 +1,20 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-
-char const *const operands = "+-*/";
+#include <ctype.h>
 
 typedef struct Node
 {
     struct Node *rightChild;
     struct Node *leftChild;
     bool isNumber;
-    float value;
-    char operation;
+
+    union value
+    {
+        float number;
+        char operation;
+    } value;
+
 } Node;
 
 typedef struct ParseTree
@@ -18,79 +22,56 @@ typedef struct ParseTree
     Node *root;
 } ParseTree;
 
-static Node *recursion(size_t *counter, size_t const len, char const *const expression, const bool isNumber)
+static float parseNumber(size_t *counter, char const *const expression)
+{
+    float number = 0;
+    int p = 1;
+    int sig = 1;
+    if (expression[*counter] == '-')
+    {
+        sig = -1;
+        ++(*counter);
+    }
+
+    while (isdigit(expression[*counter]))
+    {
+        number *= p;
+        number += expression[(*counter)++] - '0';
+        p *= 10;
+    }
+    number *= sig;
+    return number;
+}
+
+static Node *recursion(size_t *counter, char const *const expression)
 {
     Node *newNode = calloc(1, sizeof(Node));
-    for (; expression[*counter] == ' ' || expression[*counter] == '('; ++(*counter))
+    for (; expression[*counter] == ' '; ++(*counter))
         ;
     if (newNode == NULL)
     {
         return NULL;
     }
 
-    if (isNumber)
+    if (expression[*counter] == '(')
     {
-        newNode->isNumber = true;
-        newNode->value = expression[*counter] - '0';
-        ++(counter);
+        ++(*counter);
+        for (; expression[*counter] == ' '; ++(*counter))
+        ;
+        newNode->isNumber = false;
+        newNode->value.operation = expression[(*counter)++];
+        newNode->leftChild = recursion(counter, expression);
+        newNode->rightChild = recursion(counter, expression);
+        for (; expression[*counter] == ' '; ++(*counter))
+        ;
+        ++(*counter);
     }
     else
     {
-        for (; expression[*counter] == ' '; ++(*counter))
-            ;
-
-        newNode->operation = expression[*counter];
-        ++(*counter);
-        for (; expression[*counter] == ' '; ++(*counter))
-            ;
-        if (expression[*counter] == '(')
-        {
-            ++(*counter);
-            newNode->leftChild = recursion(counter, len, expression, false);
-            if (newNode->leftChild == NULL)
-            {
-                free(newNode);
-                return NULL;
-            }
-        }
-        else
-        {
-            newNode->leftChild = recursion(counter, len, expression, true);
-            if (newNode->leftChild == NULL)
-            {
-                free(newNode);
-                return NULL;
-            }
-            ++(*counter);
-        }
-
-        for (; expression[*counter] == ' '; ++(*counter))
-            ;
-        if (expression[*counter] == '(')
-        {
-            ++(*counter);
-
-            newNode->rightChild = recursion(counter, len, expression, false);
-            if (newNode->rightChild == NULL)
-            {
-                free(newNode);
-                return NULL;
-            }
-        }
-        else
-        {
-            newNode->rightChild = recursion(counter, len, expression, true);
-            if (newNode->rightChild == NULL)
-            {
-                free(newNode);
-                return NULL;
-            }
-            ++(*counter);
-        }
-
-        for (; expression[*counter] == ' ' || expression[*counter] == ')'; ++(*counter))
-            ;
+        newNode->isNumber = true;
+        newNode->value.number = parseNumber(counter, expression);
     }
+
     return newNode;
 }
 
@@ -102,10 +83,9 @@ ParseTree *createTree(char const *const expression)
         return NULL;
     }
 
-    size_t len = strlen(expression);
     size_t counter = 0;
 
-    tree->root = recursion(&counter, len, expression, false);
+    tree->root = recursion(&counter, expression);
     if (tree->root == NULL)
     {
         free(tree);
@@ -125,7 +105,7 @@ static void deleteRecursion(Node *root)
     free(root);
 }
 
-static float operation(const char op, const float number1, const float number2)
+static float operation(const char op, const float number1, const float number2, bool *const wrongOperation)
 {
     switch (op)
     {
@@ -140,21 +120,24 @@ static float operation(const char op, const float number1, const float number2)
 
     case '/':
         return number1 / number2;
+    default:
+        *wrongOperation = true;
     }
 }
 
-static float calculateRecursion(Node const *const root)
+static float calculateRecursion(Node const *const root, bool *const wrongOperation)
 {
     if (root->isNumber)
     {
-        return root->value;
+        return root->value.number;
     }
-    return operation(root->operation, calculateRecursion(root->leftChild), calculateRecursion(root->rightChild));
+    return operation(root->value.operation, calculateRecursion(root->leftChild, wrongOperation), calculateRecursion(root->rightChild, wrongOperation), wrongOperation);
 }
 
-float calculate(ParseTree const *const tree)
+float calculate(ParseTree const *const tree, bool *const wrongOperation)
 {
-    return calculateRecursion(tree->root);
+    *wrongOperation = false;
+    return calculateRecursion(tree->root, wrongOperation);
 }
 
 void deleteTree(ParseTree **const tree)

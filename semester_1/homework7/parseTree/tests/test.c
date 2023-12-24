@@ -5,12 +5,11 @@
 #include "test.h"
 #include "../String/String.h"
 
-const bool testCase(char const * const testFile)
+const bool testCase(char const *const testFile)
 {
-    FILE * file = fopen(testFile, "r");
+    FILE *file = fopen(testFile, "r");
     if (file == NULL)
     {
-        printf("12313");
         return false;
     }
     char *expression = getString(file, '\n');
@@ -19,28 +18,37 @@ const bool testCase(char const * const testFile)
     fclose(file);
     if (expression == NULL)
     {
-        printf("e");
         return false;
     }
     ParseTree *tree = createTree(expression);
     free(expression);
-    float answer = calculate(tree);
-    deleteTree(&tree); 
-    return answer == testAnswer;    
+    if (tree == NULL)
+    {
+        return false;
+    }
+
+    bool wrongOperation = false;
+    float answer = calculate(tree, &wrongOperation);
+    deleteTree(&tree);
+    if (wrongOperation)
+    {
+        return false;
+    }
+
+    return answer == testAnswer;
 }
 
 const bool test(void)
 {
-    const size_t testNumber = 3;
-    char const * const testFiles[testNumber] = {"../tests/testFile1.txt", "../tests/testFile2.txt", "../tests/testFile3.txt"};
+    const size_t testNumber = 4;
+    char const *const testFiles[testNumber] = {"../tests/testFile1.txt", "../tests/testFile2.txt", "../tests/testFile3.txt", "../tests/testFile4.txt"};
     for (size_t i = 0; i < testNumber; ++i)
     {
         if (!testCase(testFiles[i]))
         {
-            printf("%lu\n", i);
             return false;
         }
     }
-    
+
     return true;
 }

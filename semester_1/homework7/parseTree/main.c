@@ -11,7 +11,8 @@ typedef enum exitCode
     ok,
     programFailedTests,
     memoryError,
-    fileReadingError
+    fileReadingError,
+    wrongOperation
 } exitCode;
 
 char const * const fileName = "../file.txt";
@@ -38,16 +39,30 @@ exitCode main(void)
 {
     setlocale(LC_ALL, "Russian");
     
-    if (!test())
-    {
-        printf("Программа сейчас не рабоатет\n");
-        return programFailedTests;
-    }
+    // if (!test())
+    // {
+    //     printf("Программа сейчас не рабоатет\n");
+    //     return programFailedTests;
+    // }
 
     char * expression = readFile(fileName);
     ParseTree * parseTree = createTree(expression);
+    if (parseTree == NULL)
+    {
+        printf("Кончиалсь память\n");
+        return memoryError;
+    }
+    
     free(expression);
-    printf("Значение выражения из файла: %f\n", calculate(parseTree));
+    bool wrongOperation = false;
+    float answer = calculate(parseTree, &wrongOperation);
+    if (wrongOperation)
+    {
+        printf("В выражении содержится неподдерживаемая операция\n");
+        return wrongOperation;
+    }
+    
+    printf("Значение выражения из файла: %f\n", answer);
     deleteTree(&parseTree);
     return ok;
 }
