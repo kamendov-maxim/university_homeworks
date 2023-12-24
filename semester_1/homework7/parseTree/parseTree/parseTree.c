@@ -25,7 +25,7 @@ typedef struct ParseTree
 static float parseNumber(size_t *counter, char const *const expression)
 {
     float number = 0;
-    int p = 1;
+    int pow = 1;
     int sig = 1;
     if (expression[*counter] == '-')
     {
@@ -35,19 +35,24 @@ static float parseNumber(size_t *counter, char const *const expression)
 
     while (isdigit(expression[*counter]))
     {
-        number *= p;
+        number *= pow;
         number += expression[(*counter)++] - '0';
-        p *= 10;
+        pow *= 10;
     }
     number *= sig;
     return number;
 }
 
-static Node *recursion(size_t *counter, char const *const expression)
+static void ignoreSpaces(char const * const expression, size_t * const counter)
 {
-    Node *newNode = calloc(1, sizeof(Node));
     for (; expression[*counter] == ' '; ++(*counter))
         ;
+}
+
+static Node *recursion(size_t * const counter, char const *const expression)
+{
+    Node *newNode = calloc(1, sizeof(Node));
+    ignoreSpaces(expression, counter);
     if (newNode == NULL)
     {
         return NULL;
@@ -56,14 +61,14 @@ static Node *recursion(size_t *counter, char const *const expression)
     if (expression[*counter] == '(')
     {
         ++(*counter);
-        for (; expression[*counter] == ' '; ++(*counter))
-        ;
+        ignoreSpaces(expression, counter);
+
         newNode->isNumber = false;
         newNode->value.operation = expression[(*counter)++];
         newNode->leftChild = recursion(counter, expression);
         newNode->rightChild = recursion(counter, expression);
         for (; expression[*counter] == ' '; ++(*counter))
-        ;
+            ;
         ++(*counter);
     }
     else

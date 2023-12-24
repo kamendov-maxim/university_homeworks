@@ -39,11 +39,11 @@ exitCode main(void)
 {
     setlocale(LC_ALL, "Russian");
     
-    // if (!test())
-    // {
-    //     printf("Программа сейчас не рабоатет\n");
-    //     return programFailedTests;
-    // }
+    if (!test())
+    {
+        printf("Программа сейчас не рабоатет\n");
+        return programFailedTests;
+    }
 
     char * expression = readFile(fileName);
     ParseTree * parseTree = createTree(expression);
