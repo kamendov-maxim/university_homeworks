@@ -132,6 +132,7 @@ static const bool testCase(size_t testLen, UserInput const *const testCommands,
             const char *const value = getValue(dictionary, keys[currentKey]);
             if (value == NULL)
             {
+                deleteDictionary(&dictionary);
                 return false;
             }
 
