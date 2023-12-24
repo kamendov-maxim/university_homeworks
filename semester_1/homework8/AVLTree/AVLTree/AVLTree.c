@@ -173,12 +173,12 @@ DictionaryErrorCode addElement(Dictionary *const dictionary, char *const key, ch
         {
             return memoryError;
         }
+        valueCopy = copyString(value);
         if (valueCopy == NULL)
         {
             free(keyCopy);
             return memoryError;
         }
-        valueCopy = copyString(value);
     }
 
     Node *newRoot = insert(dictionary->root, keyCopy, valueCopy);
