@@ -22,35 +22,6 @@ Dictionary *createDictionary()
     return calloc(1, sizeof(Dictionary));
 }
 
-static void recursion(Node *const root, FILE *file, int *const i)
-{
-    if (root->leftChild != NULL)
-    {
-
-        recursion(root->leftChild, file, i);
-        fprintf(file, "    %s->%s;\n", root->value, root->leftChild->value);
-    }
-    else
-    {
-        fprintf(file, "   null%d [shape=point];\n", *i);
-        fprintf(file, "    %s->null%d\n", root->value, *i);
-        ++(*i);
-    }
-
-    if (root->rightChild != NULL)
-    {
-
-        recursion(root->rightChild, file, i);
-        fprintf(file, "    %s->%s;\n", root->value, root->rightChild->value);
-    }
-    else
-    {
-        fprintf(file, "   null%d [shape=point];\n", *i);
-        fprintf(file, "    %s->null%d\n", root->value, *i);
-        ++(*i);
-    }
-}
-
 static int getHeight(Node const *const root)
 {
     return (root == NULL ? 0 : root->height);
@@ -194,6 +165,7 @@ static Node *insert(Node *root, char *const key, char *const value)
 DictionaryErrorCode addElement(Dictionary *const dictionary, char *const key, char *const value, const bool copyRequired)
 {
     char *keyCopy = key;
+    char *valueCopy = value;
     if (copyRequired)
     {
         keyCopy = copyString(key);
@@ -201,23 +173,22 @@ DictionaryErrorCode addElement(Dictionary *const dictionary, char *const key, ch
         {
             return memoryError;
         }
-    }
-
-    char *valueCopy = value;
-    if (copyRequired)
-    {
-        valueCopy = copyString(value);
         if (valueCopy == NULL)
         {
             free(keyCopy);
             return memoryError;
         }
+        valueCopy = copyString(value);
     }
+
     Node *newRoot = insert(dictionary->root, keyCopy, valueCopy);
     if (newRoot == NULL)
     {
-        free(valueCopy);
-        free(keyCopy);
+        if (copyRequired)
+        {
+            free(valueCopy);
+            free(keyCopy);
+        }
         return memoryError;
     }
 
@@ -228,7 +199,10 @@ DictionaryErrorCode addElement(Dictionary *const dictionary, char *const key, ch
 
 static Node *getMin(Node *root)
 {
-    return (root->leftChild == NULL ? root : getMin(root->leftChild));
+    Node *currentNode = root;
+    for (; currentNode->leftChild != NULL; currentNode = currentNode->leftChild)
+        ;
+    return currentNode;
 }
 
 Node *removeMin(Node *root)
@@ -298,14 +272,14 @@ void deleteDictionaryRecursion(Node *root)
     deleteNode(root);
 }
 
-void deleteDictionary(Dictionary **dictionary)
+void deleteDictionary(Dictionary **const dictionary)
 {
     deleteDictionaryRecursion((*dictionary)->root);
     free(*dictionary);
     *dictionary = NULL;
 }
 
-char *findNode(Node *root, char const *const key)
+static char *findNode(Node *const root, char const *const key)
 {
     if (root == NULL)
     {
@@ -317,14 +291,12 @@ char *findNode(Node *root, char const *const key)
     {
         return findNode(root->leftChild, key);
     }
-    else if (comparison < 0)
+    if (comparison < 0)
     {
         return findNode(root->rightChild, key);
     }
-    else
-    {
-        return root->value;
-    }
+    
+    return root->value;
 }
 
 char *getValue(Dictionary *const dictionary, char const *const key)

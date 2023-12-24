@@ -15,4 +15,4 @@ DictionaryErrorCode addElement(Dictionary *const dictionary, char *const key, ch
 char *getValue(Dictionary *const dictionary, char const *const key);
 bool keyCheck(Dictionary *const dictionary, char const *const key);
 void deleteElement(Dictionary *const dictionary, char const *const key);
-void deleteDictionary(Dictionary **dictionary);
+void deleteDictionary(Dictionary ** const dictionary);
