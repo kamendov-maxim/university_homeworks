@@ -4,12 +4,16 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define PROGRAM_FINISHED_CORRECTLY 0
-#define PROGRAM_FAILED_TESTS 1
-#define MEMORY_ERROR 2
-#define INPUT_ERROR 3
 #define ELEMENT_NOT_FOUND -1
 #define RANDINT_DIGITS_LIMIT 100
+
+typedef enum ExitCode 
+{
+    programFinishedCorrectly,
+    programFailedTests,
+    memoryError,
+    inputError
+} ExitCode;
 
 static void printArray(int const *const array, size_t const size)
 {
@@ -100,12 +104,12 @@ static const bool test(void)
    && testPartitionFunction();
 }
 
-int main()
+ExitCode main()
 {
     if (!test())
     {
         printf("\nSorry but the program does not work correctly\n");
-        return PROGRAM_FAILED_TESTS;
+        return programFailedTests;
     }
 
     printf("\nEnter the size of your array: ");
@@ -113,7 +117,7 @@ int main()
     if (scanf("%zd", &size) != 1)
     {
         printf("Input error\n");
-        return INPUT_ERROR;
+        return inputError;
     }
 
     while (size <= 0)
@@ -127,7 +131,7 @@ int main()
     if (array == NULL)
     {
         printf("\nNot enough memory\n");
-        return MEMORY_ERROR;
+        return memoryError;
     }
 
     generateRandomArray(array, size);
@@ -139,4 +143,6 @@ int main()
     printArray(array, size);
 
     free(array);
+
+    return programFinishedCorrectly;
 }
