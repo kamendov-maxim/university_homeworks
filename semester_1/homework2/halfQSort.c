@@ -47,7 +47,6 @@ static size_t partition(int *const array, size_t leftElement, size_t rightElemen
    return i;
 }
 
-
 static void generateRandomArray(int *const array, size_t const size)
 {
    srand((time(NULL)));
@@ -94,16 +93,12 @@ static const bool testPartitionFunction(void)
    && memcmp(testArray4, answerArray4, testSize4) == 0;
 }
 
-
 static const bool test(void)
 {
 
    return testSwapFunction()
    && testPartitionFunction();
 }
-
-
-
 
 int main()
 {
@@ -145,4 +140,3 @@ int main()
 
     free(array);
 }
-
