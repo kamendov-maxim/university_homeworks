@@ -1,6 +1,5 @@
 #pragma once
 
-#include <stdbool.h>
+#include <stdlib.h>
 
-void smartQuickSort(int array[], int leftElement, int rightElement);
-
+ void smartQuickSort(int *const array, size_t leftElement, size_t rightElement);

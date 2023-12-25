@@ -1,21 +1,21 @@
-#include "smartQuickSort.h"
-#include <stdlib.h>
 #include <stdbool.h>
 
-static void swap(int *firstValue, int *secondValue)
+#include "smartQuickSort.h"
+
+static void swap(int *const firstValue, int *const secondValue)
 {
     int buffer = *firstValue;
     *firstValue = *secondValue;
     *secondValue = buffer;
 }
 
-static int partition(int array[], int leftElement, int rightElement)
+static size_t partition(int *const array, size_t leftElement, size_t rightElement)
 {
     rightElement -= 1;
     int currentSeparator = array[leftElement];
-    int i = rightElement;
+    size_t i = rightElement;
 
-    for (int j = rightElement; j > leftElement; --j)
+    for (size_t j = rightElement; j > leftElement; --j)
     {
         if (array[j] >= currentSeparator)
         {
@@ -29,33 +29,37 @@ static int partition(int array[], int leftElement, int rightElement)
     return i;
 }
 
-int insertSort(int * const array, const int leftElement, const int rightElement)
+static void insertSort(int *const array, size_t rightElement)
 {
-    if (rightElement < leftElement)
-    {
-        return 1;
-    }
-
-    for (int i = leftElement; i < rightElement; ++i)
+    size_t leftElement = 0;
+    for (size_t i = leftElement + 1; i < rightElement; ++i)
     {
         int currentElement = array[i];
         int j = i - 1;
+        bool f = false;
         while (j >= leftElement && array[j] >= currentElement)
         {
             array[j + 1] = array[j];
+            f = true;
+            if (j == 0)
+            {
+                break;
+            }
             --j;
         }
-        array[j + 1] = currentElement;
+        if (f)
+        {
+            array[j] = currentElement;
+        }
     }
-    return 0;
 }
 
-void smartQuickSort(int * const array, const int leftElement, const int rightElement)
+void smartQuickSort(int *const array, size_t leftElement, size_t rightElement)
 {
-
     if (rightElement - leftElement + 1 < 10)
     {
-        int errorCode = insertSort(array, leftElement, rightElement + 1);
+        insertSort(array, rightElement + 1);
+        return;
     }
     if (leftElement < rightElement)
     {

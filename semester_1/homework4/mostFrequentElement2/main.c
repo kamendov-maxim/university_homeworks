@@ -1,129 +1,77 @@
 #include <stdio.h>
-#include <stdbool.h>
+#include <time.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
 
 #include "smartQuickSort/smartQuickSort.h"
 #include "smartQuickSort/tests/test.h"
+#include "mostFrequentElement/mostFrequentElement.h"
+#include "mostFrequentElement/tests/test.h"
+#include "readFile/readFile.h"
 
-#define filename "file.txt"
-#define PROGRAM_FINISHED_CORRECTLY 0
-#define TESTS_ARE_NOT_PASSES 1
-#define MEMORY_ERROR 2
-#define FILE_READING_ERROR 3
+#define FILENAME "../file.txt"
 
-static void printArray(int const *const array, size_t const size)
+typedef enum ExitCode
+{
+    programFinishedCorrectly,
+    programFailedTests,
+    memoryError,
+    fileReadingError,
+    fileOpeningError
+} ExitCode;
+
+static void printArray(int const *const array, const size_t size)
 {
     for (size_t i = 0; i < size; ++i)
     {
         printf("%d ", array[i]);
     }
-    printf('\n');
+    printf("\n");
 }
 
-static int mostFrequentElement(int *array, size_t size)
+const bool test(void)
 {
-    int mostFrequentElement = array[0];
-    int counter = 1;
-    int maxCount = 1;
-    for (int i = 1; i < size; ++i)
+    return testSmartQuickSort() && testMostFrequentElement();
+}
+
+ExitCode main()
+{
+    if (!test())
     {
-        if (array[i] == array[i - 1])
-        {
-            ++counter;
-            if (counter > maxCount)
-            {
-                maxCount = counter;
-                mostFrequentElement = array[i];
-            }
-        }
-        else
-        {
-            counter = 1;
-        }
+        printf("\nSorry but the program does not work correctly\n");
+        return programFailedTests;
     }
-    return mostFrequentElement;
-}
-
-static const bool testCaseForMostFrequentELement(int testArray[], int size, int answer)
-{
-    return mostFrequentElement(testArray, size) != answer;
-}
-
-static const bool testMostFrequentElementFunction(void)
-{
-    int testArray1[10] = {1, 3, 4, 4, 5, 6, 7, 7, 7, 8};
-    int answer1 = 7;
-
-    int testArray2[4] = {3, 0, 0, 5};
-    int answer2 = 0;
-
-    int testArray3[1] = {0};
-    int answer3 = 0;
-
-    return testCaseForMostFrequentELement(testArray1, 10, answer1) && testCaseForMostFrequentELement(testArray2, 4, answer2) && testCaseForMostFrequentELement(testArray3, 1, answer3);
-}
-
-static bool const test(void)
-{
-    return testMostFrequentElementFunction() && testSmartQuickSort();
-}
-
-static int *fileReading(char const *const fileName, size_t *const size)
-{
-    FILE *file = fopen(fileName, "r");
-    if (file == NULL)
-    {
-        exit(MEMORY_ERROR);
-    }
-
-    if (fscanf(file, "%zd", size) != 1)
-    {
-        fclose(file);
-        exit(FILE_READING_ERROR);
-    }
-
-    int *array = (int *)malloc((*size) * sizeof(int));
-    if (array == NULL)
-    {
-        fclose(file);
-        exit(MEMORY_ERROR);
-    }
-
-    for (size_t i = 0; i < *size; ++i)
-    {
-        if (fscanf(file, "%d", &array[i]) != 1)
-        {
-            fclose(file);
-            free(array);
-            exit(FILE_READING_ERROR);
-        }
-    }
-
-    fclose(file);
-    return array;
-}
-
-int main(void)
-{
-    // if (!test())
-    // {
-    //     printf("\nSorry but the program does not work correctly\n");
-    //     return testsAreNotPassedError;
-    // }
 
     size_t size = 0;
-    int *array = fileReading(filename, &size);
+    fileReadingErrorCode errorCode = okFR;
+    int *array = readArrayFromFile(FILENAME, &errorCode, &size);
+    if (array == NULL)
+    {
+        char *message = '/0';
+        switch (errorCode)
+        {
+        case openingFileErrorFR:
+            printf("Cannot open the file\n");
+            return fileOpeningError;
 
-    printf("Numbers from the file:\n");
+        case readingFileErrorFR:
+            printf("Error occured while reading from file\n");
+            return fileReadingError;
+
+        case memoryErrorFR:
+            printf("Not enough memory\n");
+            return memoryError;
+
+        default:
+            return fileReadingError;
+        }
+    }
+
+    printf("Array from file \"%s\": ", FILENAME);
     printArray(array, size);
-    printf("dasads");
-
-    smartQuickSort(array, 0, size - 1);
-    printf("sdad");
-
-    printf("\nThe most frequent element in the file is %d\n", mostFrequentElement(array, size + 1));
-    printArray(array, size);
+    printf("\nThe most frequent element in the array is %d\n", mostFrequentElement(array, size));
     free(array);
 
-    return PROGRAM_FINISHED_CORRECTLY;
+    return programFinishedCorrectly;
 }
