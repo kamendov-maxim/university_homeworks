@@ -2,12 +2,14 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 #define PROGRAM_FINISHED_CORRECTLY 0
 #define PROGRAM_FAILED_TESTS 1
 #define MEMORY_ERROR 2
 #define INPUT_ERROR 3
 #define ELEMENT_NOT_FOUND -1
+#define RANDINT_DIGITS_LIMIT 100
 
 static void printArray(int const *const array, size_t const size)
 {
@@ -51,18 +53,18 @@ static void insertSort(int *const array, size_t leftElement, size_t rightElement
    {
       int currentElement = array[i];
       int j = i - 1;
-      bool f = false;
+      bool arrayWasChanged = false;
       while (j >= leftElement && array[j] >= currentElement)
       {
          array[j + 1] = array[j];
-         f = true;
+         arrayWasChanged = true;
          if (j == 0)
          {
             break;
          }
          --j;
       }
-      if (f)
+      if (arrayWasChanged)
       {
          array[j] = currentElement;
       }
@@ -89,15 +91,16 @@ static void generateRandomArray(int *const array, size_t const size)
    srand((time(NULL)));
    for (int i = 0; i < size; ++i)
    {
-      array[i] = rand() % 100;
+      array[i] = rand() % RANDINT_DIGITS_LIMIT;
    }
 }
 
-static int binarySearch(int const *const array, int const elementWeAreLookingFor, int leftEdge, int rightEdge)
+static int binarySearch(int const *const array, int const elementWeAreLookingFor, size_t rightEdge)
 {
+   size_t leftEdge = 0;
    while (leftEdge <= rightEdge)
    {
-      int middleElement = leftEdge + (rightEdge - leftEdge) / 2;
+      size_t middleElement = leftEdge + (rightEdge - leftEdge) / 2;
       if (array[middleElement] == elementWeAreLookingFor)
       {
          return middleElement;
@@ -119,7 +122,7 @@ static int binarySearch(int const *const array, int const elementWeAreLookingFor
 
 static const bool binarySearchTestCase(int const *const testArray, const int elementWeAreLookingFor, const long answer, const size_t testSize)
 {
-   return binarySearch(testArray, elementWeAreLookingFor, 0, testSize) == answer;
+   return binarySearch(testArray, elementWeAreLookingFor, testSize) == answer;
 }
 
 static const bool testBinarySearch(void)
@@ -139,7 +142,9 @@ static const bool testBinarySearch(void)
    const int testElementWeAreLookingFor3 = 10;
    const long answer3 = -1;
 
-   return binarySearchTestCase(testArray1, testElementWeAreLookingFor1, answer1, testSize1) && binarySearchTestCase(testArray2, testElementWeAreLookingFor2, answer2, testSize2) && binarySearchTestCase(testArray3, testElementWeAreLookingFor3, answer3, testSize3);
+   return binarySearchTestCase(testArray1, testElementWeAreLookingFor1, answer1, testSize1)
+   && binarySearchTestCase(testArray2, testElementWeAreLookingFor2, answer2, testSize2)
+   && binarySearchTestCase(testArray3, testElementWeAreLookingFor3, answer3, testSize3);
 }
 
 static const bool testSwapFunction(void)
@@ -148,18 +153,6 @@ static const bool testSwapFunction(void)
    int secondValue = 1;
    swap(&firstValue, &secondValue);
    return firstValue == 1 && secondValue == 0;
-}
-
-static const bool compareArrays(int const *const testArray, int const *const answerArray, const size_t size)
-{
-   for (int i = 0; i < size; ++i)
-   {
-      if (testArray[i] != answerArray[i])
-      {
-         return false;
-      }
-   }
-   return true;
 }
 
 static const bool testPartitionFunction(void)
@@ -185,7 +178,10 @@ static const bool testPartitionFunction(void)
    partition(testArray3, 0, testSize3);
    partition(testArray4, 0, testSize4);
 
-   return compareArrays(testArray1, answerArray1, testSize1) && compareArrays(testArray2, answerArray2, testSize2) && compareArrays(testArray3, answerArray3, testSize3) && compareArrays(testArray4, answerArray4, testSize4);
+   return memcmp(testArray1, answerArray1, testSize1) == 0
+   && memcmp(testArray2, answerArray2, testSize2) == 0
+   && memcmp(testArray3, answerArray3, testSize3) == 0
+   && memcmp(testArray4, answerArray4, testSize4) == 0;
 }
 
 static const bool testSmartQuickSort(void)
@@ -206,13 +202,18 @@ static const bool testSmartQuickSort(void)
    smartQuickSort(testArray2, 0, testSize2 - 1);
    smartQuickSort(testArray3, 0, testSize3 - 1);
 
-   return compareArrays(testArray1, answerArray1, testSize1) && compareArrays(testArray2, answerArray2, testSize2) && compareArrays(testArray3, answerArray3, testSize3);
+   return memcmp(testArray1, answerArray1, testSize1) == 0
+   && memcmp(testArray2, answerArray2, testSize2) == 0
+   && memcmp(testArray3, answerArray3, testSize3) == 0;
 }
 
 static const bool test(void)
 {
 
-   return testSwapFunction() && testPartitionFunction() && testSmartQuickSort() && testBinarySearch();
+   return testSwapFunction()
+   && testPartitionFunction()
+   && testSmartQuickSort()
+   && testBinarySearch();
 }
 
 int main(void)
@@ -259,9 +260,12 @@ int main(void)
 
    for (size_t i = 0; i < k; ++i)
    {
-      int randomNumber = rand() % 100;
-      printf("test #%lu number: %d, answer: ", i + 1, randomNumber);
-      char * answer = (binarySearch(array, randomNumber, 0, size) == -1 ? "there is no such number in the array\n": "this number was found in the array\n");
+      int randomNumber = rand() % RANDINT_DIGITS_LIMIT;
+
+      printf("test #%lu", i+1);
+      printf(" number: % d", randomNumber);
+      printf(", answer: ");
+      char * answer = (binarySearch(array, randomNumber, size) == -1 ? "there is no such number in the array\n": "this number was found in the array\n");
       printf("%s", answer);
    }
    free(array);
