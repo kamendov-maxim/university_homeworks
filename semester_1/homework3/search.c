@@ -264,6 +264,7 @@ int main(void)
       char * answer = (binarySearch(array, randomNumber, 0, size) == -1 ? "there is no such number in the array\n": "this number was found in the array\n");
       printf("%s", answer);
    }
+   free(array);
 
    return PROGRAM_FINISHED_CORRECTLY;
 }
