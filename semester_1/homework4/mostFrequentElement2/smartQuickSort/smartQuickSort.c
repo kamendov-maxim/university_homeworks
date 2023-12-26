@@ -36,18 +36,18 @@ static void insertSort(int *const array, size_t rightElement)
     {
         int currentElement = array[i];
         int j = i - 1;
-        bool f = false;
+        bool arrayWasChanged = false;
         while (j >= leftElement && array[j] >= currentElement)
         {
             array[j + 1] = array[j];
-            f = true;
+            arrayWasChanged = true;
             if (j == 0)
             {
                 break;
             }
             --j;
         }
-        if (f)
+        if (arrayWasChanged)
         {
             array[j] = currentElement;
         }

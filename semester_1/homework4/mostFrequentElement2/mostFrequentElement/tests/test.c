@@ -18,6 +18,6 @@ const bool testMostFrequentElement(void)
     const int answer3 = 0;
 
     return mostFrequentElement(testArray1, testSize1) == answer1
-    && mostFrequentElement(testArray2, testSize2) == answer2
-    && mostFrequentElement(testArray3, testSize3) == answer3;
+                    && mostFrequentElement(testArray2, testSize2) == answer2
+                    && mostFrequentElement(testArray3, testSize3) == answer3;
 }

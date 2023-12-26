@@ -22,6 +22,6 @@ const bool testSmartQuickSort(void)
     smartQuickSort(testArray3, 0, testSize3 - 1);
 
     return memcmp(testArray1, answerArray1, testSize1) == 0
-    && memcmp(testArray2, answerArray2, testSize2) == 0
-    && memcmp(testArray3, answerArray3, testSize3) == 0;
+                    && memcmp(testArray2, answerArray2, testSize2) == 0
+                    && memcmp(testArray3, answerArray3, testSize3) == 0;
 }
