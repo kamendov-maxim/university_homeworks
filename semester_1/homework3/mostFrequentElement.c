@@ -79,18 +79,18 @@ static void insertSort(int *const array, size_t rightElement)
     {
         int currentElement = array[i];
         int j = i - 1;
-        bool f = false;
+        bool arrayWasChanged = false;
         while (j >= leftElement && array[j] >= currentElement)
         {
             array[j + 1] = array[j];
-            f = true;
+            arrayWasChanged = true;
             if (j == 0)
             {
                 break;
             }
             --j;
         }
-        if (f)
+        if (arrayWasChanged)
         {
             array[j] = currentElement;
         }
@@ -144,9 +144,9 @@ static const bool testPartitionFunction(void)
     partition(testArray4, 0, testSize4);
 
     return memcmp(testArray1, answerArray1, testSize1) == 0
-    && memcmp(testArray2, answerArray2, testSize2) == 0
-    && memcmp(testArray3, answerArray3, testSize3) == 0
-    && memcmp(testArray4, answerArray4, testSize4) == 0;
+                    && memcmp(testArray2, answerArray2, testSize2) == 0
+                    && memcmp(testArray3, answerArray3, testSize3) == 0
+                    && memcmp(testArray4, answerArray4, testSize4) == 0;
 }
 
 static const bool testSmartQuickSort(void)
@@ -168,8 +168,8 @@ static const bool testSmartQuickSort(void)
     smartQuickSort(testArray3, 0, testSize3 - 1);
 
     return memcmp(testArray1, answerArray1, testSize1) == 0
-    && memcmp(testArray2, answerArray2, testSize2) == 0
-    && memcmp(testArray3, answerArray3, testSize3) == 0;
+                    && memcmp(testArray2, answerArray2, testSize2) == 0
+                    && memcmp(testArray3, answerArray3, testSize3) == 0;
 }
 
 static const bool testMostFrequentElement(void)
@@ -187,16 +187,16 @@ static const bool testMostFrequentElement(void)
     const int answer3 = 0;
 
     return mostFrequentElement(testArray1, testSize1) == answer1
-    && mostFrequentElement(testArray2, testSize2) == answer2
-    && mostFrequentElement(testArray3, testSize3) == answer3;
+                    && mostFrequentElement(testArray2, testSize2) == answer2
+                    && mostFrequentElement(testArray3, testSize3) == answer3;
 }
 
 const bool test(void)
 {
     return testSwapFunction()
-    && testPartitionFunction()
-    && testSmartQuickSort()
-    && testMostFrequentElement();
+                    && testPartitionFunction()
+                    && testSmartQuickSort()
+                    && testMostFrequentElement();
 }
 
 ExitCode main()
@@ -237,6 +237,7 @@ ExitCode main()
         if (scanf("%d", &currentNumber) != 1)
         {
             printf("Input error\n");
+            free(array);
             return inputError;
         }
         array[i] = currentNumber;
