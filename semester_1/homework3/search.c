@@ -120,7 +120,8 @@ static int binarySearch(int const *const array, int const elementWeAreLookingFor
    return ELEMENT_NOT_FOUND;
 }
 
-static const bool binarySearchTestCase(int const *const testArray, const int elementWeAreLookingFor, const long answer, const size_t testSize)
+static const bool binarySearchTestCase(int const *const testArray,
+                                       const int elementWeAreLookingFor, const long answer, const size_t testSize)
 {
    return binarySearch(testArray, elementWeAreLookingFor, testSize) == answer;
 }
@@ -143,8 +144,8 @@ static const bool testBinarySearch(void)
    const long answer3 = -1;
 
    return binarySearchTestCase(testArray1, testElementWeAreLookingFor1, answer1, testSize1)
-   && binarySearchTestCase(testArray2, testElementWeAreLookingFor2, answer2, testSize2)
-   && binarySearchTestCase(testArray3, testElementWeAreLookingFor3, answer3, testSize3);
+               && binarySearchTestCase(testArray2, testElementWeAreLookingFor2, answer2, testSize2)
+               && binarySearchTestCase(testArray3, testElementWeAreLookingFor3, answer3, testSize3);
 }
 
 static const bool testSwapFunction(void)
@@ -178,10 +179,10 @@ static const bool testPartitionFunction(void)
    partition(testArray3, 0, testSize3);
    partition(testArray4, 0, testSize4);
 
-   return memcmp(testArray1, answerArray1, testSize1) == 0
-   && memcmp(testArray2, answerArray2, testSize2) == 0
-   && memcmp(testArray3, answerArray3, testSize3) == 0
-   && memcmp(testArray4, answerArray4, testSize4) == 0;
+   return memcmp(testArray1, answerArray1, testSize1)== 0
+               && memcmp(testArray2, answerArray2, testSize2) == 0
+               && memcmp(testArray3, answerArray3, testSize3) == 0
+               && memcmp(testArray4, answerArray4, testSize4) == 0;
 }
 
 static const bool testSmartQuickSort(void)
@@ -203,17 +204,17 @@ static const bool testSmartQuickSort(void)
    smartQuickSort(testArray3, 0, testSize3 - 1);
 
    return memcmp(testArray1, answerArray1, testSize1) == 0
-   && memcmp(testArray2, answerArray2, testSize2) == 0
-   && memcmp(testArray3, answerArray3, testSize3) == 0;
+               && memcmp(testArray2, answerArray2, testSize2) == 0
+               && memcmp(testArray3, answerArray3, testSize3) == 0;
 }
 
 static const bool test(void)
 {
 
    return testSwapFunction()
-   && testPartitionFunction()
-   && testSmartQuickSort()
-   && testBinarySearch();
+               && testPartitionFunction()
+               && testSmartQuickSort()
+               && testBinarySearch();
 }
 
 int main(void)
@@ -262,10 +263,12 @@ int main(void)
    {
       int randomNumber = rand() % RANDINT_DIGITS_LIMIT;
 
-      printf("test #%lu", i+1);
+      printf("test #%lu", i + 1);
       printf(" number: % d", randomNumber);
       printf(", answer: ");
-      char * answer = (binarySearch(array, randomNumber, size) == -1 ? "there is no such number in the array\n": "this number was found in the array\n");
+      char *answer = (binarySearch(array, randomNumber, size) == -1
+                  ? "there is no such number in the array\n"
+                  : "this number was found in the array\n");
       printf("%s", answer);
    }
    free(array);
