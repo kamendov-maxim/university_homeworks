@@ -92,19 +92,19 @@ static const bool testPartitionFunction(void)
    partition(testArray4, 0, testSize4);
 
    return memcmp(testArray1, answerArray1, testSize1) == 0
-   && memcmp(testArray2, answerArray2, testSize2) == 0
-   && memcmp(testArray3, answerArray3, testSize3) == 0
-   && memcmp(testArray4, answerArray4, testSize4) == 0;
+      && memcmp(testArray2, answerArray2, testSize2) == 0
+      && memcmp(testArray3, answerArray3, testSize3) == 0
+      && memcmp(testArray4, answerArray4, testSize4) == 0;
 }
 
 static const bool test(void)
 {
 
    return testSwapFunction()
-   && testPartitionFunction();
+      && testPartitionFunction();
 }
 
-ExitCode main()
+int main(void)
 {
     if (!test())
     {
