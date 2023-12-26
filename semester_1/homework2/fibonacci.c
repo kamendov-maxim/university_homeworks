@@ -1,91 +1,183 @@
 #include <stdio.h>
 #include <stdbool.h>
-#include <time.h>
 
-bool checkIfNumberIsCorrect(int n)
+int iterativeFibonacci(int number, long long int *answer);
+int recursiveFibonacci(int number, long long int *answer);
+long long int recursiveFibonacciBody(int number);
+bool correctInputCheckForRecursiveFunction(int number);
+bool testIterativeFunction(void);
+bool testRecursiveFunction(void);
+bool test(void);
+
+int main()
 {
-    if (n < 1)
+
+    if (!test())
+    {
+        printf("\nSorry but the program does not work correctly\n");
+        return 1;
+    }
+
+    printf("\nEnter the number of fbonacci number you want to see: ");
+    int number = 0;
+    int scanfNumberOfElements = scanf("%d", &number);
+
+    if (scanfNumberOfElements != 1)
+    {
+        printf("\nSorry but something went wrong\n");
+        return 1;
+    }
+
+    long long int iterativeAnswer = 0;
+    int errorCode1 = iterativeFibonacci(number, &iterativeAnswer);
+    if (errorCode1 != 0)
+    {
+        printf("\nSorry but something went wrong\n");
+        return 1;
+    }
+
+    long long int recursiveAnswer = 0;
+    int errorCode2 = recursiveFibonacci(number, &recursiveAnswer);
+    if (errorCode2 != 0)
+    {
+        printf("\nSorry but something went wrong\n");
+        return 1;
+    }
+
+    if (iterativeAnswer != recursiveAnswer)
+    {
+        printf("\nSorry but something went wrong\n");
+        return 1;
+    }
+
+    printf("\nResult of work of iterative function: %lld", iterativeAnswer);
+    printf("\nResult of work of recursive function: %lld\n", recursiveAnswer);
+
+    return 0;
+}
+
+int iterativeFibonacci(int number, long long int *answer)
+{
+    if (number < 1)
+    {
+        *answer = -1;
+        return 1;
+    }
+
+    long long int currentNumbers[3] = {1, 1, 2};
+
+    if (number < 4)
+    {
+        *answer = currentNumbers[number - 1];
+        return 0;
+    }
+
+    for (int n = 2; n <= number; ++n)
+    {
+        currentNumbers[2] = currentNumbers[1] + currentNumbers[0];
+        currentNumbers[0] = currentNumbers[1];
+        currentNumbers[1] = currentNumbers[2];
+    }
+
+    *answer = currentNumbers[0];
+    return 0;
+}
+
+int recursiveFibonacci(int number, long long int *answer)
+{
+    if (!correctInputCheckForRecursiveFunction(number))
+    {
+        return 1;
+    }
+
+    *answer = recursiveFibonacciBody(number);
+
+    return 0;
+}
+
+long long int recursiveFibonacciBody(int number)
+{
+    if (number == 0)
+    {
+        return 0;
+    }
+    if (number == 1)
+    {
+        return 1;
+    }
+    return recursiveFibonacciBody(number - 1) + recursiveFibonacciBody(number - 2);
+}
+
+bool correctInputCheckForRecursiveFunction(int number)
+{
+    if (number < 1)
     {
         return false;
     }
     return true;
 }
 
-int iterativeFibonacci(int number)
+bool testIterativeFunction(void)
 {
-
-    if (number <= 3)
+    long long int test1 = 0;
+    int errorCode1 = iterativeFibonacci(-5, &test1);
+    if (errorCode1 != 1)
     {
-        int firstThreeNumbers[3] = {1, 1, 2};
-        return firstThreeNumbers[number - 1];
+        return false;
     }
 
-    int previousNumber = 1;
-    int previousNumberForPreviousNumber = 1;
-    int currentNumber = 1;
-    int buffer = 0;
-
-    for (int i = 2; i < number; i++)
+    long long int test2 = 0;
+    int errorCode2 = iterativeFibonacci(3, &test2);
+    if (test2 != 2 || errorCode2 != 0)
     {
-        previousNumberForPreviousNumber = previousNumber;
-        previousNumber = currentNumber;
-        currentNumber = previousNumber + previousNumberForPreviousNumber;
+        return false;
     }
 
-    return currentNumber;
+    long long int test3 = 0;
+    int errorCode3 = iterativeFibonacci(21, &test3);
+    if (test3 != 10946 || errorCode3 != 0)
+    {
+        return false;
+    }
+    return true;
 }
 
-int recursiveFibonacci(int number)
+bool testRecursiveFunction(void)
 {
-
-    if (number == 0)
+    long long int test1 = 0;
+    int errorCode1 = recursiveFibonacci(-5, &test1);
+    if (errorCode1 != 1)
     {
-        return 0;
+        return false;
     }
 
-    if (number == 1)
+    long long int test2 = 0;
+    int errorCode2 = recursiveFibonacci(3, &test2);
+    if (test2 != 2 || errorCode2 != 0)
     {
-        return 1;
+        return false;
     }
 
-    return recursiveFibonacci(number - 2) + recursiveFibonacci(number - 1);
+    long long int test3 = 0;
+    int errorCode3 = recursiveFibonacci(21, &test3);
+    if (test3 != 10946 || errorCode3 != 0)
+    {
+        return false;
+    }
+    return true;
 }
 
-int timeComparison()
+bool test(void)
 {
-    float recursiveFunctionTimeOfWork = 1;
-    float iterativeFunctionTimeOfWork = 1;
-    int i = 1;
-    while (recursiveFunctionTimeOfWork / iterativeFunctionTimeOfWork < 2.0)
+    if (!testIterativeFunction())
     {
-
-        float startTimeOfWorkIterative, finishTimeOfWorkIterative;
-        startTimeOfWorkIterative = clock();
-        int iterativeFunctionWorkResult = iterativeFibonacci(i);
-        finishTimeOfWorkIterative = clock();
-        iterativeFunctionTimeOfWork = finishTimeOfWorkIterative - startTimeOfWorkIterative;
-
-        float startTimeOfWorkRecursive, finishTimeOfWorkRecursive;
-        startTimeOfWorkRecursive = clock();
-        int recursiveFunctionWorkResult = recursiveFibonacci(i);
-        finishTimeOfWorkRecursive = clock();
-        recursiveFunctionTimeOfWork = finishTimeOfWorkRecursive - startTimeOfWorkRecursive;
-
-        if (iterativeFunctionWorkResult != recursiveFunctionWorkResult)
-        {
-            printf("Different answers for same arguments");
-            return 0;
-        }
-        printf("%f", recursiveFunctionTimeOfWork / iterativeFunctionTimeOfWork);
-        
+        return false;
     }
-    return i;
-}
 
-int main()
-{
+    if (!testRecursiveFunction())
+    {
+        return false;
+    }
 
-    printf("%d", timeComparison());
-
-    return 0;
+    return true;
 }
