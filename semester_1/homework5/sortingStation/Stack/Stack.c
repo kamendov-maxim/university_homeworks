@@ -78,25 +78,7 @@ char topElement(Stack const *const stack, StackErrorCode *const errorCode)
     return stack->head->value;
 }
 
-static void addToString(Node *const node, char *output, size_t i)
-{
-    if (node == NULL)
-    {
-        return;
-    }
-
-    if (node->next == NULL)
-    {
-        output[i] = node->value;
-        output[i + 1] = ' ';
-        return;
-    }
-    addToString(node->next, output, i - 2);
-    output[i] = node->value;
-    output[i + 1] = ' ';
-}
-
-char *createString(Stack const *const stack, StackErrorCode *errorCode)
+char *createString(Stack const *const stack, StackErrorCode *const errorCode)
 {
     if (stack == NULL || stack->head == NULL)
     {
@@ -104,14 +86,22 @@ char *createString(Stack const *const stack, StackErrorCode *errorCode)
         return NULL;
     }
 
-    char *output = (char *)malloc((stack->length) * 2 * sizeof(char));
+    size_t strl = stack->length * 2;
+    char *output = (char *)malloc(strl * sizeof(char));
     if (output == NULL)
     {
         *errorCode = memoryErrorStack;
         return NULL;
     }
-    size_t strl = stack->length * 2;
-    addToString(stack->head, output, strl - 2);
+
+    size_t i = strl - 1;
+    for (Node *currentNode = stack->head; currentNode != NULL; currentNode = currentNode->next)
+    {
+        output[i - 1] = currentNode->value;
+        output[i] = ' ';
+        i -= 2;
+    }
+
     output[strl - 1] = '\0';
     return output;
 }
