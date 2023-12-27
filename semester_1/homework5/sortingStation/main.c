@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <locale.h>
+#include <stdlib.h>
 
 #include "sortingStation/sortingStation.h"
 #include "getString/getString.h"
@@ -33,6 +34,14 @@ int main(void)
     
     printf("\nВыражение в постфиксной форме: ");
     char * ex = createPostfixForm(expression);
+    free(expression);
+    if (ex == NULL)
+    {
+        printf("\nНедостаточно памяти\n");
+        return memoryError;
+    }
+    
     printf("%s\n", ex);
+    free(ex);
     return programFinishedCorrectly;
 }

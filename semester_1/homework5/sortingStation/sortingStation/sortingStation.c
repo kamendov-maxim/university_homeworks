@@ -88,12 +88,6 @@ char *createPostfixForm(char const *const infixForm)
         else
         {
             char top = topElement(operatorsStack, &ec);
-            if (ec != okStack)
-            {
-                deleteStack(&operatorsStack);
-                deleteStack(&outputStack);
-                return NULL;
-            }
             int comparison = compareOperators(top, currentChar);
             while (ec != emptyStack && top != '(' && comparison != -1)
             {
@@ -113,5 +107,7 @@ char *createPostfixForm(char const *const infixForm)
     }
     ec = moveToOutputStack(outputStack, operatorsStack);
     char *output = createString(outputStack, &ec);
+    deleteStack(&operatorsStack);
+    deleteStack(&outputStack);
     return output;
 }
