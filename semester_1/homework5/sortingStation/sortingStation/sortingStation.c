@@ -93,6 +93,12 @@ char *createPostfixForm(char const *const infixForm)
             {
                 char operatorFromStack = getElement(operatorsStack, &ec);
                 ec = addElement(outputStack, operatorFromStack);
+                if (ec != okStack)
+                {
+                    deleteStack(&operatorsStack);
+                    deleteStack(&outputStack);
+                    return NULL;
+                }
                 top = topElement(operatorsStack, &ec);
                 comparison = compareOperators(top, currentChar);
             }

@@ -24,5 +24,4 @@ char getElement(Stack *const stack, StackErrorCode * const errorCode);
 char topElement(Stack const *const stack, StackErrorCode *const errorCode);
 
 // получить строку со всеми значениями стека, где самый правый элемент - самый верхний элемент стека
-char *createString(Stack const *const stack, StackErrorCode *errorCode);
-
+char *createString(Stack const *const stack, StackErrorCode * const errorCode);

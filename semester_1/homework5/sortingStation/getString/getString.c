@@ -4,7 +4,7 @@
 
 #include "getString.h"
 
-char *getString(FILE * file, char const endOfLine)
+char *getString(FILE const * const file, char const endOfLine)
 {
     size_t len = 0;
     size_t capacity = 1;
