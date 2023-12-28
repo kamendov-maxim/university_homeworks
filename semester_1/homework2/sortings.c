@@ -10,6 +10,7 @@
 #define BUBBLE_SORT_ARRAY_ERROR 4
 #define INPUT_ERROR 5
 #define TEST_ARRAY_SIZE 100000
+#define RAND_LIMIT 1000000
 
 typedef enum SortingErrorCode
 {
@@ -122,7 +123,7 @@ static float compareTime(bool *const memoryError)
     srand(time(NULL));
     for (size_t i = 0; i < TEST_ARRAY_SIZE; ++i)
     {
-        int randomNumber = rand();
+        int randomNumber = rand() % RAND_LIMIT;
         array1[i] = randomNumber;
         array2[i] = randomNumber;
     }
@@ -166,7 +167,8 @@ static bool checkIfArrayIsSorted(int const *const array, size_t size)
     return true;
 }
 
-static const bool testCase(int *const testArray, SortingErrorCode (*sortingFunction)(int *const, const size_t), const size_t testArraySize)
+static const bool testCase(int *const testArray,
+                           SortingErrorCode (*sortingFunction)(int *const, const size_t), const size_t testArraySize)
 {
     int *tempArray = (int *)malloc(testArraySize);
     if (tempArray == NULL)
@@ -174,13 +176,11 @@ static const bool testCase(int *const testArray, SortingErrorCode (*sortingFunct
         return false;
     }
 
-    for (size_t i = 0; i < testArraySize; ++i)
-    {
-        tempArray[i] = testArray[i];
-    }
+    memcpy(tempArray, testArray, testArraySize * sizeof(int));
 
     if (sortingFunction(tempArray, testArraySize) != ok)
     {
+        free(tempArray);
         return false;
     }
 
