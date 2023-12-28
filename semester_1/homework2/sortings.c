@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 
 #define PROGRAM_FINISHED_CORRECTLY 0
 #define PROGRAM_FAILED_TESTS 1
@@ -8,8 +9,7 @@
 #define COUNTING_SORT_ARRAY_ERROR 3
 #define BUBBLE_SORT_ARRAY_ERROR 4
 #define INPUT_ERROR 5
-
-#define SOMETHING_WENT_WRONG_MESSAGE "\nSorry but something went wrong\n"
+#define TEST_ARRAY_SIZE 100000
 
 typedef enum SortingErrorCode
 {
@@ -17,19 +17,12 @@ typedef enum SortingErrorCode
     memoryError
 } SortingErrorCode;
 
-void bubbleSort(int *const array, const size_t size);
-SortingErrorCode countingSort(int array[], const size_t size);
-bool test(void);
-bool checkIfArrayIsSorted(int const *const array, size_t size);
-bool testBubbleSort(void);
-bool testCountingSort(void);
-void printArray(int const *const array, const size_t size);
-
-void bubbleSort(int *const array, const size_t size)
+// errorCode всегда ок, чтобы была одинаковая сигнатура с countingSort
+static SortingErrorCode bubbleSort(int *const array, const size_t size)
 {
     if (size == 0)
     {
-        return;
+        return ok;
     }
 
     int buffer;
@@ -54,9 +47,10 @@ void bubbleSort(int *const array, const size_t size)
         ++i;
 
     } while (alreadySwapped);
+    return ok;
 }
 
-void printArray(int const *const array, const size_t size)
+static void printArray(int const *const array, const size_t size)
 {
     for (size_t i = 0; i < size; ++i)
     {
@@ -73,49 +67,93 @@ SortingErrorCode countingSort(int *const array, const size_t size)
     }
 
     int maxElement = array[0];
+    int minElement = array[0];
     for (size_t i = 0; i < size; ++i)
     {
-        if (array[i] > maxElement)
+        if (maxElement < array[i])
         {
             maxElement = array[i];
         }
+        if (minElement > array[i])
+        {
+            minElement = array[i];
+        }
     }
-
-    int *countArray = malloc(maxElement * sizeof(int));
+    const int countingArraySize = maxElement - minElement + 1;
+    int *countArray = (int *)calloc(countingArraySize, sizeof(int));
     if (countArray == NULL)
     {
         return memoryError;
     }
-
     for (size_t i = 0; i < size; ++i)
     {
-        ++countArray[array[i]];
+        ++countArray[array[i] - minElement];
     }
-
-    for (size_t i = 1; i < maxElement; ++i)
+    size_t currentIndex = 0;
+    for (int i = 0; i < countingArraySize; ++i)
     {
-        countArray[i] += countArray[i - 1];
+        for (size_t j = currentIndex; j < countArray[i] + currentIndex; ++j)
+        {
+            array[j] = i + minElement;
+        }
+        currentIndex += countArray[i];
     }
-
-    for (size_t i = maxElement; i > 0; --i)
-    {
-        countArray[i] = countArray[i - 1];
-    }
-    countArray[0] = 0;
-
-    for (size_t i = 0; i < size; ++i)
-    {
-        int temp = array[i];
-        array[countArray[array[i]]] = array[i];
-        ++countArray[temp];
-    }
-
     free(countArray);
     return ok;
 }
 
-bool checkIfArrayIsSorted(int const *const array, size_t size)
+static float compareTime(bool *const memoryError)
 {
+    int *array1 = (int *)malloc(TEST_ARRAY_SIZE * sizeof(int));
+    if (array1 == NULL)
+    {
+        *memoryError = true;
+        return 0;
+    }
+
+    int *array2 = (int *)malloc(TEST_ARRAY_SIZE * sizeof(int));
+    if (array2 == NULL)
+    {
+        *memoryError = true;
+        free(array1);
+        return 0;
+    }
+
+    srand(time(NULL));
+    for (size_t i = 0; i < TEST_ARRAY_SIZE; ++i)
+    {
+        int randomNumber = rand();
+        array1[i] = randomNumber;
+        array2[i] = randomNumber;
+    }
+
+    time_t startTime1 = time(NULL);
+    bubbleSort(array1, TEST_ARRAY_SIZE);
+    time_t finishTime1 = time(NULL);
+    double time1 = difftime(finishTime1, startTime1);
+    free(array1);
+
+    time_t startTime2 = time(NULL);
+    SortingErrorCode ec = countingSort(array2, TEST_ARRAY_SIZE);
+    time_t finishTime2 = time(NULL);
+    double time2 = difftime(finishTime2, startTime2);
+    free(array2);
+    if (ec != ok)
+    {
+        *memoryError = true;
+        return 0;
+    }
+    *memoryError = false;
+
+    return time1 - time2;
+}
+
+static bool checkIfArrayIsSorted(int const *const array, size_t size)
+{
+    if (size == 1)
+    {
+        return true;
+    }
     int previousElement = array[0];
     for (size_t i = 1; i < size; ++i)
     {
@@ -123,11 +161,12 @@ bool checkIfArrayIsSorted(int const *const array, size_t size)
         {
             return false;
         }
+        previousElement = array[i];
     }
     return true;
 }
 
-static const bool testCase(int *const testArray, void * (*sortingFunction)(int *const, const size_t), const size_t testArraySize)
+static const bool testCase(int *const testArray, SortingErrorCode (*sortingFunction)(int *const, const size_t), const size_t testArraySize)
 {
     int *tempArray = (int *)malloc(testArraySize);
     if (tempArray == NULL)
@@ -140,7 +179,7 @@ static const bool testCase(int *const testArray, void * (*sortingFunction)(int *
         tempArray[i] = testArray[i];
     }
 
-    if (sortingFunction(tempArray, testArraySize) == ok)
+    if (sortingFunction(tempArray, testArraySize) != ok)
     {
         return false;
     }
@@ -150,7 +189,7 @@ static const bool testCase(int *const testArray, void * (*sortingFunction)(int *
     return answer;
 }
 
-bool test(void)
+static bool test(void)
 {
     const size_t amountOfTests = 10;
     const size_t testArraySize = 10;
@@ -162,7 +201,7 @@ bool test(void)
 
     for (size_t i = 0; i < amountOfTests; ++i)
     {
-        if (!(testCase(tests[i], bubbleSort, testArraySize) && testCase(tests[i], countingSort, testArraySize)))
+        if (!(testCase(tests[i], &bubbleSort, testArraySize) && testCase(tests[i], &countingSort, testArraySize)))
         {
             return false;
         }
@@ -170,7 +209,7 @@ bool test(void)
     return true;
 }
 
-int main()
+int main(void)
 {
     if (!test())
     {
@@ -178,67 +217,26 @@ int main()
         return PROGRAM_FAILED_TESTS;
     }
 
-    size_t size = 0;
-    while (size == 0)
+    bool memoryError = false;
+    float timeDif = compareTime(&memoryError);
+    if (memoryError)
     {
-        printf("Enter the size of your array: ");
-        scanf("%zd", &size);
-        if (scanf("%zd", &size) != 1)
-        {
-            return INPUT_ERROR;
-        }
-        if (size == 0)
-        {
-            printf("\nSize of your array should be at least 1\n");
-        }
-    }
-
-    int *countingSortArray = (int *)malloc(size * sizeof(int));
-    if (countingSortArray == NULL)
-    {
-        printf("%s", SOMETHING_WENT_WRONG_MESSAGE);
+        printf("Недостаточно памяти\n");
         return MEMORY_ERROR;
     }
 
-    int *bubbleSortArray = (int *)malloc(size * sizeof(int));
-    if (bubbleSortArray == NULL)
+    if (timeDif < 0)
     {
-        printf("%s", SOMETHING_WENT_WRONG_MESSAGE);
-        free(countingSortArray);
-        return 1;
+        printf("Counting sort was %f seconds slower\n", timeDif * -1);
     }
-
-    int currentElement = 0;
-    for (int i = 0; i < size; ++i)
+    else if (timeDif > 0)
     {
-        printf("Enter the element number %d: ", i + 1);
-        scanf("%d", &currentElement);
-        countingSortArray[i] = currentElement;
-        bubbleSortArray[i] = currentElement;
+        printf("Bubble sort was %f seconds slower\n", timeDif);
     }
-
-    int errorCode = countingSort(countingSortArray, size);
-
-    if (errorCode == 1)
+    else
     {
-        printf("%s", SOMETHING_WENT_WRONG_MESSAGE);
-        free(bubbleSortArray);
-        free(countingSortArray);
-        return COUNTING_SORT_ARRAY_ERROR;
+        printf("Time of work of counting sort and bubble sort was equal\n");
     }
-
-    bubbleSort(bubbleSortArray, size);
-
-    printf("\nResult of work of counting sort: \n");
-    printArray(countingSortArray, size);
-
-    printf("\nResult of work of bubble sort: \n");
-    printArray(bubbleSortArray, size);
-
-    printf("\n");
-
-    free(bubbleSortArray);
-    free(countingSortArray);
 
     return PROGRAM_FINISHED_CORRECTLY;
 }
